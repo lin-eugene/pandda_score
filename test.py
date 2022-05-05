@@ -22,9 +22,6 @@ structure = gemmi.read_structure(filename_structure)
 map = gemmi.read_ccp4_map(filename_map,setup=True)
 
 coord = gemmi.Position(9.458363688, 34.30846021, 35.98092784)
-print(type(coord))
-print(dir(coord))
-print(coord.x)
 map.grid.set_points_around(coord,radius=10,value=0)
 map.grid.symmetrize_max()
 
