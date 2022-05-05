@@ -20,20 +20,17 @@ filename_map = 'BAZ2BA-x481/BAZ2BA-x481-event_1_1-BDC_038_map,native.ccp4'
 
 structure = gemmi.read_structure(filename_structure)
 map = gemmi.read_ccp4_map(filename_map,setup=True)
-print(map.grid)
-print(map.grid.spacing)
 
-#TODO — need Angstrom to voxel conversion
-distance = 30 #still need to convert this into Angstroms
+distance = 30 #TOOD — need to convert this into Angstroms (Angstrom to voxel coordinate conversion)
 
 density = np.array(map.grid, copy=False)
 
 x,y,z = np.indices(density.shape)
 
 coord = np.array([9.458363688, 34.30846021, 35.98092784])/map.grid.spacing
-coord = np.array([9.639798479316351, 34.343529790592804, 35.665502553889404])/map.grid.spacing
+#coord = np.array([9.639798479316351, 34.343529790592804, 35.665502553889404])/map.grid.spacing
 
-edf = np.sqrt((x-coord[2])**2 + (y-coord[1])**2 + (z-coord[0])**2)
+edf = np.sqrt((x-coord[0])**2 + (y-coord[1])**2 + (z-coord[1])**2)
 
 mask = edf < distance
 
@@ -47,17 +44,17 @@ ccp4_out.grid.spacegroup = map.grid.spacegroup
 ccp4_out.update_ccp4_header()
 ccp4_out.write_ccp4_map('out.ccp4')
 
-#plotting
+# #plotting
 
-x =  np.linspace(0,map.grid.unit_cell.a, num=density.shape[0], endpoint=False)
-y =  np.linspace(0,map.grid.unit_cell.b, num=density.shape[1], endpoint=False)
-xx,yy = np.meshgrid(x, y, indexing='ij')
+# x =  np.linspace(0,map.grid.unit_cell.a, num=density.shape[0], endpoint=False)
+# y =  np.linspace(0,map.grid.unit_cell.b, num=density.shape[1], endpoint=False)
+# xx,yy = np.meshgrid(x, y, indexing='ij')
 
-plt.subplot(121)
-plt.contour(xx,yy, density[:,:,36])
+# plt.subplot(121)
+# plt.contour(xx,yy, density[:,:,36])
 
-plt.subplot(122)
-plt.contour(xx,yy, density_modified[:,:,36])
-plt.show()
+# plt.subplot(122)
+# plt.contour(xx,yy, density_modified[:,:,36])
+# plt.show()
 
 
