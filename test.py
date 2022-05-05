@@ -21,28 +21,35 @@ filename_map = 'BAZ2BA-x481/BAZ2BA-x481-event_1_1-BDC_038_map,native.ccp4'
 structure = gemmi.read_structure(filename_structure)
 map = gemmi.read_ccp4_map(filename_map,setup=True)
 
-distance = 30 #TOOD — need to convert this into Angstroms (Angstrom to voxel coordinate conversion)
+coord = gemmi.Position(9.458363688, 34.30846021, 35.98092784)
+print(type(coord))
+print(dir(coord))
+print(coord.x)
+map.grid.set_points_around(coord,radius=10,value=0)
+map.grid.symmetrize_max()
 
-density = np.array(map.grid, copy=False)
-
-x,y,z = np.indices(density.shape)
-
-coord = np.array([9.458363688, 34.30846021, 35.98092784])/map.grid.spacing
-#coord = np.array([9.639798479316351, 34.343529790592804, 35.665502553889404])/map.grid.spacing
-
-edf = np.sqrt((x-coord[0])**2 + (y-coord[1])**2 + (z-coord[1])**2)
-
-mask = edf < distance
-
-density_modified = density * mask
-
-#writing out map
-ccp4_out = gemmi.Ccp4Map()
-ccp4_out.grid = gemmi.FloatGrid(density_modified)
-ccp4_out.grid.unit_cell = map.grid.unit_cell
-ccp4_out.grid.spacegroup = map.grid.spacegroup
-ccp4_out.update_ccp4_header()
+ccp4_out = map
 ccp4_out.write_ccp4_map('out.ccp4')
+
+# mask = map.grid.clone()
+# mask.fill(0)
+# mask.set_points_around(coord,radius=10,value=1)
+
+
+# # x,y,z = np.indices(map.grid.shape)
+# # edf = np.sqrt((x-coord[0])**2 + (y-coord[1])**2 + (z-coord[1])**2) #compute Euclidean distance field
+
+# # mask = edf < distance #mask excluding region 
+
+# density_modified = map.grid.array * mask.array
+
+# #writing out map
+# ccp4_out = gemmi.Ccp4Map()
+# ccp4_out.grid = gemmi.FloatGrid(density_modified)
+# ccp4_out.grid.unit_cell = map.grid.unit_cell
+# ccp4_out.grid.spacegroup = map.grid.spacegroup
+# ccp4_out.update_ccp4_header()
+# ccp4_out.write_ccp4_map('out.ccp4')
 
 # #plotting
 
