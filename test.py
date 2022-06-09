@@ -21,9 +21,20 @@ filename_map = 'BAZ2BA-x481/BAZ2BA-x481-event_1_1-BDC_038_map,native.ccp4'
 structure = gemmi.read_structure(filename_structure)
 map = gemmi.read_ccp4_map(filename_map,setup=True)
 
-coord = gemmi.Position(9.458363688, 34.30846021, 35.98092784)
-map.grid.set_points_around(coord,radius=10,value=0)
-map.grid.symmetrize_max()
+print(map.grid.spacegroup)
+
+def remove_density(x,y,z,map):
+    """
+    Masks out electron density at specified Cartesian coordinates
+    x,y,z — coordinates
+    map — gemmi map class
+    """
+    coord = gemmi.Position(x, y, z)
+    map.grid.set_points_around(coord,radius=1,value=0)
+    map.grid.symmetrize_min
+
+remove_density(14.49,39.87,29.69,map)
+
 
 ccp4_out = map
 ccp4_out.write_ccp4_map('out.ccp4')
