@@ -1,3 +1,4 @@
 #ignore data files
 data/
 BAZ2BA-x481/
+*.ccp4
