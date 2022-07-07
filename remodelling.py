@@ -135,7 +135,7 @@ class pandda_remodel():
         else:
             for i, mtz in enumerate(self.mtzs):
                 print(f'parsing event {str(mtz)}')
-                print(f'running phenix_rsr for dataset {str(mtz)} ({i+1} of {len(self.mtzs)})')
+                print(f'running buccanneer for dataset {str(mtz)} ({i+1} of {len(self.mtzs)})')
 
                 pdb = str(self.pdbs[f"{mtz.parent.parent.parent.name}"])
                 fasta = str(self.fasta[f"{mtz.parent.parent.parent.name}"])
