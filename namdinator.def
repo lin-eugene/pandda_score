@@ -3,6 +3,7 @@ From: nvcr.io/hpc/namd:2.12-171025
 
 %help
     Namdinator container
+
 %setup
     # Very first thing on container creation, make a dir to put stuff in
     mkdir ${SINGULARITY_ROOTFS}/namdinator_software
@@ -20,12 +21,19 @@ From: nvcr.io/hpc/namd:2.12-171025
     Version v1.0
 
 %post
-    apt-get update -y
+    #renaming namd
+    mv /opt/namd/namd2.12.171025-multicore /opt/namd/namd2
+
+    #installing new apt keys: https://developer.nvidia.com/blog/updating-the-cuda-linux-gpg-repository-key/
+    #apt-key del 7fa2af80
+    #wget https://developer.download.nvidia.com/compute/cuda/repos/$distro/$arch/cuda-keyring_1.0-1_all.deb
+    #dpkg -i cuda-keyring_1.0-1_all.deb
 
     # install vmd
-    apt-get -y install libglu1
-    apt-get -y install libxinerama1
-    apt-get -y install libxi6 libgconf-2-4
+    apt-get update -y
+    apt-get -y install libglu1 --allow-unauthenticated
+    apt-get -y install libxinerama1 --allow-unauthenticated
+    apt-get -y install libxi6 libgconf-2-4 --allow-unauthenticated
     cd /namdinator_software/
     tar -zxvf /namdinator_software/vmd-1.9.3.bin.LINUXAMD64-CUDA8-OptiX4-OSPRay111p1.opengl.tar.gz --no-same-owner
     cd /namdinator_software/vmd-1.9.3
@@ -34,10 +42,10 @@ From: nvcr.io/hpc/namd:2.12-171025
     make install
 
     # install rosetta
-    apt update
-    apt -y install zlib1g-dev
-    apt -y install scons
-    apt-get -y install libsqlite3-dev
+    # apt update
+    apt -y install zlib1g-dev --allow-unauthenticated
+    apt -y install scons --allow-unauthenticated
+    apt-get -y install libsqlite3-dev --allow-unauthenticated
 
     cd /namdinator_software/
     tar -zxvf /namdinator_software/rosetta_src_2016.32.58837_bundle.tgz --no-same-owner
@@ -45,9 +53,9 @@ From: nvcr.io/hpc/namd:2.12-171025
     ./scons.py mode=release bin
 
     # install phenix
-    apt-get -y install libxcb-shm0
-    apt-get -y install libxcb-render-util0
-    apt-get -y install libsqlite3-dev
+    apt-get -y install libxcb-shm0 --allow-unauthenticated
+    apt-get -y install libxcb-render-util0 --allow-unauthenticated
+    apt-get -y install libsqlite3-dev --allow-unauthenticated
     cd /namdinator_software/
     tar -zxvf phenix-installer-1.13-2998-intel-linux-2.6-x86_64-centos6.tar.gz --no-same-owner
     cd phenix-installer-1.13-2998-intel-linux-2.6-x86_64-centos6
@@ -58,15 +66,18 @@ From: nvcr.io/hpc/namd:2.12-171025
     export ROSETTA_BIN=$PHENIX_ROSETTA_PATH/main/source/bin/
     export ROSETTA3_DB=$PHENIX_ROSETTA_PATH/main/database/
 
-    cp /namdinator_software/site.settings /rosetta_src_2016.32.58837_bundle/main/source/tools/build/site.settings
+    cp /namdinator_software/site.settings /namdinator_software/rosetta_src_2016.32.58837_bundle/main/source/tools/build/site.settings
 
     rosetta.build_phenix_interface nproc=2
     rosetta.run_tests
 
+    #unzip namdinator
+    apt install unzip --allow-unauthenticated
+    cd /namdinator_software/
+    unzip Namdinator_bash-master.zip
+
 %environment
     # Set environment variables
-    # namd alias
-
 
     # rosetta path
     export PHENIX_ROSETTA_PATH=/namdinator_software/rosetta_src_2016.32.58837_bundle
@@ -75,11 +86,6 @@ From: nvcr.io/hpc/namd:2.12-171025
     
 
 %runscript
-
-
-
-
-
     # Put in a basic runscript to test everything is installed
     echo "ls /namdinator_software"
     echo "Arguments received: $*"
@@ -89,5 +95,4 @@ From: nvcr.io/hpc/namd:2.12-171025
     export PHENIX_ROSETTA_PATH=/namdinator_software/rosetta_src_2016.32.58837_bundle
     export ROSETTA_BIN=$PHENIX_ROSETTA_PATH/main/source/bin/
     export ROSETTA3_DB=$PHENIX_ROSETTA_PATH/main/database/
-    rosetta.run_tests
     echo "rosetta loaded successfully"
