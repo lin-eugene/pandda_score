@@ -72,6 +72,7 @@ From: nvcr.io/hpc/namd:2.12-171025
     rosetta.run_tests
 
     #unzip namdinator
+    apt-get -y install rlwrap --allow-unauthenticated
     apt install unzip --allow-unauthenticated
     cd /namdinator_software/
     unzip Namdinator_bash-master.zip
