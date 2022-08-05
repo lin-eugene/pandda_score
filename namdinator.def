@@ -10,6 +10,7 @@ From: nvcr.io/hpc/namd:2.12-171025
 %files
     # Copy file from local drive into container
     vmd-1.9.3.bin.LINUXAMD64-CUDA8-OptiX4-OSPRay111p1.opengl.tar.gz /namdinator_software/vmd-1.9.3.bin.LINUXAMD64-CUDA8-OptiX4-OSPRay111p1.opengl.tar.gz
+    vmd /namdinator_software/vmd
     phenix-installer-1.13-2998-intel-linux-2.6-x86_64-centos6.tar.gz /namdinator_software/phenix-installer-1.13-2998-intel-linux-2.6-x86_64-centos6.tar.gz
     rosetta_src_2016.32.58837_bundle.tgz /namdinator_software/rosetta_src_2016.32.58837_bundle.tgz
     rosetta_compiler_test.py /namdinator_software/rosetta_compiler_test.py
@@ -24,13 +25,9 @@ From: nvcr.io/hpc/namd:2.12-171025
     #renaming namd
     mv /opt/namd/namd2.12.171025-multicore /opt/namd/namd2
 
-    #installing new apt keys: https://developer.nvidia.com/blog/updating-the-cuda-linux-gpg-repository-key/
-    #apt-key del 7fa2af80
-    #wget https://developer.download.nvidia.com/compute/cuda/repos/$distro/$arch/cuda-keyring_1.0-1_all.deb
-    #dpkg -i cuda-keyring_1.0-1_all.deb
-
     # install vmd
     apt-get update -y
+    apt-get -y install rlwrap --allow-unauthenticated
     apt-get -y install libglu1 --allow-unauthenticated
     apt-get -y install libxinerama1 --allow-unauthenticated
     apt-get -y install libxi6 libgconf-2-4 --allow-unauthenticated
@@ -40,6 +37,8 @@ From: nvcr.io/hpc/namd:2.12-171025
     ./configure
     cd ./src
     make install
+
+    cp /namdinator_software/vmd /usr/local/bin/vmd
 
     # install rosetta
     # apt update
@@ -72,7 +71,7 @@ From: nvcr.io/hpc/namd:2.12-171025
     rosetta.run_tests
 
     #unzip namdinator
-    apt-get -y install rlwrap --allow-unauthenticated
+    
     apt install unzip --allow-unauthenticated
     cd /namdinator_software/
     unzip Namdinator_bash-master.zip

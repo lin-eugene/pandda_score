@@ -47,7 +47,7 @@ class pandda_remodel():
             #fetching resolutions
             mtz_name = p / f'{p.parts[-1]}-pandda-input.mtz'
             mtz = gemmi.read_mtz_file(str(mtz_name))
-            self.resolution[f"{p.name}"] = mtz.resolution_high()
+            self.resolution[f0{p.name}"] = mtz.resolution_high()
 
             #fetching event map paths
             for j, file in enumerate(p.iterdir()):

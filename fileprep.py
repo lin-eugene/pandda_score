@@ -1,47 +1,96 @@
+from importlib.resources import path
 import pandas as pd
 import pathlib
 
+from torch import is_distributed
+from lib import rmsdcalc
+import sys
+import numpy as np
 
-def log_built_ligands(path_analyses_dir):
-    path_panddas = path_analyses_dir / 'panddas'
+def directory_check(path_year: pathlib.PosixPath):
+    """
+    checks if directories exist within dataset path and writes into log.csv file
+    """
+   
+    paths_system = [x for x in path_year.iterdir() if x.is_dir()]
+
+    directories = {'system': [],
+                'panddas_exist?': [],
+                'initial_model_exist?': []}
+
+    for path_system in paths_system:
+        path_panddas = path_system / 'processing' / 'analysis' / 'panddas'
+        path_initial_model = path_system / 'processing' / 'analysis' / 'initial_model'
+        path_model_building = path_system / 'processing' / 'analysis' / 'model_building'
+
+        directories['system'].append(path_system)
+        if path_panddas.is_dir():
+            directories['panddas_exist?'].append(True)
+        if path_initial_model.is_dir() or path_model_building.is_dir():
+            directories['initial_model_exist?'].append(True)
     
+    pd_dircheck = pd.DataFrame.from_dict(directories)
+    python_path = pathlib.Path(__file__).resolve(strict=True).parent #fetch path of python script
+    outfname = python_path / 'training' / 'dircheck.csv'
+    outfname.parent.mkdir(parents=True, exist_ok=True)
+    pd_dircheck.to_csv(outfname)
+
+
+def log_built_ligands(path_system: pathlib.PosixPath):
+    """
+    logs paths of pandda maps with ligands built into csv
+    """
+    path_panddas = path_system / 'processing' / 'analysis' / 'panddas'
+
+    if path_panddas.is_dir() == False:
+        print(f'{path_system} panddas path not found')
+    
+    #read csv logging all events
     path_analyses = [x for x in path_panddas.iterdir() if x.is_dir() and 'analyses' in x.stem]
     path_events_csv = path_analyses[0] / 'pandda_inspect_events.csv'
-
     events_csv = pd.read_csv(path_events_csv)
 
-    #extracting rows where Ligand Placed is True
+    #extracting rows where 'Ligand Placed' is True
     ligand_built = events_csv.loc[(events_csv['Ligand Placed']==True) & (events_csv['Ligand Confidence']=='High')]
-
+  
     #extracting and saving relevant columns
     ligand_built = ligand_built[['dtag','event_idx', 'x', 'y', 'z', '1-BDC', 'high_resolution','Ligand Placed', 'Ligand Confidence']]
 
     #saving pandas dataframe into csv
-    outfile = path_analyses[0] / 'pandda_builtligands.csv'
+    python_path = pathlib.Path(__file__).resolve(strict=True).parent #fetch path of python script
+    outfile = python_path / 'training' / f'{path_system.name}'/ 'pandda_builtligands.csv'
+    outfile.parent.mkdir(parents=True, exist_ok=True)
     ligand_built.to_csv(outfile)
 
     return ligand_built
 
 
-def log_training_data_paths(path_analyses_dir):
-
-    path_panddas = path_analyses_dir / 'panddas'
-    path_analyses = [x for x in path_panddas.iterdir() if x.is_dir() and 'analyses' in x.stem]
+def log_training_data_paths(path_system: pathlib.PosixPath):
+    """
+    logs paths of input and output models generated from pandda.inspect
+    """
+    path_panddas = path_system / 'processing' / 'analysis' / 'panddas'
     path_proc_datasets = path_panddas / 'processed_datasets'
-    path_ligand_csv = path_analyses[0] / 'pandda_builtligands.csv'
-    path_initial_model = path_proc_datasets.parent.parent / 'initial_model'
+    path_initial_model = path_panddas.parent / 'initial_model'
+
+    python_path = pathlib.Path(__file__).resolve(strict=True).parent #fetch path of python script
+    path_ligand_csv = python_path / 'training' / f'{path_system.name}' / 'pandda_builtligands.csv'
+    
+
     if path_initial_model.is_dir():
         print('initial_model directory exists')
+
     elif path_initial_model.is_dir() == False:
-        path_initial_model = path_analyses / 'model_building'
+        path_initial_model = path_panddas.parent / 'model_building'
 
         if path_initial_model.is_dir() == False:
-            print('no built models')
+            print(f'no built models for {path_system}')
 
     if path_ligand_csv.is_file():
         ligand_csv = pd.read_csv(path_ligand_csv)
     else:
         print('pandda_builtligands.csv does not exist!')
+        sys.exit()
 
     data_paths = {'dataset': [], 
             'event_map': [],
@@ -81,13 +130,72 @@ def log_training_data_paths(path_analyses_dir):
             data_paths['output_model'].append('')
 
     pd_datapaths = pd.DataFrame.from_dict(data_paths)
-    outfname = path_analyses[0] / 'training_data_paths.csv'
+    python_path = pathlib.Path(__file__).resolve(strict=True).parent #fetch path of python script
+    outfname = python_path / 'training' / f'{path_system.name}'/ 'training_data_paths.csv'
+    outfname.parent.mkdir(parents=True, exist_ok=True)
     pd_datapaths.to_csv(outfname)
 
     return pd_datapaths
 
+def gen_rmsds(path_system: pathlib.PosixPath):
+    """
+    calculates rmsds between input and output models
+    """
+    python_path = pathlib.Path(__file__).resolve(strict=True).parent #fetch path of python script
+    path_dataset_csv = python_path / 'training' / f'{path_system.name}' / 'training_data_paths.csv'
+
+
+    if path_dataset_csv.is_file():
+        dataset_csv = pd.read_csv(path_dataset_csv)
+        dataset = dataset_csv[dataset_csv['output_model'].notnull()] #input into rmsd code
+
+        thresh = 1
+        data = [] #rmsd values for each dataset
+        interest = [] #if dataset has been remodelled
+        residues = [] #residues of interest for each dataset
+        
+        for row in dataset.itertuples():
+            path_input_model = pathlib.Path(row.input_model)
+            path_output_model = pathlib.Path(row.output_model)
+
+            rmsd_dict = rmsdcalc.calc_rmsds(path_input_model, path_output_model)   
+            bool_dict = rmsdcalc.find_remodelled(rmsd_dict, thresh)
+
+            rmsd_list = []
+            for i, dict in enumerate(rmsd_dict.values()):
+                for i, val in enumerate(dict.values()):
+                    rmsd_list.append(val)
+
+
+            rmsd_list = np.array(rmsd_list)
+            bool = rmsd_list > thresh
+            count = np.sum(bool)
+
+            data.append(rmsd_dict)
+            residues.append(bool_dict)
+            
+            if count > 0:
+                interest.append(True)
+            else:
+                interest.append(False)
+            
+        dataset.insert(loc=6, column='rmsd', value=data)
+        dataset.insert(loc=7, column='remodelled?', value=interest)
+        dataset.insert(loc=8, column='remodelled_res', value=residues)
+        
+        outfname = python_path / 'training' / f'{path_system.name}' / 'rmsd.csv'
+        outfname.parent.mkdir(parents=True, exist_ok=True)
+        dataset.to_csv(outfname)
+
+    else:
+        print('training_data_paths.csv file not found!')
+
 if __name__ == "__main__":
-    path_analyses_dir = pathlib.Path.cwd() / 'data' / 'testdirs' / 'MID2A' / 'processing' / 'analysis'
-    ligand_built = log_built_ligands(path_analyses_dir)
-    #pd_datapaths = log_training_data_paths(path_analyses_dir)
+
+    system = 'MID2A'
+    directory_check(pathlib.Path.cwd() / 'data' / 'testdirs')
+    path_system = pathlib.Path.cwd() / 'data' / 'testdirs' / f'{system}' #path to dataset
+    ligand_built = log_built_ligands(path_system)
+    pd_datapaths = log_training_data_paths(path_system)
+    rmsd = gen_rmsds(path_system)
 

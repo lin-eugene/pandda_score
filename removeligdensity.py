@@ -34,7 +34,7 @@ def rmligdensity(filename_structure: str, filename_map: str, ccp4_out_name: str)
         map.grid.set_points_around(positions[i],radius=radii[i],value=0)
 
     #symmetrising map
-    map.grid.symmetrize_min
+    map.grid.symmetrize_min()
 
     #writing output map
     ccp4_out = map
