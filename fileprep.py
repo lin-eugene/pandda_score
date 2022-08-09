@@ -23,15 +23,20 @@ def directory_check(path_year: pathlib.PosixPath):
         path_model_building = path_system / 'processing' / 'analysis' / 'model_building'
 
         directories['system'].append(path_system)
-        if path_panddas.is_dir():
-            directories['panddas_exist?'].append(True)
-        else:
-            directories['panddas_exist?'].append(False)
 
-        if path_initial_model.is_dir() or path_model_building.is_dir():
-            directories['initial_model_exist?'].append(True)
-        else:
-            directories['initial_model_exist?'].append(False)
+        try:
+            if path_panddas.is_dir():
+                directories['panddas_exist?'].append(True)
+            else:
+                directories['panddas_exist?'].append(False)
+
+            if path_initial_model.is_dir() or path_model_building.is_dir():
+                directories['initial_model_exist?'].append(True)
+            else:
+                directories['initial_model_exist?'].append(False)
+        
+        except PermissionError:
+            pass
     
     pd_dircheck = pd.DataFrame.from_dict(directories)
     python_path = pathlib.Path(__file__).resolve(strict=True).parent #fetch path of python script
