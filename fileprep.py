@@ -230,7 +230,7 @@ def make_training_files():
 #######
 
 if __name__ == "__main__":
-    p = pathlib.Path.cwd() 
+    p = sys.argv[1]
     dirs(p)
     make_training_files()
 
