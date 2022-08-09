@@ -23,7 +23,9 @@ def directory_check(path_year: pathlib.PosixPath):
         path_model_building = path_system / 'processing' / 'analysis' / 'model_building'
         
         try:
-            directories['system'].append(path_system)
+            if path_system.is_dir():
+                directories['system'].append(path_system)
+
             if path_panddas.is_dir():
                 directories['panddas_exist?'].append(True)
             else:
