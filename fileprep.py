@@ -227,11 +227,10 @@ def make_training_files():
             log_training_data_paths(path_system)
             gen_rmsds(path_system)
 
-
 #######
 
 if __name__ == "__main__":
-    p = pathlib.Path.cwd() / 'data' / 'testdirs' #path
+    p = pathlib.Path.cwd() 
     dirs(p)
     make_training_files()
 
