@@ -26,18 +26,24 @@ def directory_check(path_year: pathlib.PosixPath):
         directories['system'].append(path_system)
         if path_panddas.is_dir():
             directories['panddas_exist?'].append(True)
+        else:
+            directories['panddas_exist?'].append(False)
+
         if path_initial_model.is_dir() or path_model_building.is_dir():
             directories['initial_model_exist?'].append(True)
+        else:
+            directories['initial_model_exist?'].append(False)
     
     pd_dircheck = pd.DataFrame.from_dict(directories)
     python_path = pathlib.Path(__file__).resolve(strict=True).parent #fetch path of python script
-    outfname = python_path / 'training' / 'dircheck.csv'
+    outfname = python_path / 'training' / path_year.name / 'dircheck.csv'
     outfname.parent.mkdir(parents=True, exist_ok=True)
     pd_dircheck.to_csv(outfname)
 
 
 def log_built_ligands(path_system: pathlib.PosixPath):
     """
+    input: path of 1 pandda dataset/crystal system
     logs paths of pandda maps with ligands built into csv
     """
     path_panddas = path_system / 'processing' / 'analysis' / 'panddas'
@@ -58,7 +64,7 @@ def log_built_ligands(path_system: pathlib.PosixPath):
 
     #saving pandas dataframe into csv
     python_path = pathlib.Path(__file__).resolve(strict=True).parent #fetch path of python script
-    outfile = python_path / 'training' / f'{path_system.name}'/ 'pandda_builtligands.csv'
+    outfile = python_path / 'training' / f'{path_system.parent.name}' / f'{path_system.name}'/ 'pandda_builtligands.csv'
     outfile.parent.mkdir(parents=True, exist_ok=True)
     ligand_built.to_csv(outfile)
 
@@ -67,6 +73,7 @@ def log_built_ligands(path_system: pathlib.PosixPath):
 
 def log_training_data_paths(path_system: pathlib.PosixPath):
     """
+    input: path of pandda dataset/crystal system
     logs paths of input and output models generated from pandda.inspect
     """
     path_panddas = path_system / 'processing' / 'analysis' / 'panddas'
@@ -74,7 +81,7 @@ def log_training_data_paths(path_system: pathlib.PosixPath):
     path_initial_model = path_panddas.parent / 'initial_model'
 
     python_path = pathlib.Path(__file__).resolve(strict=True).parent #fetch path of python script
-    path_ligand_csv = python_path / 'training' / f'{path_system.name}' / 'pandda_builtligands.csv'
+    path_ligand_csv = python_path / 'training' / f'{path_system.parent.name}' / f'{path_system.name}' / 'pandda_builtligands.csv'
     
 
     if path_initial_model.is_dir():
@@ -89,8 +96,7 @@ def log_training_data_paths(path_system: pathlib.PosixPath):
     if path_ligand_csv.is_file():
         ligand_csv = pd.read_csv(path_ligand_csv)
     else:
-        print('pandda_builtligands.csv does not exist!')
-        sys.exit()
+        print(f'{path_system.name} pandda_builtligands.csv does not exist!')
 
     data_paths = {'dataset': [], 
             'event_map': [],
@@ -131,7 +137,7 @@ def log_training_data_paths(path_system: pathlib.PosixPath):
 
     pd_datapaths = pd.DataFrame.from_dict(data_paths)
     python_path = pathlib.Path(__file__).resolve(strict=True).parent #fetch path of python script
-    outfname = python_path / 'training' / f'{path_system.name}'/ 'training_data_paths.csv'
+    outfname = python_path / 'training' / f'{path_system.parent.name}' / f'{path_system.name}'/ 'training_data_paths.csv'
     outfname.parent.mkdir(parents=True, exist_ok=True)
     pd_datapaths.to_csv(outfname)
 
@@ -142,7 +148,7 @@ def gen_rmsds(path_system: pathlib.PosixPath):
     calculates rmsds between input and output models
     """
     python_path = pathlib.Path(__file__).resolve(strict=True).parent #fetch path of python script
-    path_dataset_csv = python_path / 'training' / f'{path_system.name}' / 'training_data_paths.csv'
+    path_dataset_csv = python_path / 'training' / f'{path_system.parent.name}' / f'{path_system.name}' / 'training_data_paths.csv'
 
 
     if path_dataset_csv.is_file():
@@ -183,19 +189,56 @@ def gen_rmsds(path_system: pathlib.PosixPath):
         dataset.insert(loc=7, column='remodelled?', value=interest)
         dataset.insert(loc=8, column='remodelled_res', value=residues)
         
-        outfname = python_path / 'training' / f'{path_system.name}' / 'rmsd.csv'
+        outfname = python_path / 'training' / f'{path_system.parent.name}' / f'{path_system.name}' / 'rmsd.csv'
         outfname.parent.mkdir(parents=True, exist_ok=True)
         dataset.to_csv(outfname)
 
     else:
         print('training_data_paths.csv file not found!')
 
-if __name__ == "__main__":
 
-    system = 'MID2A'
-    directory_check(pathlib.Path.cwd() / 'data' / 'testdirs')
-    path_system = pathlib.Path.cwd() / 'data' / 'testdirs' / f'{system}' #path to dataset
-    ligand_built = log_built_ligands(path_system)
-    pd_datapaths = log_training_data_paths(path_system)
-    rmsd = gen_rmsds(path_system)
+###############
+def dirs(path: pathlib.PosixPath):
+    paths_year = [x for x in path.iterdir() if x.is_dir() and len(x.name)==4]
+    for year in paths_year:
+        directory_check(year)
+
+def make_training_files():
+    """
+    input: path to dir_check_csv
+    """
+    python_path = pathlib.Path(__file__).resolve(strict=True).parent #fetch path of python script
+    path_training = python_path / 'training'
+    paths = [x for x in path_training.iterdir() if x.is_dir()]
+    
+    for p in paths:
+        csv_path = p / 'dircheck.csv'
+
+        if csv_path.is_file():
+            df = pd.read_csv(csv_path)
+            df_panddas = df[(df['panddas_exist?']==True) & (df['initial_model_exist?']==True)]
+            panddas_paths = df_panddas['system'].tolist()
+        
+        print(panddas_paths)
+
+        for path in panddas_paths:
+            path_system = pathlib.Path(path)
+            log_built_ligands(path_system)
+            log_training_data_paths(path_system)
+            gen_rmsds(path_system)
+
+
+#######
+
+if __name__ == "__main__":
+    p = pathlib.Path.cwd() / 'data' / 'testdirs' #path
+    dirs(p)
+    make_training_files()
+
+
+    # directory_check(pathlib.Path.cwd() / 'data' / 'testdirs')
+    # path_system = pathlib.Path.cwd() / 'data' / 'testdirs' / f'{system}' #path to dataset
+    # ligand_built = log_built_ligands(path_system)
+    # pd_datapaths = log_training_data_paths(path_system)
+    # rmsd = gen_rmsds(path_system)
 
