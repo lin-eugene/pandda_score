@@ -36,6 +36,8 @@ def directory_check(path_year: pathlib.PosixPath):
         
         except PermissionError:
             pass
+
+    print(directories)
     
     pd_dircheck = pd.DataFrame.from_dict(directories)
     python_path = pathlib.Path(__file__).resolve(strict=True).parent #fetch path of python script
