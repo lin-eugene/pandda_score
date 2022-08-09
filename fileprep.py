@@ -2,7 +2,6 @@ from importlib.resources import path
 import pandas as pd
 import pathlib
 
-from torch import is_distributed
 from lib import rmsdcalc
 import sys
 import numpy as np
