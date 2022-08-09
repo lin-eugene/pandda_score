@@ -1,6 +1,9 @@
 from importlib.resources import path
 import pandas as pd
 import pathlib
+from os import access, R_OK
+
+from torch import is_distributed
 
 from lib import rmsdcalc
 import sys
@@ -23,7 +26,7 @@ def directory_check(path_year: pathlib.PosixPath):
         path_model_building = path_system / 'processing' / 'analysis' / 'model_building'
         
         try:
-            if path_system.is_dir():
+            if path_system.is_dir() and access(path_system, R_OK):
                 directories['system'].append(path_system)
 
             if path_panddas.is_dir():
