@@ -197,7 +197,8 @@ def gen_rmsds(path_system: pathlib.PosixPath):
 
 
 ###############
-def dirs(path: pathlib.PosixPath):
+def dirs(path_str: str):
+    path = pathlib.Path(path_str)
     paths_year = [x for x in path.iterdir() if x.is_dir() and len(x.name)==4]
     for year in paths_year:
         directory_check(year)
