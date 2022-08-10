@@ -75,17 +75,18 @@ def dirs_check_pandda_inspect(dircheck_csv: pathlib.PosixPath):
 
     for row in dirs.itertuples():
         path_panddas = pathlib.Path(row.system) / 'processing' / 'analysis' / 'panddas'
-        try:
-            if path_panddas.is_dir() and check_pandda_analyses(path_panddas):
-                if pandda_inspect(path_panddas):
-                    check.append('empty')
-                else:
-                    check.append('populated')
-            else:
-                check.append('')
-        except PermissionError:
-            check.append('')
 
+        if path_panddas.is_dir() and check_pandda_analyses(path_panddas):
+            try: 
+                path_analyses = [x for x in path_panddas.iterdir() if x.is_dir() and 'analyses' in x.stem]
+                path_events_csv = path_analyses[0] / 'pandda_inspect_events.csv'
+                events_csv = pd.read_csv(path_events_csv)
+                check.append('populated')
+            except pd.errors.EmptyDataError:
+                check.append('empty')
+        else:
+            check.append('')
+        
     dirs.insert(loc=4, column='pandda_inspect_csv?', value=check)
     dirs.to_csv(dircheck_csv)
 
