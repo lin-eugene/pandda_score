@@ -58,6 +58,7 @@ def directory_check(path_year: pathlib.PosixPath):
 
 def pandda_inspect(path_panddas: pathlib.PosixPath):
     path_analyses = [x for x in path_panddas.iterdir() if x.is_dir() and 'analyses' in x.stem]
+    print(path_analyses)
     path_events_csv = path_analyses[0] / 'pandda_inspect_events.csv'
     events_csv = pd.read_csv(path_events_csv)
     inspect = events_csv.empty
