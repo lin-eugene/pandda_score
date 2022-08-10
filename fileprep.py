@@ -28,7 +28,7 @@ def directory_check(path_year: pathlib.PosixPath):
             if path_system.is_dir() and access(path_system, R_OK):
                 directories['system'].append(path_system)
 
-                if path_panddas.is_dir():
+                if path_panddas.is_dir() and check_pandda_analyses(path_panddas):
                     if access(path_panddas, R_OK):
                         directories['panddas_exist?'].append(True)
 
@@ -56,10 +56,14 @@ def directory_check(path_year: pathlib.PosixPath):
     outfname.parent.mkdir(parents=True, exist_ok=True)
     pd_dircheck.to_csv(outfname)
 
+def check_pandda_analyses(path_panddas: pathlib.PosixPath):
+    path_analyses = [x for x in path_panddas.iterdir() if x.is_dir() and 'analyses' in x.stem]
+    exist = len(path_analyses) > 0
+
+    return exist
+
 def pandda_inspect(path_panddas: pathlib.PosixPath):
     path_analyses = [x for x in path_panddas.iterdir() if x.is_dir() and 'analyses' in x.stem]
-    print(path_analyses)
-    print(path_panddas)
     path_events_csv = path_analyses[0] / 'pandda_inspect_events.csv'
     events_csv = pd.read_csv(path_events_csv)
     inspect = events_csv.empty
