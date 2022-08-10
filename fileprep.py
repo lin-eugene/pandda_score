@@ -75,7 +75,7 @@ def dirs_check_pandda_inspect(dircheck_csv: pathlib.PosixPath):
         else:
             check.append('populated')
 
-    dirs.insert(loc=6, column='pandda_inspect_csv?', value=check)
+    dirs.insert(loc=4, column='pandda_inspect_csv?', value=check)
     dirs.to_csv(dircheck_csv)
 
 
