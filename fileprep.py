@@ -28,12 +28,11 @@ def directory_check(path_year: pathlib.PosixPath):
             if path_system.is_dir() and access(path_system, R_OK):
                 directories['system'].append(path_system)
 
-                if path_panddas.is_dir() and check_pandda_analyses(path_panddas):
-                    if access(path_panddas, R_OK):
+                if path_panddas.is_dir():
+                    if access(path_panddas, R_OK) and check_pandda_analyses(path_panddas):
                         directories['panddas_exist?'].append(True)
-
-                    elif access(path_panddas, R_OK) == False:
-                        directories['panddas_exist?'].append('No Permission')
+                    else:
+                        directories['panddas_exist?'].append(False)
                 else:
                     directories['panddas_exist?'].append(False)
 
