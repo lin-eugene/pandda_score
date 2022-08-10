@@ -41,23 +41,22 @@ def superpose(polymer1: gemmi.ResidueSpan, polymer2: gemmi.ResidueSpan):
 
 def calculate_CoM_residue(residue: gemmi.Residue):
     """
-    calculates the centre of mass for a single polypeptide residue
+    calculates the centre of mass for a single residue
     """
-    if residue.het_flag == 'A': #if residue is a protein atom
-        coords = []
-        mass = []
-        for atom in residue.first_conformer(): #just looking at one conformer
-            coords.append(atom.pos.tolist())
-            mass.append(atom.element.weight)
-        
-        coords = np.asarray(coords)
-        mass = np.asarray(mass)
-        mass = mass.reshape(-1,1) #convert into column vector
+    coords = []
+    mass = []
+    for atom in residue.first_conformer(): #just looking at one conformer
+        coords.append(atom.pos.tolist())
+        mass.append(atom.element.weight)
+    
+    coords = np.asarray(coords)
+    mass = np.asarray(mass)
+    mass = mass.reshape(-1,1) #convert into column vector
 
-        CoM = np.sum((mass * coords),axis=0) / np.sum(mass) # calculating centre of mass
-        #print(CoM) 
+    CoM = np.sum((mass * coords),axis=0) / np.sum(mass) # calculating centre of mass
+    #print(CoM) 
 
-        return CoM
+    return CoM
 
 def calc_dist_diff(polymer1: gemmi.ResidueSpan, polymer2: gemmi.ResidueSpan):
     """
@@ -68,7 +67,7 @@ def calc_dist_diff(polymer1: gemmi.ResidueSpan, polymer2: gemmi.ResidueSpan):
 
     for residue1 in polymer1:
         for residue2 in polymer2:
-            if str(residue1) == str(residue2):
+            if (str(residue1) == str(residue2)) and (residue1.het_flat == 'A' and residue2.het_flag ==' A'):
                 com1 = calculate_CoM_residue(residue1)
                 com2 = calculate_CoM_residue(residue2)
                 calc_dist = np.linalg.norm(com1-com2) #calculate euclidean dist between 2 CoMs
