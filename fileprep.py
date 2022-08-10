@@ -70,10 +70,13 @@ def dirs_check_pandda_inspect(dircheck_csv: pathlib.PosixPath):
 
     for row in dirs.itertuples():
         path_panddas = pathlib.Path(row.system) / 'processing' / 'analysis' / 'panddas'
-        if pandda_inspect(path_panddas):
-            check.append('empty')
+        if path_panddas.is_dir():
+            if pandda_inspect(path_panddas):
+                check.append('empty')
+            else:
+                check.append('populated')
         else:
-            check.append('populated')
+            check.append('')
 
     dirs.insert(loc=4, column='pandda_inspect_csv?', value=check)
     dirs.to_csv(dircheck_csv)
@@ -260,7 +263,6 @@ def make_training_files():
     
     for p in paths:
         csv_path = p / 'dircheck.csv'
-        
 
         if csv_path.is_file():
             df = pd.read_csv(csv_path)
