@@ -16,7 +16,8 @@ def directory_check(path_year: pathlib.PosixPath):
 
     directories = {'system': [],
                 'panddas_exist?': [],
-                'initial_model_exist?': []}
+                'initial_model_exist?': [],
+                }
 
     for path_system in paths_system:
         path_panddas = path_system / 'processing' / 'analysis' / 'panddas'
@@ -27,21 +28,22 @@ def directory_check(path_year: pathlib.PosixPath):
             if path_system.is_dir() and access(path_system, R_OK):
                 directories['system'].append(path_system)
 
-            if path_panddas.is_dir():
-                if access(path_panddas, R_OK):
-                    directories['panddas_exist?'].append(True)
-                elif access(path_panddas, R_OK) == False:
-                    directories['panddas_exist?'].append('No Permission')
-            else:
-                directories['panddas_exist?'].append(False)
+                if path_panddas.is_dir():
+                    if access(path_panddas, R_OK):
+                        directories['panddas_exist?'].append(True)
 
-            if (path_initial_model.is_dir() or path_model_building.is_dir()):
-                if access(path_initial_model, R_OK) or access(path_model_building, R_OK):
-                    directories['initial_model_exist?'].append(True)
-                elif access(path_initial_model, R_OK) or access(path_model_building, R_OK)==False:
-                    directories['initial_model_exist?'].append('No Permission')          
-            else:
-                directories['initial_model_exist?'].append(False)
+                    elif access(path_panddas, R_OK) == False:
+                        directories['panddas_exist?'].append('No Permission')
+                else:
+                    directories['panddas_exist?'].append(False)
+
+                if (path_initial_model.is_dir() or path_model_building.is_dir()):
+                    if access(path_initial_model, R_OK) or access(path_model_building, R_OK):
+                        directories['initial_model_exist?'].append(True)
+                    elif access(path_initial_model, R_OK) or access(path_model_building, R_OK)==False:
+                        directories['initial_model_exist?'].append('No Permission')          
+                else:
+                    directories['initial_model_exist?'].append(False)
         
         except PermissionError:
             pass
@@ -53,6 +55,28 @@ def directory_check(path_year: pathlib.PosixPath):
     outfname = python_path / 'training' / path_year.name / 'dircheck.csv'
     outfname.parent.mkdir(parents=True, exist_ok=True)
     pd_dircheck.to_csv(outfname)
+
+def pandda_inspect(path_panddas: pathlib.PosixPath):
+    path_analyses = [x for x in path_panddas.iterdir() if x.is_dir() and 'analyses' in x.stem]
+    path_events_csv = path_analyses[0] / 'pandda_inspect_events.csv'
+    events_csv = pd.read_csv(path_events_csv)
+    inspect = events_csv.empty
+
+    return inspect
+
+def dirs_check_pandda_inspect(dircheck_csv: pathlib.PosixPath):
+    dirs = pd.read_csv(dircheck_csv)
+    check = []
+
+    for row in dirs.itertuples():
+        path_panddas = row.system / 'processing' / 'analysis' / 'panddas'
+        if pandda_inspect(path_panddas):
+            check.append('empty')
+        else:
+            check.append('populated')
+
+    dirs.insert(loc=6, column='pandda_inspect_csv?', value=check)
+    dirs.to_csv(dircheck_csv)
 
 
 def log_built_ligands(path_system: pathlib.PosixPath):
@@ -218,6 +242,15 @@ def dirs(path_str: str):
     for year in paths_year:
         directory_check(year)
 
+    python_path = pathlib.Path(__file__).resolve(strict=True).parent #fetch path of python script
+    path_training = python_path / 'training'
+    paths = [x for x in path_training.iterdir() if x.is_dir()]
+
+    for p in paths:
+        csv_path = p / 'dircheck.csv'
+        dirs_check_pandda_inspect(csv_path)
+
+
 def make_training_files():
     """
     input: path to dir_check_csv
@@ -228,6 +261,7 @@ def make_training_files():
     
     for p in paths:
         csv_path = p / 'dircheck.csv'
+        
 
         if csv_path.is_file():
             df = pd.read_csv(csv_path)
