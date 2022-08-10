@@ -253,8 +253,6 @@ def dirs(path_str: str):
     for year in paths_year:
         directory_check(year)
 
-def check_panddas():
-
     python_path = pathlib.Path(__file__).resolve(strict=True).parent #fetch path of python script
     path_training = python_path / 'training'
     paths = [x for x in path_training.iterdir() if x.is_dir()]
@@ -262,6 +260,7 @@ def check_panddas():
     for p in paths:
         csv_path = p / 'dircheck.csv'
         dirs_check_pandda_inspect(csv_path)
+    
 
 def make_training_files():
     """
