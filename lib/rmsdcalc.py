@@ -57,7 +57,7 @@ def calculate_CoM_residue(residue: gemmi.Residue):
         CoM = np.sum((mass * coords),axis=0) / np.sum(mass) # calculating centre of mass
         #print(CoM) 
 
-    return CoM
+        return CoM
 
 def calc_dist_diff(polymer1: gemmi.ResidueSpan, polymer2: gemmi.ResidueSpan):
     """
