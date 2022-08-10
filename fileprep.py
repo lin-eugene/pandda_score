@@ -29,7 +29,7 @@ def directory_check(path_year: pathlib.PosixPath):
                 directories['system'].append(path_system)
 
                 if path_panddas.is_dir():
-                    if access(path_panddas, R_OK) and check_pandda_analyses(path_panddas):
+                    if access(path_panddas, R_OK):
                         directories['panddas_exist?'].append(True)
                     else:
                         directories['panddas_exist?'].append(False)
@@ -76,7 +76,7 @@ def dirs_check_pandda_inspect(dircheck_csv: pathlib.PosixPath):
     for row in dirs.itertuples():
         path_panddas = pathlib.Path(row.system) / 'processing' / 'analysis' / 'panddas'
         try:
-            if path_panddas.is_dir():
+            if path_panddas.is_dir() and check_pandda_analyses(path_panddas):
                 if pandda_inspect(path_panddas):
                     check.append('empty')
                 else:
@@ -252,6 +252,8 @@ def dirs(path_str: str):
     paths_year = [x for x in path.iterdir() if x.is_dir() and len(x.name)==4]
     for year in paths_year:
         directory_check(year)
+
+def check_panddas():
 
     python_path = pathlib.Path(__file__).resolve(strict=True).parent #fetch path of python script
     path_training = python_path / 'training'
