@@ -28,12 +28,18 @@ def directory_check(path_year: pathlib.PosixPath):
                 directories['system'].append(path_system)
 
             if path_panddas.is_dir():
-                directories['panddas_exist?'].append(True)
+                if access(path_panddas, R_OK):
+                    directories['panddas_exist?'].append(True)
+                elif access(path_system, R_OK) == False:
+                    directories['panddas_exist?'].append('No Permission')
             else:
                 directories['panddas_exist?'].append(False)
 
-            if path_initial_model.is_dir() or path_model_building.is_dir():
-                directories['initial_model_exist?'].append(True)
+            if (path_initial_model.is_dir() or path_model_building.is_dir()):
+                if access(path_initial_model, R_OK) or access(path_model_building, R_OK):
+                    directories['initial_model_exist?'].append(True)
+                elif access(path_initial_model, R_OK) or access(path_model_building, R_OK)==False:
+                    directories['initial_model_exist?'].append('No Permission')          
             else:
                 directories['initial_model_exist?'].append(False)
         
@@ -227,10 +233,9 @@ def make_training_files():
             df = pd.read_csv(csv_path)
             df_panddas = df[(df['panddas_exist?']==True) & (df['initial_model_exist?']==True)]
             panddas_paths = df_panddas['system'].tolist()
-        
-        print(panddas_paths)
 
         for path in panddas_paths:
+            print(f'generating csvs for {path}...')
             path_system = pathlib.Path(path)
             log_built_ligands(path_system)
             log_training_data_paths(path_system)
