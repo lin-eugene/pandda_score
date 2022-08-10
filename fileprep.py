@@ -69,7 +69,7 @@ def dirs_check_pandda_inspect(dircheck_csv: pathlib.PosixPath):
     check = []
 
     for row in dirs.itertuples():
-        path_panddas = row.system / 'processing' / 'analysis' / 'panddas'
+        path_panddas = pathlib.Path(row.system) / 'processing' / 'analysis' / 'panddas'
         if pandda_inspect(path_panddas):
             check.append('empty')
         else:
@@ -249,7 +249,6 @@ def dirs(path_str: str):
     for p in paths:
         csv_path = p / 'dircheck.csv'
         dirs_check_pandda_inspect(csv_path)
-
 
 def make_training_files():
     """
