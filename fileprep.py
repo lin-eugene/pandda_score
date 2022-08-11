@@ -10,8 +10,6 @@ from lib import rmsdcalc
 import sys
 import numpy as np
 
-def 
-
 def directory_check(path_year: pathlib.PosixPath):
     """
     checks if directories exist within dataset path and writes into log.csv file
@@ -241,19 +239,6 @@ def gen_rmsds(path_system: pathlib.PosixPath):
         print('training_data_paths.csv file not found!')
 
 
-def check_dataset_permission(path_system: pathlib.PosixPath) -> bool:
-    if access(path_system, R_OK):
-        return True
-    else:
-        return False
-
-def check_pandda_analyses(path_system: pathlib.PosixPath) -> bool:
-
-
-def check_pandda_inspect(path_panddas: pathlib.PosixPath) -> bool:
-    try:
-    
-    except pd.errors.EmptyDataError:
         
 ###############
 def dirs(path_str: str):
