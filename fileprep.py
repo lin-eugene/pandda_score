@@ -307,6 +307,8 @@ if __name__ == "__main__":
     dirs(p)
     make_training_files()
 
+    print('data prep completed!')
+
 
     # directory_check(pathlib.Path.cwd() / 'data' / 'testdirs')
     # path_system = pathlib.Path.cwd() / 'data' / 'testdirs' / f'{system}' #path to dataset
