@@ -26,6 +26,7 @@ def map_chains(input_model: gemmi.Model, output_model: gemmi.Model):
             if dist < 1:
                 #chain_rsr.name = chain_gt.name
                 chain.append([chain_gt,chain_rsr])
+    print(chain)
     return chain
 
 def superpose(polymer1: gemmi.ResidueSpan, polymer2: gemmi.ResidueSpan):
