@@ -266,6 +266,8 @@ def make_training_files():
     for p in paths:
         csv_path = p / 'dircheck.csv'
 
+        print(csv_path)
+
         if csv_path.is_file():
             df = pd.read_csv(csv_path)
             df_panddas = df[(df['panddas_exist?']==True) & (df['initial_model_exist?']==True)]
