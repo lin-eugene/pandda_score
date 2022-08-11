@@ -1,4 +1,6 @@
 from importlib.resources import path
+from logging import NullHandler
+from re import I
 import pandas as pd
 import pathlib
 from os import access, R_OK
@@ -45,7 +47,9 @@ def directory_check(path_year: pathlib.PosixPath):
                     directories['initial_model_exist?'].append(False)
         
         except PermissionError:
-            pass
+            directories['system'].append(path_system)
+            directories['panddas_exist?'].append('No Permission')
+            directories['initial_model_exist?'].append('No Permission')
 
     print(directories)
     
@@ -54,42 +58,6 @@ def directory_check(path_year: pathlib.PosixPath):
     outfname = python_path / 'training' / path_year.name / 'dircheck.csv'
     outfname.parent.mkdir(parents=True, exist_ok=True)
     pd_dircheck.to_csv(outfname)
-
-def check_pandda_analyses(path_panddas: pathlib.PosixPath):
-    path_analyses = [x for x in path_panddas.iterdir() if x.is_dir() and 'analyses' in x.stem]
-    exist = len(path_analyses) > 0
-
-    return exist
-
-def pandda_inspect(path_panddas: pathlib.PosixPath):
-    path_analyses = [x for x in path_panddas.iterdir() if x.is_dir() and 'analyses' in x.stem]
-    path_events_csv = path_analyses[0] / 'pandda_inspect_events.csv'
-    events_csv = pd.read_csv(path_events_csv)
-    inspect = events_csv.empty
-
-    return inspect
-
-def dirs_check_pandda_inspect(dircheck_csv: pathlib.PosixPath):
-    dirs = pd.read_csv(dircheck_csv)
-    check = []
-
-    for row in dirs.itertuples():
-        path_panddas = pathlib.Path(row.system) / 'processing' / 'analysis' / 'panddas'
-
-        if path_panddas.is_dir() and check_pandda_analyses(path_panddas):
-            try: 
-                path_analyses = [x for x in path_panddas.iterdir() if x.is_dir() and 'analyses' in x.stem]
-                path_events_csv = path_analyses[0] / 'pandda_inspect_events.csv'
-                events_csv = pd.read_csv(path_events_csv)
-                check.append('populated')
-            except pd.errors.EmptyDataError:
-                check.append('empty')
-        else:
-            check.append('')
-        
-    dirs.insert(loc=4, column='pandda_inspect_csv?', value=check)
-    dirs.to_csv(dircheck_csv)
-
 
 def log_built_ligands(path_system: pathlib.PosixPath):
     """
@@ -253,14 +221,6 @@ def dirs(path_str: str):
     paths_year = [x for x in path.iterdir() if x.is_dir() and len(x.name)==4]
     for year in paths_year:
         directory_check(year)
-
-    python_path = pathlib.Path(__file__).resolve(strict=True).parent #fetch path of python script
-    path_training = python_path / 'training'
-    paths = [x for x in path_training.iterdir() if x.is_dir()]
-
-    for p in paths:
-        csv_path = p / 'dircheck.csv'
-        dirs_check_pandda_inspect(csv_path)
     
 
 def make_training_files():
