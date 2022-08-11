@@ -3,11 +3,14 @@ from logging import NullHandler
 from re import I
 import pandas as pd
 import pathlib
+import os
 from os import access, R_OK
 
 from lib import rmsdcalc
 import sys
 import numpy as np
+
+def 
 
 def directory_check(path_year: pathlib.PosixPath):
     """
@@ -30,21 +33,43 @@ def directory_check(path_year: pathlib.PosixPath):
             if path_system.is_dir() and access(path_system, R_OK):
                 directories['system'].append(path_system)
 
-                if path_panddas.is_dir():
-                    if access(path_panddas, R_OK):
-                        directories['panddas_exist?'].append(True)
+                if path_panddas.is_dir() and access(path_panddas, R_OK):
+                    path_analyses = [x for x in path_panddas.iterdir() if x.is_dir() and 'analyses' in x.stem]
+                    
+                    if len(path_analyses) > 0:
+                        path_analyses = path_analyses[0]
+
+                        if path_analyses.is_dir() and access(path_analyses, R_OK):
+                            path_events_csv = path_analyses / 'pandda_inspect_events.csv'
+
+                            if os.stat(path_events_csv).st_size != 0:
+                                directories['panddas_exist?'].append(True)
+                            
+                            else:
+                                directories['panddas_exist?'].append('pandda_inspect_events.csv is empty')
+                        
+                        else:
+                            directories['panddas_exist?'].append('no access to panddas analyses')
+                    
                     else:
-                        directories['panddas_exist?'].append(False)
+                        directories['panddas_exist?'].append('panddas analyses dir does not exist')
+                
                 else:
-                    directories['panddas_exist?'].append(False)
+                    directories['panddas_exist?'].append('No Permission')
+
 
                 if (path_initial_model.is_dir() or path_model_building.is_dir()):
                     if access(path_initial_model, R_OK) or access(path_model_building, R_OK):
                         directories['initial_model_exist?'].append(True)
-                    elif access(path_initial_model, R_OK) or access(path_model_building, R_OK)==False:
+                    else:
                         directories['initial_model_exist?'].append('No Permission')          
                 else:
                     directories['initial_model_exist?'].append(False)
+            
+            else:
+                directories['system'].append(path_system)
+                directories['panddas_exist?'].append('No Permission')
+                directories['initial_model_exist?'].append('No Permission')
         
         except PermissionError:
             directories['system'].append(path_system)
@@ -58,6 +83,7 @@ def directory_check(path_year: pathlib.PosixPath):
     outfname = python_path / 'training' / path_year.name / 'dircheck.csv'
     outfname.parent.mkdir(parents=True, exist_ok=True)
     pd_dircheck.to_csv(outfname)
+
 
 def log_built_ligands(path_system: pathlib.PosixPath):
     """
@@ -215,13 +241,26 @@ def gen_rmsds(path_system: pathlib.PosixPath):
         print('training_data_paths.csv file not found!')
 
 
+def check_dataset_permission(path_system: pathlib.PosixPath) -> bool:
+    if access(path_system, R_OK):
+        return True
+    else:
+        return False
+
+def check_pandda_analyses(path_system: pathlib.PosixPath) -> bool:
+
+
+def check_pandda_inspect(path_panddas: pathlib.PosixPath) -> bool:
+    try:
+    
+    except pd.errors.EmptyDataError:
+        
 ###############
 def dirs(path_str: str):
     path = pathlib.Path(path_str)
     paths_year = [x for x in path.iterdir() if x.is_dir() and len(x.name)==4]
     for year in paths_year:
         directory_check(year)
-    
 
 def make_training_files():
     """
