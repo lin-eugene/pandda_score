@@ -12,6 +12,7 @@ def map_chains(input_model: gemmi.Model, output_model: gemmi.Model):
     returns list with mapped chain pairs
     """
     chain = []
+    chain_id = []
     #renaming chains in two models to match each other if they are aligned
     print('mapping chains')
     for i, chain_gt in enumerate(input_model):
@@ -26,8 +27,9 @@ def map_chains(input_model: gemmi.Model, output_model: gemmi.Model):
             if dist < 1:
                 #chain_rsr.name = chain_gt.name
                 chain.append([chain_gt,chain_rsr])
-    print(chain)
-    return chain
+                chain_id.append([i,j])
+    print(chain_id)
+    return chain, chain_id
 
 def superpose(polymer1: gemmi.ResidueSpan, polymer2: gemmi.ResidueSpan):
     """
@@ -85,7 +87,7 @@ def calc_rmsds(input_pdb_name: pathlib.PosixPath, remodelled_pdb_name: pathlib.P
     model_input = input_pdb[0]
     model_remodelled = remodelled_pdb[0]
 
-    chain = map_chains(model_input, model_remodelled)
+    chain, chain_id = map_chains(model_input, model_remodelled)
     #print(chain)
 
     rmsd_dict = {}
