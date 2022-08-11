@@ -257,6 +257,7 @@ def make_training_files():
     """
     input: path to dir_check_csv
     """
+    print('running make training csvs')
     python_path = pathlib.Path(__file__).resolve(strict=True).parent #fetch path of python script
     path_training = python_path / 'training'
     paths = [x for x in path_training.iterdir() if x.is_dir()]
