@@ -67,7 +67,7 @@ def calc_dist_diff(polymer1: gemmi.ResidueSpan, polymer2: gemmi.ResidueSpan):
 
     for residue1 in polymer1:
         for residue2 in polymer2:
-            if (str(residue1) == str(residue2)) and (residue1.het_flag == 'A' and residue2.het_flag ==' A'):
+            if (str(residue1) == str(residue2)) and (residue1.het_flag == 'A' and residue2.het_flag == 'A'):
                 com1 = calculate_CoM_residue(residue1)
                 com2 = calculate_CoM_residue(residue2)
                 calc_dist = np.linalg.norm(com1-com2) #calculate euclidean dist between 2 CoMs

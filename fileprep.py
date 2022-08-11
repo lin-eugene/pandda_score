@@ -198,12 +198,11 @@ def gen_rmsds(path_system: pathlib.PosixPath):
     python_path = pathlib.Path(__file__).resolve(strict=True).parent #fetch path of python script
     path_dataset_csv = python_path / 'training' / f'{path_system.parent.name}' / f'{path_system.name}' / 'training_data_paths.csv'
 
+
     if path_dataset_csv.is_file():
         dataset_csv = pd.read_csv(path_dataset_csv)
-
         dataset = dataset_csv[dataset_csv['output_model'].notnull()] #input into rmsd code
 
-        print(dataset)
         thresh = 1
         data = [] #rmsd values for each dataset
         interest = [] #if dataset has been remodelled
@@ -223,7 +222,6 @@ def gen_rmsds(path_system: pathlib.PosixPath):
 
 
             rmsd_list = np.array(rmsd_list)
-            print(rmsd_list)
             bool = rmsd_list > thresh
             count = np.sum(bool)
 
