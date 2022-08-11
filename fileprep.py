@@ -59,14 +59,14 @@ def directory_check(path_year: pathlib.PosixPath):
                         directories['panddas_exist?'].append('panddas analyses dir does not exist')
                 
                 else:
-                    directories['panddas_exist?'].append('No Permission')
+                    directories['panddas_exist?'].append('No Permission panddas')
 
 
                 if (path_initial_model.is_dir() or path_model_building.is_dir()):
                     if access(path_initial_model, R_OK) or access(path_model_building, R_OK):
                         directories['initial_model_exist?'].append(True)
                     else:
-                        directories['initial_model_exist?'].append('No Permission')          
+                        directories['initial_model_exist?'].append('No Permission model_building')          
                 else:
                     directories['initial_model_exist?'].append(False)
             
