@@ -202,6 +202,8 @@ def gen_rmsds(path_system: pathlib.PosixPath):
     if path_dataset_csv.is_file():
         dataset_csv = pd.read_csv(path_dataset_csv)
         dataset = dataset_csv[dataset_csv['output_model'].notnull()] #input into rmsd code
+        
+        print(dataset)
 
         thresh = 1
         data = [] #rmsd values for each dataset
