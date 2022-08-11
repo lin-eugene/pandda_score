@@ -198,9 +198,10 @@ def gen_rmsds(path_system: pathlib.PosixPath):
     python_path = pathlib.Path(__file__).resolve(strict=True).parent #fetch path of python script
     path_dataset_csv = python_path / 'training' / f'{path_system.parent.name}' / f'{path_system.name}' / 'training_data_paths.csv'
 
-
     if path_dataset_csv.is_file():
         dataset_csv = pd.read_csv(path_dataset_csv)
+
+        print(dataset_csv)
         dataset = dataset_csv[dataset_csv['output_model'].notnull()] #input into rmsd code
 
         thresh = 1
@@ -270,7 +271,7 @@ def make_training_files():
 
         if csv_path.is_file():
             df = pd.read_csv(csv_path)
-            df_panddas = df[(df['panddas_exist?']=='True') & (df['initial_model_exist?']=='True')]
+            df_panddas = df[(df['panddas_exist?']==True) & (df['initial_model_exist?']==True)]
 
             print(df_panddas)
             panddas_paths = df_panddas['system'].tolist()
