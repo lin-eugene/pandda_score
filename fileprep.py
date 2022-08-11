@@ -209,6 +209,7 @@ def gen_rmsds(path_system: pathlib.PosixPath):
         residues = [] #residues of interest for each dataset
         
         for row in dataset.itertuples():
+            print(row.input_model)
             path_input_model = pathlib.Path(row.input_model)
             path_output_model = pathlib.Path(row.output_model)
 
