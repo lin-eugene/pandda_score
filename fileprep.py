@@ -1,3 +1,4 @@
+from gc import is_finalized
 from importlib.resources import path
 from logging import NullHandler
 from re import I
@@ -40,11 +41,16 @@ def directory_check(path_year: pathlib.PosixPath):
                         if path_analyses.is_dir() and access(path_analyses, R_OK):
                             path_events_csv = path_analyses / 'pandda_inspect_events.csv'
 
-                            if os.stat(path_events_csv).st_size != 0:
-                                directories['panddas_exist?'].append(True)
+                            if path_events_csv.is_file() and access(path_events_csv, R_OK):
+                                
+                                if os.stat(path_events_csv).st_size != 0:
+                                    directories['panddas_exist?'].append(True)
+                                
+                                else:
+                                    directories['panddas_exist?'].append('pandda_inspect_events.csv is empty')
                             
                             else:
-                                directories['panddas_exist?'].append('pandda_inspect_events.csv is empty')
+                                directories['panddas_exist?'].append('pandda_inspect_events.csv does not exist')
                         
                         else:
                             directories['panddas_exist?'].append('no access to panddas analyses')
