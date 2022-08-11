@@ -157,22 +157,32 @@ def log_training_data_paths(path_system: pathlib.PosixPath):
 
         #add event map path
         event_map_path = path_proc_datasets / f'{row.dtag}' / f'{row.dtag}-event_{row.event_idx}_1-BDC_{row._7}_map.native.ccp4' # only selecting relevant event map from which ligand was built
+        event_map_path2 = path_initial_model / f'{row.dtag}' / f'{row.dtag}-event_{row.event_idx}_1-BDC_{row._7}_map.native.ccp4'
+
         if event_map_path.is_file():
             data_paths['event_map'].append(event_map_path)
+        elif event_map_path2.is_file():
+            data_paths['event_map'].append(event_map_path2)
         else:
             data_paths['event_map'].append('')
 
         #add intiial mtz path
         mtz_path = path_proc_datasets / f'{row.dtag}' / f'{row.dtag}-pandda-input.mtz'
+        mtz_path2 = path_initial_model / f'{row.dtag}' / f'{row.dtag}-pandda-input.mtz'
         if mtz_path.is_file():
             data_paths['mtz'].append(mtz_path)
+        elif mtz_path2.is_file():
+            data_paths['mtz'].append(mtz_path2)
         else:
             data_paths['mtz'].append('')
 
         #add input model path
         input_path = path_proc_datasets / f'{row.dtag}' / f'{row.dtag}-pandda-input.pdb'
+        input_path2 = path_initial_model / f'{row.dtag}' / f'{row.dtag}-pandda-input.pdb'
         if input_path.is_file():
             data_paths['input_model'].append(input_path)
+        elif input_path2.is_file():
+            data_paths['input_model'].append(input_path2)
         else:
             data_paths['input_model'].append('')
 
