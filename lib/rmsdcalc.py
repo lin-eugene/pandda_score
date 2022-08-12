@@ -87,20 +87,20 @@ def calc_rmsds(input_pdb_name: pathlib.PosixPath, remodelled_pdb_name: pathlib.P
     model_input = input_pdb[0]
     model_remodelled = remodelled_pdb[0]
 
-    chain, chain_id = map_chains(model_input, model_remodelled)
+    chain, chain_mapping = map_chains(model_input, model_remodelled)
     #print(chain)
 
     rmsd_dict = {}
     for i, pair in enumerate(chain):
-        # polymer1 = pair[0].get_polymer()
-        # polymer2 = pair[1].get_polymer()
-        # # print(polymer1)
-        # # print(polymer2)
-        # polymer2 = superpose(polymer1, polymer2)
+        polymer1 = pair[0].get_polymer()
+        polymer2 = pair[1].get_polymer()
+        # print(polymer1)
+        # print(polymer2)
+        polymer2 = superpose(polymer1, polymer2)
         dist_diff = calc_dist_diff(pair[0], pair[1])
         rmsd_dict[pair[0].name] = dist_diff
 
-    return rmsd_dict
+    return rmsd_dict, chain_mapping
 
 def find_remodelled(rmsd_dict: dict, thresh: float):
     bool_dict = {}

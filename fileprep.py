@@ -259,6 +259,7 @@ def gen_rmsds(path_system: pathlib.PosixPath):
 
         thresh = 1
         data = [] #rmsd values for each dataset
+        chain_mapping = []
         interest = [] #if dataset has been remodelled
         residues = [] #residues of interest for each dataset
         
@@ -267,7 +268,7 @@ def gen_rmsds(path_system: pathlib.PosixPath):
             path_input_model = pathlib.Path(row.input_model)
             path_output_model = pathlib.Path(row.output_model)
 
-            rmsd_dict = rmsdcalc.calc_rmsds(path_input_model, path_output_model)   
+            rmsd_dict, chain_map = rmsdcalc.calc_rmsds(path_input_model, path_output_model)   
             bool_dict = rmsdcalc.find_remodelled(rmsd_dict, thresh)
 
             rmsd_list = []
@@ -282,6 +283,7 @@ def gen_rmsds(path_system: pathlib.PosixPath):
 
             data.append(rmsd_dict)
             residues.append(bool_dict)
+            chain_mapping.append(chain_map)
             
             if count > 0:
                 interest.append(True)
@@ -291,6 +293,7 @@ def gen_rmsds(path_system: pathlib.PosixPath):
         dataset.insert(loc=6, column='rmsd', value=data)
         dataset.insert(loc=7, column='remodelled?', value=interest)
         dataset.insert(loc=8, column='remodelled_res', value=residues)
+        dataset.insert(loc=9, column='chain_mapping', value=chain_mapping)
         
         outfname = python_path / 'training' / f'{path_system.parent.name}' / f'{path_system.name}' / 'rmsd.csv'
         outfname.parent.mkdir(parents=True, exist_ok=True)
@@ -325,7 +328,7 @@ def make_training_files():
 
         if csv_path.is_file():
             df = pd.read_csv(csv_path)
-            df_panddas = df[(df['panddas_exist?']=='True') & (df['initial_model_exist?']=='True')]
+            df_panddas = df[(df['panddas_exist?']==True) & (df['initial_model_exist?']==True)]
 
             print(df_panddas)
             panddas_paths = df_panddas['system'].tolist()
