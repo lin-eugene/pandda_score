@@ -16,7 +16,7 @@ def filter_path_analyses(path_analyses):
 
     for path in path_analyses:
 
-        if path_analyses.is_dir() and access(path_analyses, R_OK):
+        if path.is_dir() and access(path, R_OK):
             path_events_csv = path / 'pandda_inspect_events.csv'
 
             if path_events_csv.is_file() and access(path_events_csv, R_OK):
