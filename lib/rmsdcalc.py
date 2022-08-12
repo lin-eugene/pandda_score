@@ -99,7 +99,7 @@ def calc_rmsds(input_pdb_name: pathlib.PosixPath, remodelled_pdb_name: pathlib.P
         # # print(polymer2)
         # polymer2 = superpose(polymer1, polymer2)
         dist_diff = calc_dist_diff(pair[0], pair[1])
-        print(bool(dist_diff))
+        
         if bool(dist_diff)==True: #if dist_diff dictionary is not empty
             rmsd_dict[pair[0].name] = dist_diff
             chain_mapping_filt.append(chain_id)
