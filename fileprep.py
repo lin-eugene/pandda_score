@@ -64,7 +64,7 @@ def directory_check(path_year: pathlib.PosixPath):
                             if path_events_csv.is_file() and access(path_events_csv, R_OK):
                                 
                                 if os.stat(path_events_csv).st_size != 0:
-                                    directories['panddas_exist?'].append('True')
+                                    directories['panddas_exist?'].append('Y')
                                     directories['panddas_analyses_path'].append(path_analyses)
                                 
                                 else:
@@ -90,14 +90,14 @@ def directory_check(path_year: pathlib.PosixPath):
 
                 if path_initial_model.is_dir():
                     if access(path_initial_model, R_OK) :
-                        directories['initial_model_exist?'].append('True')
+                        directories['initial_model_exist?'].append('Y')
                         directories['initial_model_path'].append(path_initial_model)
                     else:
                         directories['initial_model_exist?'].append('No Permission model_building')
                         directories['initial_model_path'].append('')
                 elif path_model_building.is_dir():
                     if access(path_model_building, R_OK):
-                        directories['initial_model_exist?'].append('True')
+                        directories['initial_model_exist?'].append('Y')
                         directories['initial_model_path'].append(path_model_building)
                     else:
                         directories['initial_model_exist?'].append('No Permission model_building')
@@ -328,7 +328,7 @@ def make_training_files():
 
         if csv_path.is_file():
             df = pd.read_csv(csv_path)
-            df_panddas = df[(str(df['panddas_exist?'])=='True') & (str(df['initial_model_exist?'])=='True')]
+            df_panddas = df[(df['panddas_exist?']=='Y') & df['initial_model_exist?']=='Y')]
 
             print(df_panddas)
             panddas_paths = df_panddas['system'].tolist()
