@@ -92,11 +92,11 @@ def calc_rmsds(input_pdb_name: pathlib.PosixPath, remodelled_pdb_name: pathlib.P
 
     rmsd_dict = {}
     for i, pair in enumerate(chain):
-        polymer1 = pair[0].get_polymer()
-        polymer2 = pair[1].get_polymer()
-        # print(polymer1)
-        # print(polymer2)
-        polymer2 = superpose(polymer1, polymer2)
+        # polymer1 = pair[0].get_polymer()
+        # polymer2 = pair[1].get_polymer()
+        # # print(polymer1)
+        # # print(polymer2)
+        # polymer2 = superpose(polymer1, polymer2)
         dist_diff = calc_dist_diff(pair[0], pair[1])
         rmsd_dict[pair[0].name] = dist_diff
 
