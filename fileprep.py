@@ -328,7 +328,7 @@ def make_training_files():
 
         if csv_path.is_file():
             df = pd.read_csv(csv_path)
-            df_panddas = df[(df['panddas_exist?']=='Y') & df['initial_model_exist?']=='Y')]
+            df_panddas = df[(df['panddas_exist?']=='Y') & (df['initial_model_exist?']=='Y')]
 
             print(df_panddas)
             panddas_paths = df_panddas['system'].tolist()
