@@ -105,6 +105,7 @@ def directory_check(path_year: pathlib.PosixPath):
 
                 else:
                     directories['initial_model_exist?'].append('False')
+                    directories['initial_model_path'].append('')
             
             else:
                 directories['system'].append(path_system)
