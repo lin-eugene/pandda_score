@@ -26,6 +26,110 @@ def filter_path_analyses(path_analyses):
 
     return new_paths
 
+def directory_check_from_csv(path_csv: pathlib.PosixPath):
+    
+    df = pd.read_csv(path_csv)
+    paths_system = df['path'].tolist()
+
+    directories = {
+                'system': [],
+                'panddas_exist?': [],
+                'initial_model_exist?': [],
+                'panddas_analyses_path': [],
+                'initial_model_path': [],
+                
+                }
+    
+    for path_system in paths_system:
+        path_system = pathlib.Path(path_system)
+        path_panddas = path_system / 'processing' / 'analysis' / 'panddas'
+        path_initial_model = path_system / 'processing' / 'analysis' / 'initial_model'
+        path_model_building = path_system / 'processing' / 'analysis' / 'model_building'
+        
+        try:
+            if path_system.is_dir() and access(path_system, R_OK):
+                directories['system'].append(path_system)
+
+                if path_panddas.is_dir() and access(path_panddas, R_OK):
+                    path_analyses = [x for x in path_panddas.iterdir() if x.is_dir() and 'analyses' in x.stem]
+                    path_analyses = filter_path_analyses(path_analyses)
+
+                    if len(path_analyses) > 0:
+                        path_analyses = path_analyses[0]
+
+                        if path_analyses.is_dir() and access(path_analyses, R_OK):
+                            path_events_csv = path_analyses / 'pandda_inspect_events.csv'
+
+                            if path_events_csv.is_file() and access(path_events_csv, R_OK):
+                                
+                                if os.stat(path_events_csv).st_size != 0:
+                                    directories['panddas_exist?'].append('Y')
+                                    directories['panddas_analyses_path'].append(path_analyses)
+                                
+                                else:
+                                    directories['panddas_exist?'].append('pandda_inspect_events.csv is empty')
+                                    directories['panddas_analyses_path'].append('')
+                            
+                            else:
+                                directories['panddas_exist?'].append('pandda_inspect_events.csv does not exist')
+                                directories['panddas_analyses_path'].append('')
+
+                        else:
+                            directories['panddas_exist?'].append('no access to panddas analyses')
+                            directories['panddas_analyses_path'].append('')
+                    
+                    else:
+                        directories['panddas_exist?'].append('panddas analyses dir does not exist')
+                        directories['panddas_analyses_path'].append('')
+                
+                else:
+                    directories['panddas_exist?'].append('No Permission panddas')
+                    directories['panddas_analyses_path'].append('')
+
+
+                if path_initial_model.is_dir():
+                    if access(path_initial_model, R_OK) :
+                        directories['initial_model_exist?'].append('Y')
+                        directories['initial_model_path'].append(path_initial_model)
+                    else:
+                        directories['initial_model_exist?'].append('No Permission model_building')
+                        directories['initial_model_path'].append('')
+                elif path_model_building.is_dir():
+                    if access(path_model_building, R_OK):
+                        directories['initial_model_exist?'].append('Y')
+                        directories['initial_model_path'].append(path_model_building)
+                    else:
+                        directories['initial_model_exist?'].append('No Permission model_building')
+                        directories['initial_model_path'].append('')
+
+                else:
+                    directories['initial_model_exist?'].append('False')
+                    directories['initial_model_path'].append('')
+            
+            else:
+                directories['system'].append(path_system)
+                directories['panddas_exist?'].append('No Permission')
+                directories['initial_model_exist?'].append('No Permission')
+                directories['panddas_analyses_path'].append('')
+                directories['initial_model_path'].append('')
+        
+        except PermissionError:
+            directories['system'].append(path_system)
+            directories['panddas_exist?'].append('No Permission')
+            directories['initial_model_exist?'].append('No Permission')
+            directories['panddas_analyses_path'].append('')
+            directories['initial_model_path'].append('')
+
+    print(directories)
+    
+    pd_dircheck = pd.DataFrame.from_dict(directories)
+    python_path = pathlib.Path(__file__).resolve(strict=True).parent #fetch path of python script
+    outfname = python_path / 'training' / 'manual' / 'dircheck.csv'
+    outfname.parent.mkdir(parents=True, exist_ok=True)
+    pd_dircheck.to_csv(outfname)
+
+
+
 def directory_check(path_year: pathlib.PosixPath):
     """
     checks if directories exist within dataset path and writes into log.csv file
@@ -311,6 +415,11 @@ def dirs(path_str: str):
     for year in paths_year:
         directory_check(year)
 
+def dir_check_csv():
+    python_path = pathlib.Path(__file__).resolve(strict=True).parent #fetch path of python script
+    path_csv = python_path / 'nonstandard_paths.csv'
+    directory_check_from_csv(path_csv)
+
 def make_training_files():
     """
     input: path to dir_check_csv
@@ -345,19 +454,19 @@ def make_training_files():
             log_training_data_paths(path_system)
             gen_rmsds(path_system)
     
-    for p in paths:
-        csv_path = python_path / 'nonstandard_paths.csv'
+    # for p in paths:
+    #     csv_path = python_path / 'training'
 
-        if csv_path.is_file():
-            df =  pd.read_csv(csv_path)
-            panddas_paths = df['paths'].tolist()
+    #     if csv_path.is_file():
+    #         df =  pd.read_csv(csv_path)
+    #         panddas_paths = df['paths'].tolist()
 
-        for path in panddas_paths:
-            print(f'generating csvs for {path}...')
-            path_system = pathlib.Path(path)
-            log_built_ligands(path_system)
-            log_training_data_paths(path_system)
-            gen_rmsds(path_system)
+    #     for path in panddas_paths:
+    #         print(f'generating csvs for {path}...')
+    #         path_system = pathlib.Path(path)
+    #         log_built_ligands(path_system)
+    #         log_training_data_paths(path_system)
+    #         gen_rmsds(path_system)
 
         
 
@@ -367,6 +476,7 @@ def make_training_files():
 if __name__ == "__main__":
     p = sys.argv[1]
     dirs(p)
+    dir_check_csv()
     make_training_files()
 
     print('data prep completed!')
