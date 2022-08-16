@@ -122,6 +122,10 @@ def directory_check_from_csv(path_csv: pathlib.PosixPath):
 
     print(directories)
     
+    for array in directories.values():
+        print(len(array))
+
+    
     pd_dircheck = pd.DataFrame.from_dict(directories)
     python_path = pathlib.Path(__file__).resolve(strict=True).parent #fetch path of python script
     outfname = python_path / 'training' / 'manual' / 'dircheck.csv'
