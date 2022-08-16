@@ -48,8 +48,7 @@ def directory_check_from_csv(path_csv: pathlib.PosixPath):
         
         try:
             if path_system.is_dir() and access(path_system, R_OK):
-                directories['system'].append(path_system)
-
+                
                 if path_panddas.is_dir() and access(path_panddas, R_OK):
                     path_analyses = [x for x in path_panddas.iterdir() if x.is_dir() and 'analyses' in x.stem]
                     path_analyses = filter_path_analyses(path_analyses)
@@ -105,7 +104,9 @@ def directory_check_from_csv(path_csv: pathlib.PosixPath):
                 else:
                     directories['initial_model_exist?'].append('False')
                     directories['initial_model_path'].append('')
-            
+
+                directories['system'].append(path_system)
+
             else:
                 directories['system'].append(path_system)
                 directories['panddas_exist?'].append('No Permission')
