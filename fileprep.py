@@ -344,6 +344,23 @@ def make_training_files():
             log_built_ligands(path_system)
             log_training_data_paths(path_system)
             gen_rmsds(path_system)
+    
+    for p in paths:
+        csv_path = python_path / 'nonstandard_paths.csv'
+
+        if csv_path.is_file():
+            df =  pd.read_csv(csv_path)
+            panddas_paths = df['paths'].tolist()
+
+        for path in panddas_paths:
+            print(f'generating csvs for {path}...')
+            path_system = pathlib.Path(path)
+            log_built_ligands(path_system)
+            log_training_data_paths(path_system)
+            gen_rmsds(path_system)
+
+        
+
 
 #######
 
