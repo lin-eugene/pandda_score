@@ -454,19 +454,22 @@ def make_training_files():
             log_training_data_paths(path_system)
             gen_rmsds(path_system)
     
-    # for p in paths:
-    #     csv_path = python_path / 'training'
+    for p in paths:
+        csv_path = python_path / 'training'
 
-    #     if csv_path.is_file():
-    #         df =  pd.read_csv(csv_path)
-    #         panddas_paths = df['paths'].tolist()
+        if csv_path.is_file():
+            df =  pd.read_csv(csv_path)
+            df_panddas = df[(df['panddas_exist?']=='Y') & (df['initial_model_exist?']=='Y')]
 
-    #     for path in panddas_paths:
-    #         print(f'generating csvs for {path}...')
-    #         path_system = pathlib.Path(path)
-    #         log_built_ligands(path_system)
-    #         log_training_data_paths(path_system)
-    #         gen_rmsds(path_system)
+            print(df_panddas)
+            panddas_paths = df_panddas['system'].tolist()
+
+        for path in panddas_paths:
+            print(f'generating csvs for {path}...')
+            path_system = pathlib.Path(path)
+            log_built_ligands(path_system)
+            log_training_data_paths(path_system)
+            gen_rmsds(path_system)
 
         
 
