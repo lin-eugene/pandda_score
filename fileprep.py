@@ -243,7 +243,7 @@ def find_all_csvs(path_data):
     path_data = pathlib.Path(path_data)
     
     csvs = []
-    paths_year = [x for x in path_data() if x.is_dir()]
+    paths_year = [x for x in path_data.iterdir() if x.is_dir()]
 
     for path_year in paths_year:
         csv_paths = find_csvs_from_year(path_year)
