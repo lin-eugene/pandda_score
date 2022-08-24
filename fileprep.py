@@ -203,7 +203,7 @@ def find_inspect_csv(paths_panddas):
             if not (path_events_csv.is_file() and access(path_events_csv, R_OK)):
                 continue
 
-            if os.stat(path_events_csv).st_size != 0:
+            if os.stat(path_events_csv).st_size == 0:
                 continue
             
             csv_paths.append(path_events_csv)
