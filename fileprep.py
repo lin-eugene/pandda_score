@@ -221,6 +221,7 @@ def find_csv_from_system_path(path_system):
     return csv_paths
 
 def find_csvs(path_year):
+    path_year = pathlib.Path(path_year)
     csvs = []
     paths_system = [x for x in path_year.iterdir() if x.is_dir()]
 
