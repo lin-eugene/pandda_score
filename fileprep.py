@@ -179,8 +179,6 @@ def find_panddas(path_analysis):
             continue
         
         paths_panddas.append(path)
-    
-    print(paths_panddas)
 
     return paths_panddas
 
@@ -192,9 +190,9 @@ def find_inspect_csv(paths_panddas):
         return csv_paths
     
     for path_panddas in paths_panddas:
+        print(path_panddas)
         paths_analyses = [x for x in path_panddas.iterdir() if x.is_dir() and 'analyses' in x.stem]
         
-
         for path in paths_analyses:
 
             if not (path.is_dir() and access(path, R_OK)):
@@ -209,6 +207,7 @@ def find_inspect_csv(paths_panddas):
                 continue
             
             csv_paths.append(path_events_csv)
+    
 
     return csv_paths
 
