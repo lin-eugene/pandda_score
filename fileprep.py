@@ -210,8 +210,6 @@ def find_inspect_csv(paths_panddas):
             
             csv_paths.append(path_events_csv)
 
-    print(csv_paths)
-
     return csv_paths
 
         
@@ -223,6 +221,8 @@ def find_csv_from_system_path(path_system):
     
     paths_panddas = find_panddas(path_analysis)
     csv_paths = find_inspect_csv(paths_panddas)
+
+    print(csv_paths)
 
     return csv_paths
 
