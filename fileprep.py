@@ -159,6 +159,8 @@ def find_path_analysis(path_system):
         return
     if not access(path_analysis, R_OK):
         return
+    
+    print(path_analysis)
 
     return path_analysis
 
@@ -177,6 +179,8 @@ def find_panddas(path_analysis):
             continue
         
         paths_panddas.append(path)
+    
+    print(paths_panddas)
 
     return paths_panddas
 
@@ -206,7 +210,9 @@ def find_inspect_csv(paths_panddas):
             
             csv_paths.append(path_events_csv)
 
-        return csv_paths
+    print(csv_paths)
+
+    return csv_paths
 
         
 def find_csv_from_system_path(path_system):
