@@ -236,6 +236,7 @@ def find_csvs(path_year):
         csvs = csvs + csv_paths
     
     print(csvs)
+    print(len(csvs))
     
     return csvs
 
