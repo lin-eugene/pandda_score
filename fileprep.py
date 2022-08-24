@@ -233,7 +233,7 @@ def find_csvs(path_year):
 
     for path in paths_system:
         csv_paths = find_csv_from_system_path(path)
-        csvs = csvs + csv_paths
+        csvs += csv_paths
     
     print(csvs)
     print(len(csvs))
