@@ -225,7 +225,7 @@ def find_csv_from_system_path(path_system):
 
     return csv_paths
 
-def find_csvs(path_year):
+def find_csvs_from_year(path_year):
     path_year = pathlib.Path(path_year)
     csvs = []
     paths_system = [x for x in path_year.iterdir() if x.is_dir()]
@@ -236,6 +236,18 @@ def find_csvs(path_year):
     
     print(csvs)
     print(len(csvs))
+    
+    return csvs
+
+def find_all_csvs(path_data):
+    path_data = pathlib.Path(path_data)
+    
+    csvs = []
+    paths_year = [x for x in path_data() if x.is_dir()]
+
+    for path_year in paths_year:
+        csv_paths = find_csvs_from_year(path_year)
+        csvs += csv_paths
     
     return csvs
 
@@ -678,7 +690,7 @@ if __name__ == "__main__":
     # dirs(p)
     # dir_check_csv()
     # make_training_files()
-    find_csvs(p)
+    find_all_csvs(p)
 
 
 
