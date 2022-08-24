@@ -234,9 +234,6 @@ def find_csvs_from_year(path_year):
         csv_paths = find_csv_from_system_path(path)
         csvs += csv_paths
     
-    print(csvs)
-    print(len(csvs))
-    
     return csvs
 
 def find_all_csvs(path_data):
@@ -248,6 +245,9 @@ def find_all_csvs(path_data):
     for path_year in paths_year:
         csv_paths = find_csvs_from_year(path_year)
         csvs += csv_paths
+    
+    print(csvs)
+    print(len(csvs))
     
     return csvs
 
