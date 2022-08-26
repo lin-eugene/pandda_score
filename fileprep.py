@@ -255,7 +255,7 @@ def filter_csvs(csvs):
     
     for path in csvs:
         df = pd.read_csv(path)
-        df = df.loc(df['Ligand Placed']==True) & (df['Ligand Confidence']=='High')
+        df = df.loc[(df['Ligand Placed']==True) & (df['Ligand Confidence']=='High')]
         arr = df['Ligand Placed'].to_numpy()
         sum = np.sum(arr)
         if sum == 0:
@@ -265,8 +265,6 @@ def filter_csvs(csvs):
     print(len(csvs))
     return csvs
         
-
-
 
 
 def filter_path_analyses(path_analyses):
