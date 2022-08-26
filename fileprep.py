@@ -261,7 +261,9 @@ def filter_csvs(csvs):
         if sum == 0:
             csvs.remove(path)
     
-    return path
+    print(csvs)
+    print(len(csvs))
+    return csvs
         
 
 
@@ -704,6 +706,7 @@ if __name__ == "__main__":
     # dir_check_csv()
     # make_training_files()
     find_all_csvs(p)
+    
 
 
 
