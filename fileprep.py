@@ -705,8 +705,9 @@ if __name__ == "__main__":
     # dirs(p)
     # dir_check_csv()
     # make_training_files()
-    find_all_csvs(p)
-    
+    csvs = find_all_csvs(p)
+    filter_csvs(csvs)
+
 
 
 
