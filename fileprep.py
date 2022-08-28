@@ -280,8 +280,8 @@ def find_models(csvs):
         if not path_model_building.is_dir():
             path_model_building = path_analysis / 'initial_model'
         
-        models.append = [[path_csv, panddas_path, path_model_building]]
-    
+        models.append([path_csv, panddas_path, path_model_building])
+        
     df_models = pd.DataFrame(models, columns=colnames)
     
     print(df_models)
