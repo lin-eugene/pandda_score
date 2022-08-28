@@ -357,8 +357,8 @@ def find_remodelled_residues_from_csv(df_pandda_inspect):
     }
 
     for row in df_pandda_inspect.itertuples():
-        input = gemmi.read_structure(row.input_model)[0]
-        output = gemmi.read_structure(row.output_model)[0]
+        input = gemmi.read_structure(str(row.input_model))[0]
+        output = gemmi.read_structure(str(row.output_model))[0]
 
         input_chain_idx, output_chain_idx, residue_input_idx, residue_output_idx, residue_name, rmsd = calc_rmsd_per_model(input, output)
         dict['dtag'] += [row.dtag]*len(rmsd)
