@@ -327,7 +327,7 @@ def find_events_all_datasets(df_models):
     pandda_inspect = pd.DataFrame(columns=['dtag','event_idx', 'x', 'y', 'z', '1-BDC', 'high_resolution','Ligand Placed', 'Ligand Confidence','event_map','mtz','input_model','output_model'])
     for row in df_models.itertuples():
         df = find_events_per_dataset(row.csv_path, row.panddas_path, row.model_building)
-        pandda_inspect = pd.concat(pandda_inspect,df)
+        pandda_inspect = pd.concat([pandda_inspect,df])
 
     print(pandda_inspect)
     return pandda_inspect
