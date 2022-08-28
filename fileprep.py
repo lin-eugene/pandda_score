@@ -306,7 +306,7 @@ def find_events_per_dataset(csv_path, panddas_path, model_building):
 
     for row in pandda_inspect.itertuples():
         print(row)
-        event_path = panddas_path / 'processed_datasets' / f'{row.dtag}' / f'{row.dtag}-event_{row.event_idx}_1-BDC_{row._7}_map.native.ccp4'
+        event_path = panddas_path / 'processed_datasets' / f'{row.dtag}' / f'{row.dtag}-event_{row.event_idx}_1-BDC_{row._6}_map.native.ccp4'
         mtz_path = panddas_path / 'processed_datasets'  / f'{row.dtag}' / f'{row.dtag}-pandda-input.mtz'
         input_model_path = panddas_path / 'processed_datasets' / f'{row.dtag}' / f'{row.dtag}-pandda-input.pdb'
         output_model_path = model_building / f'{row.dtag}' / f'{row.dtag}-pandda-model.pdb'
