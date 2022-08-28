@@ -1,4 +1,5 @@
 
+from importlib.resources import path
 from pyexpat import model
 import pandas as pd
 import pathlib
@@ -267,8 +268,7 @@ def filter_csvs(csvs):
     print(len(csvs))
     return csvs
 
-
-def find_models(csvs):
+def list_pandda_model_paths(csvs):
     models = []
     colnames = ['csv_path', 'panddas_path', 'model_building']
 
@@ -281,15 +281,54 @@ def find_models(csvs):
             path_model_building = path_analysis / 'initial_model'
         
         models.append([path_csv, panddas_path, path_model_building])
-        
+
     df_models = pd.DataFrame(models, columns=colnames)
     
     print(df_models)
     
     return df_models
         
+def find_events_per_dataset(csv_path, panddas_path, model_building):
+    csv_path = pathlib.Path(csv_path)
+    panddas_path = pathlib.Path(panddas_path)
+    model_building = pathlib.Path(model_building)
 
+    event_map = []
+    mtz = []
+    input_model = []
+    output_model = []
 
+    
+    pandda_inspect = pd.read_csv(csv_path)
+    pandda_inspect = pandda_inspect.loc[(pandda_inspect['Ligand Placed']==True) & (pandda_inspect['Ligand Confidence']=='High')]
+    pandda_inspect = pandda_inspect[['dtag','event_idx', 'x', 'y', 'z', '1-BDC', 'high_resolution','Ligand Placed', 'Ligand Confidence']]
+
+    for row in pandda_inspect.itertuples():
+        event_path = panddas_path / 'processed_datasets' / f'{row.dtag}' / f'{row.dtag}-event_{row.event_idx}_1-BDC_{row._7}_map.native.ccp4'
+        mtz_path = panddas_path / 'processed_datasets'  / f'{row.dtag}' / f'{row.dtag}-pandda-input.mtz'
+        input_model_path = panddas_path / 'processed_datasets' / f'{row.dtag}' / f'{row.dtag}-pandda-input.pdb'
+        output_model_path = model_building / f'{row.dtag}' / f'{row.dtag}-pandda-model.pdb'
+
+        event_map.append(event_path)
+        mtz.append(mtz_path)
+        input_model.append(input_model_path)
+        output_model.append(output_model_path)
+
+    pandda_inspect['event_map'] = event_map
+    pandda_inspect['mtz'] = mtz
+    pandda_inspect['input_model'] = input_model
+    pandda_inspect['output_model'] = output_model
+
+    return pandda_inspect
+
+def find_events_all_datasets(df_models):
+    pandda_inspect = pd.DataFrame(columns=['dtag','event_idx', 'x', 'y', 'z', '1-BDC', 'high_resolution','Ligand Placed', 'Ligand Confidence','event_map','mtz','input_model','output_model'])
+    for row in df_models.itertuples():
+        df = find_events_per_dataset(row.csv_path, row.panddas_path, row.model_building)
+        pandda_inspect = pd.concat(pandda_inspect,df)
+
+    print(pandda_inspect)
+    return pandda_inspect
 
 def filter_path_analyses(path_analyses):
     new_paths = []
@@ -731,7 +770,8 @@ if __name__ == "__main__":
     # make_training_files()
     csvs = find_all_csvs(p)
     csvs = filter_csvs(csvs)
-    df = find_models(csvs)
+    df = list_pandda_model_paths(csvs)
+    events_csv = find_events_all_datasets(df)
     
 
 
