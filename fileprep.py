@@ -1,11 +1,9 @@
-
-from importlib.resources import path
-from pyexpat import model
 import pandas as pd
 import pathlib
 import os
 from os import access, R_OK
 import pickle
+import gemmi
 
 from lib import rmsdcalc
 import sys
@@ -324,13 +322,120 @@ def find_events_per_dataset(csv_path, panddas_path, model_building):
     return pandda_inspect
 
 def find_events_all_datasets(df_models):
-    pandda_inspect = pd.DataFrame(columns=['dtag','event_idx', 'x', 'y', 'z', '1-BDC', 'high_resolution','Ligand Placed', 'Ligand Confidence','event_map','mtz','input_model','output_model'])
+    df_pandda_inspect = pd.DataFrame(columns=['dtag','event_idx', 'x', 'y', 'z', '1-BDC', 'high_resolution','Ligand Placed', 'Ligand Confidence','event_map','mtz','input_model','output_model'])
     for row in df_models.itertuples():
         df = find_events_per_dataset(row.csv_path, row.panddas_path, row.model_building)
-        pandda_inspect = pd.concat([pandda_inspect,df])
+        df_pandda_inspect = pd.concat([df_pandda_inspect,df])
 
-    print(pandda_inspect)
-    return pandda_inspect
+    print(df_pandda_inspect)
+
+    return df_pandda_inspect
+
+
+def find_remodelled_residues_from_csv(df_pandda_inspect):
+    dict = {
+        'dtag': [],
+        'event_idx': [], 
+        'x': [], 
+        'y': [], 
+        'z': [],
+        '1-BDC': [], 
+        'high_resolution': [],
+        'Ligand Placed': [], 
+        'Ligand Confidence': [],
+        'event_map': [],
+        'mtz': [],
+        'input_model': [],
+        'output_model': [], 
+        'input_chain_idx': [], 
+        'output_chain_idx': [], 
+        'residue_input_idx': [], 
+        'residue_output_idx': [], 
+        'residue_name': [], 
+        'rmsd': []
+
+    }
+
+    for row in df_pandda_inspect.itertuples():
+        input = gemmi.read_structure(row.input_model)[0]
+        output = gemmi.read_structure(row.output_model)[0]
+
+        input_chain_idx, output_chain_idx, residue_input_idx, residue_output_idx, residue_name, rmsd = calc_rmsd_per_model(input, output)
+        dict['dtag'] += [row.dtag]*len(rmsd)
+        dict['event_idx'] += [row.event_idx]*len(rmsd)
+        dict['x'] += [row.x]*len(rmsd)
+        dict['y'] += [row.y]*len(rmsd)
+        dict['z'] += [row.z]*len(rmsd)
+        dict['BDC'] += [row._6]*len(rmsd)
+        dict['high_res'] += [row.high_resolution]*len(rmsd)
+        dict['lig_placed'] += [row._8]*len(rmsd)
+        dict['lig_confidence'] += [row._9]*len(rmsd)
+        dict['event_map'] += [row.event_map]*len(rmsd)
+        dict['mtz'] += [row.mtz]*len(rmsd)
+        dict['input_model'] += [row.input_model]*len(rmsd)
+        dict['output_model'] += [row.output_model]*len(rmsd)
+        dict['input_chain_idx'] += input_chain_idx
+        dict['output_chain_idx'] += output_chain_idx
+        dict['residue_input_idx'] += residue_input_idx
+        dict['residue_output_idx'] += residue_output_idx
+        dict['residue_name'] += residue_name
+        dict['rmsd'] += rmsd
+
+    df = pd.DataFrame.from_dict(dict)
+
+    return dict
+
+
+    
+
+
+def calc_rmsd_per_chain(chain_input, chain_output):
+    rmsd = []
+    residue_input_idx = []
+    residue_output_idx = []
+    residue_name = []
+
+    for i, residue_input in enumerate(chain_input):
+        for j, residue_output in enumerate(chain_output):
+            if ((str(residue_input) == str(residue_output)) and 
+                (residue_input.het_flag == 'A' and residue_output.het_flag == 'A')):
+                CoM_input = rmsdcalc.calculate_CoM_residue(residue_input)
+                CoM_output = rmsdcalc.calculate_CoM_residue(residue_output)
+                dist = np.linalg.norm(CoM_input-CoM_output)
+
+                rmsd.append(dist)
+                residue_input_idx.append(i)
+                residue_output_idx.append(j)
+                residue_name.append(str(residue_input))
+    
+    return rmsd, residue_input_idx, residue_output_idx, residue_name
+        
+def calc_rmsd_per_model(model_input, model_output):
+    chain, chain_idx = rmsdcalc.map_chains(model_input, model_output)
+    input_chain_idx = []
+    output_chain_idx = []
+    rmsd_1 = []
+    residue_input_idx_1 = []
+    residue_output_idx_1 = []
+    residue_name_1 = []
+
+    for pair, pair_idx in zip(chain, chain_idx):
+        rmsd, residue_input_idx, residue_output_idx, residue_name = calc_rmsd_per_chain(pair[0], pair[1])
+
+        if bool(rmsd)==True: # if rmsd list is not empty
+            input_chain_idx += [pair_idx[0]]*len(rmsd)
+            output_chain_idx += [pair_idx[1]]*len(rmsd)
+            rmsd_1 += rmsd
+            residue_input_idx_1 += residue_input_idx
+            residue_output_idx_1 += residue_output_idx
+            residue_name_1 += residue_name
+    
+    return input_chain_idx, output_chain_idx, residue_input_idx_1, residue_output_idx_1, residue_name_1, rmsd_1
+
+
+
+
+##########
 
 def filter_path_analyses(path_analyses):
     new_paths = []
@@ -774,6 +879,7 @@ if __name__ == "__main__":
     csvs = filter_csvs(csvs)
     df = list_pandda_model_paths(csvs)
     events_csv = find_events_all_datasets(df)
+    df2 = find_remodelled_residues_from_csv(events_csv)
     
 
 
