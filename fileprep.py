@@ -1,8 +1,10 @@
 
+from pyexpat import model
 import pandas as pd
 import pathlib
 import os
 from os import access, R_OK
+import pickle
 
 from lib import rmsdcalc
 import sys
@@ -184,10 +186,10 @@ def find_panddas(path_analysis):
 
 def find_inspect_csv(paths_panddas):
 
-    csv_paths = []
+    csvs = []
 
     if len(paths_panddas) == 0:
-        return csv_paths
+        return csvs
     
     for path_panddas in paths_panddas:
         paths_analyses = [x for x in path_panddas.iterdir() if x.is_dir() and 'analyses' in x.stem]
@@ -206,10 +208,10 @@ def find_inspect_csv(paths_panddas):
             if os.stat(path_events_csv).st_size == 0:
                 continue
             
-            csv_paths.append(path_events_csv)
+            csvs.append(path_events_csv)
     
 
-    return csv_paths
+    return csvs
 
         
 def find_csv_from_system_path(path_system):
@@ -219,11 +221,11 @@ def find_csv_from_system_path(path_system):
         return []
     
     paths_panddas = find_panddas(path_analysis)
-    csv_paths = find_inspect_csv(paths_panddas)
+    csvs = find_inspect_csv(paths_panddas)
 
-    print(csv_paths)
+    print(csvs)
 
-    return csv_paths
+    return csvs
 
 def find_csvs_from_year(path_year):
     path_year = pathlib.Path(path_year)
@@ -252,7 +254,7 @@ def find_all_csvs(path_data):
     return csvs
 
 def filter_csvs(csvs):
-    
+
     for path in csvs:
         df = pd.read_csv(path)
         df = df.loc[(df['Ligand Placed']==True) & (df['Ligand Confidence']=='High')]
@@ -264,7 +266,29 @@ def filter_csvs(csvs):
     print(csvs)
     print(len(csvs))
     return csvs
+
+
+def find_models(csvs):
+    models = []
+    colnames = ['csv_path', 'panddas_path', 'model_building']
+
+    for path_csv in csvs:
+        panddas_path = path_csv.parent.parent
+        path_analysis = panddas_path.parent
+        path_model_building = path_analysis / 'model_building'
+
+        if not path_model_building.is_dir():
+            path_model_building = path_analysis / 'initial_model'
         
+        models.append = [[path_csv, panddas_path, path_model_building]]
+    
+    df_models = pd.DataFrame(models, columns=colnames)
+    
+    print(df_models)
+    
+    return df_models
+        
+
 
 
 def filter_path_analyses(path_analyses):
@@ -281,6 +305,8 @@ def filter_path_analyses(path_analyses):
                     new_paths.append(path)
 
     return new_paths
+
+
 
 
 
