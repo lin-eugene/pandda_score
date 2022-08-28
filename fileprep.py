@@ -382,7 +382,7 @@ def find_remodelled_residues_from_csv(df_pandda_inspect):
         dict['rmsd'] += rmsd
 
     df = pd.DataFrame.from_dict(dict)
-
+    print(df)
     return dict
 
 
