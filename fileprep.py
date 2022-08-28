@@ -730,7 +730,9 @@ if __name__ == "__main__":
     # dir_check_csv()
     # make_training_files()
     csvs = find_all_csvs(p)
-    filter_csvs(csvs)
+    csvs = filter_csvs(csvs)
+    df = find_models(csvs)
+    
 
 
 
