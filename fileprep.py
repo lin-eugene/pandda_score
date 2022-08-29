@@ -302,18 +302,21 @@ def find_events_per_dataset(csv_path, panddas_path, model_building):
     pandda_inspect = pandda_inspect[['dtag','event_idx', 'x', 'y', 'z', '1-BDC', 'high_resolution','Ligand Placed', 'Ligand Confidence']]
     print(pandda_inspect)
 
-    for row in pandda_inspect.itertuples():
+    for i, row in enumerate(pandda_inspect.itertuples()):
         print(row)
         event_path = panddas_path / 'processed_datasets' / f'{row.dtag}' / f'{row.dtag}-event_{row.event_idx}_1-BDC_{row._6}_map.native.ccp4'
         mtz_path = panddas_path / 'processed_datasets'  / f'{row.dtag}' / f'{row.dtag}-pandda-input.mtz'
         input_model_path = panddas_path / 'processed_datasets' / f'{row.dtag}' / f'{row.dtag}-pandda-input.pdb'
         output_model_path = model_building / f'{row.dtag}' / f'{row.dtag}-pandda-model.pdb'
 
-        if event_path.is_file() and mtz_path.is_file() and input_model_path.is_file() and output_model_path.is_file():
-            event_map.append(event_path)
-            mtz.append(mtz_path)
-            input_model.append(input_model_path)
-            output_model.append(output_model_path)
+        if not (event_path.is_file() and mtz_path.is_file() and input_model_path.is_file() and output_model_path.is_file()):
+            df
+            continue
+            
+        event_map.append(event_path)
+        mtz.append(mtz_path)
+        input_model.append(input_model_path)
+        output_model.append(output_model_path)
 
     pandda_inspect['event_map'] = event_map
     pandda_inspect['mtz'] = mtz
@@ -329,6 +332,9 @@ def find_events_all_datasets(df_models):
         df_pandda_inspect = pd.concat([df_pandda_inspect,df])
 
     print(df_pandda_inspect)
+
+    outfname = pathlib.Path.cwd() / 'training' / 'model_paths.csv'
+    df_pandda_inspect.to_csv(outfname)
 
     return df_pandda_inspect
 
