@@ -295,7 +295,6 @@ def find_events_per_dataset(csv_path, panddas_path, model_building):
     mtz = []
     input_model = []
     output_model = []
-
     
     pandda_inspect = pd.read_csv(csv_path)
     pandda_inspect = pandda_inspect.loc[(pandda_inspect['Ligand Placed']==True) & (pandda_inspect['Ligand Confidence']=='High')]
@@ -334,9 +333,29 @@ def find_events_all_datasets(df_models):
     print(df_pandda_inspect)
 
     outfname = pathlib.Path.cwd() / 'training' / 'model_paths.csv'
+    df_pandda_inspect.reset_index(drop=True)
     df_pandda_inspect.to_csv(outfname)
 
     return df_pandda_inspect
+
+def filter_non_existent_paths(df_pandda_inspect):
+    drop = []
+    for i, row in enumerate(df_pandda_inspect.itertuples()):
+        event_map = pathlib.Path(row.event_map)
+        mtz = pathlib.Path(row.mtz)
+        input_model = pathlib.Path(row.input_model)
+        output_model = pathlib.Path(row.output_model)
+
+        if not (event_map.is_file() and mtz.is_file() and input_model.is_file() and output_model.is_file()):
+            drop.append(i)
+
+    df_pandda_inspect = df_pandda_inspect.drop(df_pandda_inspect.index[drop])
+
+    return df_pandda_inspect
+
+        
+
+
 
 
 def find_remodelled_residues_from_csv(df_pandda_inspect):
@@ -886,6 +905,7 @@ if __name__ == "__main__":
     csvs = filter_csvs(csvs)
     df = list_pandda_model_paths(csvs)
     events_csv = find_events_all_datasets(df)
+    events_csv = filter_non_existent_paths(events_csv)
     df2 = find_remodelled_residues_from_csv(events_csv)
     
 
