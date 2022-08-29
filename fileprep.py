@@ -468,6 +468,11 @@ def find_remodelled_residues(df_residues, threshold=0.8):
 
     return df_residues
 
+def filter_remodelled_residues(df_residues):
+    df_residues = df_residues.loc(df_residues['remodelled']==True)
+    print(df_residues)
+    return df_residues
+
 
 
 
@@ -918,6 +923,7 @@ if __name__ == "__main__":
     events_csv = filter_non_existent_paths(events_csv)
     df2 = calc_rmsds_from_csv(events_csv)
     df2 = find_remodelled_residues(df2)
+    df2 = filter_remodelled_residues(df2)
     
 
 
