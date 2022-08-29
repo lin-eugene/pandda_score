@@ -353,12 +353,58 @@ def filter_non_existent_paths(df_pandda_inspect):
 
     return df_pandda_inspect
 
+
+
+
+    
+
+
+def calc_rmsd_per_chain(chain_input, chain_output):
+    rmsd = []
+    residue_input_idx = []
+    residue_output_idx = []
+    residue_name = []
+
+    for i, residue_input in enumerate(chain_input):
+        for j, residue_output in enumerate(chain_output):
+            if ((str(residue_input) == str(residue_output)) and 
+                (residue_input.het_flag == 'A' and residue_output.het_flag == 'A')):
+                CoM_input = rmsdcalc.calculate_CoM_residue(residue_input)
+                CoM_output = rmsdcalc.calculate_CoM_residue(residue_output)
+                dist = np.linalg.norm(CoM_input-CoM_output)
+
+                rmsd.append(dist)
+                residue_input_idx.append(i)
+                residue_output_idx.append(j)
+                residue_name.append(str(residue_input))
+    
+    return rmsd, residue_input_idx, residue_output_idx, residue_name
         
+def calc_rmsd_per_model(model_input, model_output):
+    chain, chain_idx = rmsdcalc.map_chains(model_input, model_output)
+    input_chain_idx = []
+    output_chain_idx = []
+    rmsd_1 = []
+    residue_input_idx_1 = []
+    residue_output_idx_1 = []
+    residue_name_1 = []
+
+    for pair, pair_idx in zip(chain, chain_idx):
+        rmsd, residue_input_idx, residue_output_idx, residue_name = calc_rmsd_per_chain(pair[0], pair[1])
+
+        if bool(rmsd)==True: # if rmsd list is not empty
+            input_chain_idx += [pair_idx[0]]*len(rmsd)
+            output_chain_idx += [pair_idx[1]]*len(rmsd)
+            rmsd_1 += rmsd
+            residue_input_idx_1 += residue_input_idx
+            residue_output_idx_1 += residue_output_idx
+            residue_name_1 += residue_name
+    
+    return input_chain_idx, output_chain_idx, residue_input_idx_1, residue_output_idx_1, residue_name_1, rmsd_1
 
 
 
-
-def find_remodelled_residues_from_csv(df_pandda_inspect):
+def calc_rmsds_from_csv(df_pandda_inspect):
     dict = {
         'dtag': [],
         'event_idx': [], 
@@ -407,56 +453,20 @@ def find_remodelled_residues_from_csv(df_pandda_inspect):
         dict['residue_name'] += residue_name
         dict['rmsd'] += rmsd
 
-    df = pd.DataFrame.from_dict(dict)
-    print(df)
-    return dict
+    df_residues = pd.DataFrame.from_dict(dict)
+    print(df_residues)
+    return df_residues
 
+def find_remodelled_residues(df_residues, threshold=0.8):
+    rmsd = df_residues['rmsd'].tolist()
+    remodelled = rmsd > threshold
 
-    
+    df_residues['remodelled'] = remodelled
+    print(df_residues)
+    outfname = pathlib.Path.cwd() / 'training' / 'training_data.csv'
+    df_residues.to_csv(outfname)
 
-
-def calc_rmsd_per_chain(chain_input, chain_output):
-    rmsd = []
-    residue_input_idx = []
-    residue_output_idx = []
-    residue_name = []
-
-    for i, residue_input in enumerate(chain_input):
-        for j, residue_output in enumerate(chain_output):
-            if ((str(residue_input) == str(residue_output)) and 
-                (residue_input.het_flag == 'A' and residue_output.het_flag == 'A')):
-                CoM_input = rmsdcalc.calculate_CoM_residue(residue_input)
-                CoM_output = rmsdcalc.calculate_CoM_residue(residue_output)
-                dist = np.linalg.norm(CoM_input-CoM_output)
-
-                rmsd.append(dist)
-                residue_input_idx.append(i)
-                residue_output_idx.append(j)
-                residue_name.append(str(residue_input))
-    
-    return rmsd, residue_input_idx, residue_output_idx, residue_name
-        
-def calc_rmsd_per_model(model_input, model_output):
-    chain, chain_idx = rmsdcalc.map_chains(model_input, model_output)
-    input_chain_idx = []
-    output_chain_idx = []
-    rmsd_1 = []
-    residue_input_idx_1 = []
-    residue_output_idx_1 = []
-    residue_name_1 = []
-
-    for pair, pair_idx in zip(chain, chain_idx):
-        rmsd, residue_input_idx, residue_output_idx, residue_name = calc_rmsd_per_chain(pair[0], pair[1])
-
-        if bool(rmsd)==True: # if rmsd list is not empty
-            input_chain_idx += [pair_idx[0]]*len(rmsd)
-            output_chain_idx += [pair_idx[1]]*len(rmsd)
-            rmsd_1 += rmsd
-            residue_input_idx_1 += residue_input_idx
-            residue_output_idx_1 += residue_output_idx
-            residue_name_1 += residue_name
-    
-    return input_chain_idx, output_chain_idx, residue_input_idx_1, residue_output_idx_1, residue_name_1, rmsd_1
+    return df_residues
 
 
 
@@ -906,7 +916,8 @@ if __name__ == "__main__":
     df = list_pandda_model_paths(csvs)
     events_csv = find_events_all_datasets(df)
     events_csv = filter_non_existent_paths(events_csv)
-    df2 = find_remodelled_residues_from_csv(events_csv)
+    df2 = calc_rmsds_from_csv(events_csv)
+    df2 = find_remodelled_residues(df2)
     
 
 
