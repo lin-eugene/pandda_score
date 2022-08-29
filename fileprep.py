@@ -310,7 +310,7 @@ def find_events_per_dataset(csv_path, panddas_path, model_building):
         output_model_path = model_building / f'{row.dtag}' / f'{row.dtag}-pandda-model.pdb'
 
         if not (event_path.is_file() and mtz_path.is_file() and input_model_path.is_file() and output_model_path.is_file()):
-            pandda_inspect.drop(pandda_inspect.index[i])
+            pandda_inspect = pandda_inspect.drop(pandda_inspect.index[i])
             continue
             
         event_map.append(event_path)
