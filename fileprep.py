@@ -458,7 +458,7 @@ def calc_rmsds_from_csv(df_pandda_inspect):
     return df_residues
 
 def find_remodelled_residues(df_residues, threshold=0.8):
-    rmsd = df_residues['rmsd'].tolist()
+    rmsd = df_residues['rmsd'].to_numpy()
     remodelled = rmsd > threshold
 
     df_residues['remodelled'] = remodelled
