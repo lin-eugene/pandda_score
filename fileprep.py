@@ -469,7 +469,7 @@ def find_remodelled_residues(df_residues, threshold=0.8):
     return df_residues
 
 def filter_remodelled_residues(df_residues):
-    df_residues = df_residues.loc(df_residues['remodelled']==True)
+    df_residues = df_residues.loc[df_residues['remodelled']==True]
     print(df_residues)
     return df_residues
 
