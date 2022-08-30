@@ -415,7 +415,8 @@ def find_contacts(df_residues):
                 (df_residues['output_chain_idx']==chain_idx) &
                 (df_residues['residue_output_idx']==residue_idx) &
                 (df_residues['residue_name']==res_name)
-                ].set_index('dtag').to_dict('list')
+                ].to_dict('list')
+            print(contact_row)
             
             for dict_lists, contact_row_list in zip(dict.values(), contact_row.values()):
                 dict_lists += contact_row_list
