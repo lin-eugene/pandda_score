@@ -388,7 +388,8 @@ def find_contacts(df_residues):
             'residue_input_idx': [], 
             'residue_output_idx': [], 
             'residue_name': [], 
-            'rmsd': []
+            'rmsd': [],
+            'remodelled': []
 
         }
 
