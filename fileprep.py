@@ -369,7 +369,28 @@ def filter_remodelled_residues(df_residues):
     return df_residues
 
 def find_contacts(df_residues):
-    df_negative_data = pd.DataFrame(columns=['dtag','event_idx', 'x', 'y', 'z', '1-BDC', 'high_resolution','Ligand Placed', 'Ligand Confidence','event_map','mtz','input_model','output_model','input_chain_idx', 'output_chain_idx', 'residue_input_idx', 'residue_output_idx', 'residue_name', 'rmsd'])
+    dict = {
+            'dtag': [],
+            'event_idx': [], 
+            'x': [], 
+            'y': [], 
+            'z': [],
+            '1-BDC': [], 
+            'high_resolution': [],
+            'Ligand Placed': [], 
+            'Ligand Confidence': [],
+            'event_map': [],
+            'mtz': [],
+            'input_model': [],
+            'output_model': [], 
+            'input_chain_idx': [], 
+            'output_chain_idx': [], 
+            'residue_input_idx': [], 
+            'residue_output_idx': [], 
+            'residue_name': [], 
+            'rmsd': []
+
+        }
 
     df_remodelled = df_residues.loc[df_residues['remodelled']==True]
 
@@ -387,13 +408,18 @@ def find_contacts(df_residues):
             res_name = contact[2]
             contact_row = df_residues.loc[
                 (df_residues['remodelled']==False) &           (df_residues['input_model']==row.input_model) &
+                (df_residues['x']==row.x) &
+                (df_residues['y']==row.y) &
+                (df_residues['z']==row.z) &
                 (df_residues['output_chain_idx']==chain_idx) &
                 (df_residues['residue_output_idx']==residue_idx) &
                 (df_residues['residue_name']==res_name)
-                ]
-            df_negative_data = pd.concat([df_negative_data, contact_row])
-            print(df_negative_data)
-    
+                ].to_dict('list')
+            
+            for dict_lists, contact_row_list in zip(dict.values(), contact_row.values):
+                dict_lists += contact_row_list
+
+    df_negative_data = pd.DataFrame.from_dict(dict)
     print(df_negative_data)
     df_negative_data.drop_duplicates()
     print(df_negative_data)
@@ -402,6 +428,21 @@ def find_contacts(df_residues):
     
     return df_negative_data
 
+def find_contacts_from_contact_list(df_residues, contact_list):
+    
+    
+    for contact in contact_list:
+            chain_idx = contact[0]
+            residue_idx = contact[1]
+            res_name = contact[2]
+            contact_row = df_residues.loc[
+                (df_residues['remodelled']==False) &           (df_residues['input_model']==row.input_model) &
+                (df_residues['output_chain_idx']==chain_idx) &
+                (df_residues['residue_output_idx']==residue_idx) &
+                (df_residues['residue_name']==res_name)
+                ]
+            df_negative_data = pd.concat([df_negative_data, contact_row])
+            print(df_negative_data)
 
         
 
