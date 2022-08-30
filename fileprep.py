@@ -416,6 +416,7 @@ def find_contacts(df_residues):
                 (df_residues['residue_output_idx']==residue_idx) &
                 (df_residues['residue_name']==res_name)
                 ].to_dict('list')
+            contact_row.pop('Unnamed: 0')
             print(contact_row)
             
             for dict_lists, contact_row_list in zip(dict.values(), contact_row.values()):
