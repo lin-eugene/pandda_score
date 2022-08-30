@@ -354,7 +354,7 @@ def find_remodelled_residues(df_residues, threshold=0.8):
 
     df_residues['remodelled'] = remodelled
     print(df_residues)
-    df_residues.drop_duplicates()
+    df_residues.drop_duplicates(keep='first')
     print(df_residues)
     outfname = pathlib.Path.cwd() / 'training' / 'residues.csv'
     df_residues.to_csv(outfname)
@@ -425,7 +425,7 @@ def find_contacts(df_residues):
 
     df_negative_data = pd.DataFrame.from_dict(dict)
     print(df_negative_data)
-    df_negative_data.drop_duplicates()
+    df_negative_data.drop_duplicates(keep='first', subset=dict.keys())
     print(df_negative_data)
     outfname = pathlib.Path.cwd() / 'training' / 'neg_data.csv'
     df_negative_data.to_csv(outfname)
