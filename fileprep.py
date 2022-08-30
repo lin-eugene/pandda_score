@@ -388,6 +388,7 @@ def find_contacts(df_residues):
                 (df_residues['residue_name']==res_name)
                 ]
             df_negative_data = pd.concat([df_negative_data, contact_row])
+            print(df_negative_data)
     
     print(df_negative_data)
     df_negative_data.drop_duplicates()
