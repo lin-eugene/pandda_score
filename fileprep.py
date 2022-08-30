@@ -382,11 +382,11 @@ def find_contacts(df_residues):
             residue_idx = contact[1]
             res_name = contact[2]
             contact_row = df_residues.loc[
-                df_residues['remodelled']==False and
-                df_residues['input_model']==row.input_model and
-                df_residues['output_chain_idx']==chain_idx and
-                df_residues['residue_output_idx']==residue_idx and
-                df_residues['residue_name']==res_name
+                (df_residues['remodelled']==False) and
+                (df_residues['input_model']==row.input_model) and
+                (df_residues['output_chain_idx']==chain_idx) and
+                (df_residues['residue_output_idx']==residue_idx) and
+                (df_residues['residue_name']==res_name)
                 ]
             df_negative_data = pd.concat(df_negative_data, contact_row)
     
