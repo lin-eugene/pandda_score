@@ -345,6 +345,7 @@ def calc_rmsds_from_csv(df_pandda_inspect):
         dict['rmsd'] += rmsd
 
     df_residues = pd.DataFrame.from_dict(dict)
+    df_residues = df_residues.drop_duplicates()
     print(df_residues)
     return df_residues
 
@@ -354,7 +355,7 @@ def find_remodelled_residues(df_residues, threshold=0.8):
 
     df_residues['remodelled'] = remodelled
     print(df_residues)
-    df_residues.drop_duplicates(keep='first')
+    df_residues = df_residues.drop_duplicates(keep='first')
     print(df_residues)
     outfname = pathlib.Path.cwd() / 'training' / 'residues.csv'
     df_residues.to_csv(outfname)
