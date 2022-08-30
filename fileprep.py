@@ -407,14 +407,15 @@ def find_contacts(df_residues):
             residue_idx = contact[1]
             res_name = contact[2]
             contact_row = df_residues.loc[
-                (df_residues['remodelled']==False) &           (df_residues['input_model']==row.input_model) &
+                (df_residues['remodelled']==False) &           
+                (df_residues['input_model']==row.input_model) &
                 (df_residues['x']==row.x) &
                 (df_residues['y']==row.y) &
                 (df_residues['z']==row.z) &
                 (df_residues['output_chain_idx']==chain_idx) &
                 (df_residues['residue_output_idx']==residue_idx) &
                 (df_residues['residue_name']==res_name)
-                ].to_dict('list')
+                ].set_index('dtag').to_dict('list')
             
             for dict_lists, contact_row_list in zip(dict.values(), contact_row.values()):
                 dict_lists += contact_row_list
