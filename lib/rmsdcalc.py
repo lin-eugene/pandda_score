@@ -12,7 +12,7 @@ def map_chains(input_model: gemmi.Model, output_model: gemmi.Model):
     returns list with mapped chain pairs
     """
     chain = []
-    chain_id = []
+    chain_idx = []
     #renaming chains in two models to match each other if they are aligned
     print('mapping chains')
     for i, chain_gt in enumerate(input_model):
@@ -21,15 +21,12 @@ def map_chains(input_model: gemmi.Model, output_model: gemmi.Model):
             rsr_CoM = chain_rsr.calculate_center_of_mass() #gemmi.Position
 
             dist = gt_CoM.dist(rsr_CoM)
-            # print(dist)
-            # print('chain_gt=',chain_gt.name)
-            # print('chain_rsr=',chain_rsr.name)
+
             if dist < 1:
-                #chain_rsr.name = chain_gt.name
                 chain.append([chain_gt,chain_rsr])
-                chain_id.append([i,j])
-    print(chain_id)
-    return chain, chain_id
+                chain_idx.append([i,j])
+
+    return chain, chain_idx
 
 def superpose(polymer1: gemmi.ResidueSpan, polymer2: gemmi.ResidueSpan):
     """
@@ -45,6 +42,7 @@ def superpose(polymer1: gemmi.ResidueSpan, polymer2: gemmi.ResidueSpan):
 def calculate_CoM_residue(residue: gemmi.Residue):
     """
     calculates the centre of mass for a single residue
+    only looks at one conformer
     """
     coords = []
     mass = []
@@ -93,11 +91,6 @@ def calc_rmsds(input_pdb_name: pathlib.PosixPath, remodelled_pdb_name: pathlib.P
     rmsd_dict = {}
     chain_mapping_filt = []
     for pair, chain_id in zip(chain, chain_mapping):
-        # polymer1 = pair[0].get_polymer()
-        # polymer2 = pair[1].get_polymer()
-        # # print(polymer1)
-        # # print(polymer2)
-        # polymer2 = superpose(polymer1, polymer2)
         dist_diff = calc_dist_diff(pair[0], pair[1])
         
         if bool(dist_diff)==True: #if dist_diff dictionary is not empty

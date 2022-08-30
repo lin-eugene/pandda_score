@@ -416,7 +416,7 @@ def find_contacts(df_residues):
                 (df_residues['residue_name']==res_name)
                 ].to_dict('list')
             
-            for dict_lists, contact_row_list in zip(dict.values(), contact_row.values):
+            for dict_lists, contact_row_list in zip(dict.values(), contact_row.values()):
                 dict_lists += contact_row_list
 
     df_negative_data = pd.DataFrame.from_dict(dict)
