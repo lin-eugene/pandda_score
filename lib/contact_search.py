@@ -14,7 +14,7 @@ def find_contacts_per_residue(structure: gemmi.Structure, residue: gemmi.Residue
     for mark in marks:
         cra = mark.to_cra(structure[0])
         if (cra.residue.name != residue.name) and (cra.residue.het_flag == 'A') \
-            and ([mark, cra.chain.name, cra.residue] not in contacts):
+            and ([mark.chain_idx, mark.residue_idx, str(cra.residue)] not in contacts):
             contacts.append([mark.chain_idx, mark.residue_idx, str(cra.residue)])
     
     return contacts
