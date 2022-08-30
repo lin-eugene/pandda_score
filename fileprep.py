@@ -5,7 +5,7 @@ from os import access, R_OK
 import pickle
 import gemmi
 
-from lib import rmsdcalc
+from lib import rmsdcalc, contact_search
 import sys
 import numpy as np
 
@@ -366,6 +366,35 @@ def filter_remodelled_residues(df_residues):
     df_residues.to_csv(outfname)
     return df_residues
 
+def find_contacts(df_residues):
+    df_negative_data = pd.DataFrame(columns=['dtag','event_idx', 'x', 'y', 'z', '1-BDC', 'high_resolution','Ligand Placed', 'Ligand Confidence','event_map','mtz','input_model','output_model','input_chain_idx', 'output_chain_idx', 'residue_input_idx', 'residue_output_idx', 'residue_name', 'rmsd'])
+
+    df_remodelled = df_residues.loc[df_residues['remodelled']==True]
+
+    for row in df_remodelled.itertuples():
+        structure = gemmi.read_structure(str(row.output_model))
+        residue = structure[0][row.output_chain_idx][row.output_residue_idx]
+
+        contact_list = contact_search.find_contacts_per_residue(structure, residue)
+
+        for contact in contact_list:
+            chain_idx = contact[0]
+            residue_idx = contact[1]
+            res_name = contact[3]
+            contact_row = df_residues.loc[
+                df_residues['remodelled']==False and
+                df_residues['input_model']==row.input_model and
+                df_residues['output_chain_idx']==chain_idx and
+                df_residues['residue_output_idx']==residue_idx and
+                df_residues['residue_name']==res_name
+                ]
+            df_negative_data = pd.concat(df_negative_data, contact_row)
+    
+    return df_negative_data
+
+
+        
+
 
 
 #######
@@ -373,13 +402,17 @@ def filter_remodelled_residues(df_residues):
 if __name__ == "__main__":
     p = sys.argv[1]
 
-    csvs = find_all_csvs(p)
-    csvs = filter_csvs(csvs)
-    df = list_pandda_model_paths(csvs)
-    events_csv = find_events_all_datasets(df)
-    events_csv = filter_non_existent_paths(events_csv)
-    df2 = calc_rmsds_from_csv(events_csv)
-    df2 = find_remodelled_residues(df2)
-    df2 = filter_remodelled_residues(df2)
+    # csvs = find_all_csvs(p)
+    # csvs = filter_csvs(csvs)
+    # df = list_pandda_model_paths(csvs)
+    # events_csv = find_events_all_datasets(df)
+    # events_csv = filter_non_existent_paths(events_csv)
+    # df2 = calc_rmsds_from_csv(events_csv)
+    # df2 = find_remodelled_residues(df2)
+    # df2 = filter_remodelled_residues(df2)
+
+    path = pathlib.Path.cwd() / 'training' / 'residues.csv'
+    res_csv = pd.read_csv(path)
+    df = find_contacts(res_csv)
     
 
