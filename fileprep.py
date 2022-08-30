@@ -425,7 +425,7 @@ def find_contacts(df_residues):
 
     df_negative_data = pd.DataFrame.from_dict(dict)
     print(df_negative_data)
-    df_negative_data = df_negative_data.drop_duplicates(keep='first', subset=dict.keys())
+    df_negative_data = df_negative_data.drop_duplicates()
     print(df_negative_data)
     outfname = pathlib.Path.cwd() / 'training' / 'neg_data.csv'
     df_negative_data.to_csv(outfname)
