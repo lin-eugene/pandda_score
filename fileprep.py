@@ -380,7 +380,7 @@ def find_contacts(df_residues):
         for contact in contact_list:
             chain_idx = contact[0]
             residue_idx = contact[1]
-            res_name = contact[3]
+            res_name = contact[2]
             contact_row = df_residues.loc[
                 df_residues['remodelled']==False and
                 df_residues['input_model']==row.input_model and
