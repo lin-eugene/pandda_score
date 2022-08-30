@@ -453,17 +453,17 @@ def find_contacts_from_contact_list(df_residues, contact_list):
 if __name__ == "__main__":
     p = sys.argv[1]
 
-    csvs = find_all_csvs(p)
-    csvs = filter_csvs(csvs)
-    df = list_pandda_model_paths(csvs)
-    events_csv = find_events_all_datasets(df)
-    events_csv = filter_non_existent_paths(events_csv)
-    df2 = calc_rmsds_from_csv(events_csv)
-    df2 = find_remodelled_residues(df2)
-    df2 = filter_remodelled_residues(df2)
+    # csvs = find_all_csvs(p)
+    # csvs = filter_csvs(csvs)
+    # df = list_pandda_model_paths(csvs)
+    # events_csv = find_events_all_datasets(df)
+    # events_csv = filter_non_existent_paths(events_csv)
+    # df2 = calc_rmsds_from_csv(events_csv)
+    # df2 = find_remodelled_residues(df2)
+    # df2 = filter_remodelled_residues(df2)
 
-    # path = pathlib.Path.cwd() / 'training' / 'residues.csv'
-    # res_csv = pd.read_csv(path)
-    # df = find_contacts(res_csv)
+    path = pathlib.Path.cwd() / 'training' / 'residues.csv'
+    res_csv = pd.read_csv(path)
+    df = find_contacts(res_csv)
     
 
