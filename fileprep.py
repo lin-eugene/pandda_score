@@ -373,7 +373,7 @@ def find_contacts(df_residues):
 
     for row in df_remodelled.itertuples():
         structure = gemmi.read_structure(str(row.output_model))
-        residue = structure[0][row.output_chain_idx][row.output_residue_idx]
+        residue = structure[0][row.output_chain_idx][row.residue_output_idx]
 
         contact_list = contact_search.find_contacts_per_residue(structure, residue)
 
