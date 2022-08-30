@@ -401,7 +401,7 @@ def find_contacts(df_residues):
 
         contact_list = contact_search.find_contacts_per_residue(structure, residue)
 
-        print(contact_list)
+        print('contact_list=',contact_list)
 
         for contact in contact_list:
             chain_idx = contact[0]
