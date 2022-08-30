@@ -390,6 +390,9 @@ def find_contacts(df_residues):
                 ]
             df_negative_data = pd.concat(df_negative_data, contact_row)
     
+    outfname = pathlib.Path.cwd() / 'training' / 'neg_data.csv'
+    df_remodelled.to_csv(outfname)
+    
     return df_negative_data
 
 
