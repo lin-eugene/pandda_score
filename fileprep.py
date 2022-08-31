@@ -404,7 +404,7 @@ def calc_rmsds_from_csv(df_pandda_inspect):
         # input_chain_idxs, output_chain_idxs, residue_input_idxs, residue_output_idxs, residue_names, rmsds = calc_rmsd_per_model(input, output)
         record = map(record_per_residue_rmsd_data, 
                     *calc_rmsd_per_model(input, output),
-                    itertools.repeat(row, len(calc_rmsd_per_model[0])))
+                    itertools.repeat(row, len(calc_rmsd_per_model(input,output)[0])))
         records += record
         # for (input_chain_idx, output_chain_idx, residue_input_idx, residue_output_idx, residue_name, rmsd) in zip(*calc_rmsd_per_model(input, output)):
             
