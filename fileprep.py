@@ -157,7 +157,6 @@ def if_high_confidence_ligand(csv_path: pathlib.Path) -> bool:
         return False
     
     return True
-    
 
 def filter_csvs(csvs: list[pathlib.Path]) -> list[pathlib.Path]: #filtering function
     csvs_new = list(filter(if_high_confidence_ligand,csvs)) #easy to parallelise, and easy to read
@@ -224,11 +223,6 @@ def find_events_per_dataset(csv_path, panddas_path, model_building) -> list[Dict
     panddas_path = pathlib.Path(panddas_path)
     model_building = pathlib.Path(model_building)
 
-    # event_map = []
-    # mtz = []
-    # input_model = []
-    # output_model = []
-    
     pandda_inspect = pd.read_csv(csv_path)
     pandda_inspect = pandda_inspect.loc[(pandda_inspect['Ligand Placed']==True) & (pandda_inspect['Ligand Confidence']=='High')]
     pandda_inspect = pandda_inspect[['dtag','event_idx', 'x', 'y', 'z', '1-BDC', 'high_resolution','Ligand Placed', 'Ligand Confidence']]
@@ -242,26 +236,6 @@ def find_events_per_dataset(csv_path, panddas_path, model_building) -> list[Dict
             ))
 
     print(event_records)
-    # for i, row in enumerate(pandda_inspect.itertuples()):
-    #     print(row)
-    #     event_path = panddas_path / 'processed_datasets' / f'{row.dtag}' / f'{row.dtag}-event_{row.event_idx}_1-BDC_{row._6}_map.native.ccp4'
-    #     mtz_path = panddas_path / 'processed_datasets'  / f'{row.dtag}' / f'{row.dtag}-pandda-input.mtz'
-    #     input_model_path = panddas_path / 'processed_datasets' / f'{row.dtag}' / f'{row.dtag}-pandda-input.pdb'
-    #     output_model_path = model_building / f'{row.dtag}' / f'{row.dtag}-pandda-model.pdb'
-
-    #     # if not (event_path.is_file() and mtz_path.is_file() and input_model_path.is_file() and output_model_path.is_file()):
-    #     #     pandda_inspect = pandda_inspect.drop(pandda_inspect.index[i])
-    #     #     continue
-            
-    #     event_map.append(event_path)
-    #     mtz.append(mtz_path)
-    #     input_model.append(input_model_path)
-    #     output_model.append(output_model_path)
-
-    # pandda_inspect['event_map'] = event_map
-    # pandda_inspect['mtz'] = mtz
-    # pandda_inspect['input_model'] = input_model
-    # pandda_inspect['output_model'] = output_model
 
     return event_records
 
@@ -374,82 +348,16 @@ def record_per_residue_rmsd_data(input_chain_idx,
 def calc_rmsds_from_csv(df_pandda_inspect):
     #loop creating a list of dictionaries
     #each loop creates a dictionary with just one element
-    # dict = {
-    #     'dtag': [],
-    #     'event_idx': [], 
-    #     'x': [], 
-    #     'y': [], 
-    #     'z': [],
-    #     '1-BDC': [], 
-    #     'high_resolution': [],
-    #     'Ligand Placed': [], 
-    #     'Ligand Confidence': [],
-    #     'event_map': [],
-    #     'mtz': [],
-    #     'input_model': [],
-    #     'output_model': [], 
-    #     'input_chain_idx': [], 
-    #     'output_chain_idx': [], 
-    #     'residue_input_idx': [], 
-    #     'residue_output_idx': [], 
-    #     'residue_name': [], 
-    #     'rmsd': []
 
-    # }
     records = []
     for row in df_pandda_inspect.itertuples():
         input = gemmi.read_structure(str(row.input_model))[0]
         output = gemmi.read_structure(str(row.output_model))[0]
         
-        # input_chain_idxs, output_chain_idxs, residue_input_idxs, residue_output_idxs, residue_names, rmsds = calc_rmsd_per_model(input, output)
         record = map(record_per_residue_rmsd_data, 
                     *calc_rmsd_per_model(input, output),
                     itertools.repeat(row, len(calc_rmsd_per_model(input,output)[0])))
         records += record
-        # for (input_chain_idx, output_chain_idx, residue_input_idx, residue_output_idx, residue_name, rmsd) in zip(*calc_rmsd_per_model(input, output)):
-            
-        #     records.append(
-        #         {
-        #         'dtag': row.dtag,
-        #         'event_idx': row.event_idx, 
-        #         'x': row.x, 
-        #         'y': row.y, 
-        #         'z': row.z,
-        #         '1-BDC': row._6, 
-        #         'high_resolution': row.high_resolution,
-        #         'Ligand Placed': row._8, 
-        #         'Ligand Confidence': row._9,
-        #         'event_map': row.event_map,
-        #         'mtz': row.mtz,
-        #         'input_model': row.input_model,
-        #         'output_model': row.output_model, 
-        #         'input_chain_idx': input_chain_idx, 
-        #         'output_chain_idx': output_chain_idx, 
-        #         'residue_input_idx': residue_input_idx, 
-        #         'residue_output_idx': residue_output_idx, 
-        #         'residue_name': residue_name, 
-        #         'rmsd': rmsd}
-        #     )
-
-        # dict['dtag'] += [row.dtag]*len(rmsd)
-        # dict['event_idx'] += [row.event_idx]*len(rmsd)
-        # dict['x'] += [row.x]*len(rmsd)
-        # dict['y'] += [row.y]*len(rmsd)
-        # dict['z'] += [row.z]*len(rmsd)
-        # dict['1-BDC'] += [row._6]*len(rmsd)
-        # dict['high_resolution'] += [row.high_resolution]*len(rmsd)
-        # dict['Ligand Placed'] += [row._8]*len(rmsd)
-        # dict['Ligand Confidence'] += [row._9]*len(rmsd)
-        # dict['event_map'] += [row.event_map]*len(rmsd)
-        # dict['mtz'] += [row.mtz]*len(rmsd)
-        # dict['input_model'] += [row.input_model]*len(rmsd)
-        # dict['output_model'] += [row.output_model]*len(rmsd)
-        # dict['input_chain_idx'] += input_chain_idx
-        # dict['output_chain_idx'] += output_chain_idx
-        # dict['residue_input_idx'] += residue_input_idx
-        # dict['residue_output_idx'] += residue_output_idx
-        # dict['residue_name'] += residue_name
-        # dict['rmsd'] += rmsd
 
     df_residues = pd.DataFrame(records)
     df_residues = df_residues.drop_duplicates()
@@ -525,17 +433,17 @@ def gen_training_data_csv(df_remodelled, df_negative_data, fname='training_data.
 if __name__ == "__main__":
     path_to_labxchem_data_dir = sys.argv[1]
 
-    csvs = find_all_csvs(path_to_labxchem_data_dir)
-    csvs = filter_csvs(csvs)
-    df = list_pandda_model_paths(csvs)
-    events_csv = find_events_all_datasets(df)
-    events_csv = filter_non_existent_paths(events_csv)
-    df_residues = calc_rmsds_from_csv(events_csv)
-    df_residues = find_remodelled_residues(df_residues)
-    df_remodelled = filter_remodelled_residues(df_residues)
-    df_negative_data = find_contacts(df_residues)
-    # df_remodelled = pd.read_csv(pathlib.Path.cwd() / 'training' / 'remodelled.csv', index=False)
-    # df_negative_data = pd.read_csv(pathlib.Path.cwd() / 'training' / 'neg_data.csv', index=False)
+    # csvs = find_all_csvs(path_to_labxchem_data_dir)
+    # csvs = filter_csvs(csvs)
+    # df = list_pandda_model_paths(csvs)
+    # events_csv = find_events_all_datasets(df)
+    # events_csv = filter_non_existent_paths(events_csv)
+    # df_residues = calc_rmsds_from_csv(events_csv)
+    # df_residues = find_remodelled_residues(df_residues)
+    # df_remodelled = filter_remodelled_residues(df_residues)
+    # df_negative_data = find_contacts(df_residues)
+    df_remodelled = pd.read_csv(pathlib.Path.cwd() / 'training' / 'remodelled.csv', index=False)
+    df_negative_data = pd.read_csv(pathlib.Path.cwd() / 'training' / 'neg_data.csv', index=False)
     df_training = gen_training_data_csv(df_remodelled, df_negative_data)
 
     
