@@ -63,7 +63,7 @@ def find_path_analysis(path_system: pathlib.Path) -> Optional[pathlib.Path]:
     return path_analysis
 
 
-def find_panddas(path_analysis: pathlib.Path) -> List[pathlib.Path]:
+def find_panddas(path_analysis: pathlib.Path) -> list[pathlib.Path]:
     paths = [x for x in path_analysis.iterdir() if x.is_dir()]
     paths_panddas = []
 
@@ -80,7 +80,7 @@ def find_panddas(path_analysis: pathlib.Path) -> List[pathlib.Path]:
 
     return paths_panddas
 
-def find_inspect_csv(paths_panddas: List[pathlib.Path]) -> List[pathlib.Path]:
+def find_inspect_csv(paths_panddas: list[pathlib.Path]) -> list[pathlib.Path]:
 
     csvs = []
 
@@ -110,7 +110,7 @@ def find_inspect_csv(paths_panddas: List[pathlib.Path]) -> List[pathlib.Path]:
     return csvs
 
         
-def find_csv_from_system_path(path_system: pathlib.Path) -> List[pathlib.Path]:
+def find_csv_from_system_path(path_system: pathlib.Path) -> list[pathlib.Path]:
     path_analysis = find_path_analysis(path_system)
 
     if path_analysis == None:
@@ -123,7 +123,7 @@ def find_csv_from_system_path(path_system: pathlib.Path) -> List[pathlib.Path]:
 
     return csvs
 
-def find_csvs_from_year(path_year: str) -> List[pathlib.Path]:
+def find_csvs_from_year(path_year: str) -> list[pathlib.Path]:
     path_year = pathlib.Path(path_year)
     csvs = []
     paths_system = [x for x in path_year.iterdir() if x.is_dir()]
@@ -134,7 +134,7 @@ def find_csvs_from_year(path_year: str) -> List[pathlib.Path]:
     
     return csvs
 
-def find_all_csvs(path_data: str) -> List[pathlib.Path]:
+def find_all_csvs(path_data: str) -> list[pathlib.Path]:
     path_data = pathlib.Path(path_data)
     
     csvs = []
@@ -159,7 +159,7 @@ def if_high_confidence_ligand(csv_path: pathlib.Path) -> bool:
     return True
     
 
-def filter_csvs(csvs: List[pathlib.Path]) -> List[pathlib.Path]: #filtering function
+def filter_csvs(csvs: list[pathlib.Path]) -> list[pathlib.Path]: #filtering function
     csvs_new = list(filter(if_high_confidence_ligand,csvs)) #easy to parallelise, and easy to read
     
     print(csvs_new)
