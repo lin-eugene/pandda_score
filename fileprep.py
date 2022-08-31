@@ -246,10 +246,6 @@ def filter_non_existent_paths(df_pandda_inspect):
 
 
 
-
-    
-
-
 def calc_rmsd_per_chain(chain_input, chain_output):
     rmsd = []
     residue_input_idx = []
@@ -346,6 +342,7 @@ def calc_rmsds_from_csv(df_pandda_inspect):
 
     df_residues = pd.DataFrame.from_dict(dict)
     df_residues = df_residues.drop_duplicates()
+    df_residues = df_residues.reset_index()
     print(df_residues)
     return df_residues
 
@@ -357,19 +354,20 @@ def find_remodelled_residues(df_residues, threshold=0.8):
     print(df_residues)
     df_residues = df_residues.drop_duplicates(keep='first')
     print(df_residues)
-    outfname = pathlib.Path.cwd() / 'training' / 'residues.csv'
+    outfname = pathlib.Path.cwd() / 'training' / 'all_residues.csv'
     df_residues.to_csv(outfname)
 
     return df_residues
 
 def filter_remodelled_residues(df_residues):
-    df_residues = df_residues.loc[df_residues['remodelled']==True]
-    print(df_residues)
-    outfname = pathlib.Path.cwd() / 'training' / 'training_data.csv'
-    df_residues.to_csv(outfname)
-    return df_residues
+    df_remodelled = df_residues.loc[df_residues['remodelled']==True]
+    df_remodelled = df_remodelled.reset_index()
+    print(df_remodelled)
+    outfname = pathlib.Path.cwd() / 'training' / 'remodelled.csv'
+    df_remodelled.to_csv(outfname)
+    return df_remodelled
 
-def find_contacts(df_residues):
+def find_contacts(df_residues, fname='neg_data.csv'):
     dict = {
             'dtag': [],
             'event_idx': [], 
@@ -402,8 +400,6 @@ def find_contacts(df_residues):
 
         contact_list = contact_search.find_contacts_per_residue(structure, residue)
 
-        print('contact_list=',contact_list)
-
         for contact in contact_list:
             chain_idx = contact[0]
             residue_idx = contact[1]
@@ -419,7 +415,6 @@ def find_contacts(df_residues):
                 (df_residues['residue_name']==res_name)
                 ].to_dict('list')
             contact_row.pop('Unnamed: 0')
-            print(contact_row)
             
             for dict_lists, contact_row_list in zip(dict.values(), contact_row.values()):
                 dict_lists += contact_row_list
@@ -427,30 +422,21 @@ def find_contacts(df_residues):
     df_negative_data = pd.DataFrame.from_dict(dict)
     print(df_negative_data)
     df_negative_data = df_negative_data.drop_duplicates()
+    df_negative_data = df_negative_data.reset_index()
     print(df_negative_data)
-    outfname = pathlib.Path.cwd() / 'training' / 'neg_data.csv'
+    outfname = pathlib.Path.cwd() / 'training' / fname
     df_negative_data.to_csv(outfname)
     
     return df_negative_data
 
-def find_contacts_from_contact_list(df_residues, contact_list):
-    
-    
-    for contact in contact_list:
-            chain_idx = contact[0]
-            residue_idx = contact[1]
-            res_name = contact[2]
-            contact_row = df_residues.loc[
-                (df_residues['remodelled']==False) &           (df_residues['input_model']==row.input_model) &
-                (df_residues['output_chain_idx']==chain_idx) &
-                (df_residues['residue_output_idx']==residue_idx) &
-                (df_residues['residue_name']==res_name)
-                ]
-            df_negative_data = pd.concat([df_negative_data, contact_row])
-            print(df_negative_data)
+def gen_training_data_csv(df_remodelled, df_negative_data, fname='training_data.csv'):
+    df_training = pd.concat([df_remodelled, df_negative_data])
+    df_training = df_training.sort_values(by=['dtag'])
+    df_training = df_training.reset_index()
+    outfname = pathlib.Path.cwd() / 'training' / fname
+    df_training.to_csv(outfname)
 
-        
-
+    return df_training
 
 
 #######
@@ -463,12 +449,11 @@ if __name__ == "__main__":
     df = list_pandda_model_paths(csvs)
     events_csv = find_events_all_datasets(df)
     events_csv = filter_non_existent_paths(events_csv)
-    df2 = calc_rmsds_from_csv(events_csv)
-    df2 = find_remodelled_residues(df2)
-    df2 = filter_remodelled_residues(df2)
-
-    path = pathlib.Path.cwd() / 'training' / 'residues.csv'
-    res_csv = pd.read_csv(path)
-    df = find_contacts(res_csv)
+    df_residues = calc_rmsds_from_csv(events_csv)
+    df_residues = find_remodelled_residues(df_residues)
+    df_remodelled = filter_remodelled_residues(df_residues)
+    df_negative_data = find_contacts(df_residues)
+    df_training = (df_remodelled, df_negative_data)
+    
     
 
