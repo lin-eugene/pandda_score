@@ -433,17 +433,17 @@ def gen_training_data_csv(df_remodelled, df_negative_data, fname='training_data.
 if __name__ == "__main__":
     path_to_labxchem_data_dir = sys.argv[1]
 
-    # csvs = find_all_csvs(path_to_labxchem_data_dir)
-    # csvs = filter_csvs(csvs)
-    # df = list_pandda_model_paths(csvs)
-    # events_csv = find_events_all_datasets(df)
-    # events_csv = filter_non_existent_paths(events_csv)
-    # df_residues = calc_rmsds_from_csv(events_csv)
-    # df_residues = find_remodelled_residues(df_residues)
-    # df_remodelled = filter_remodelled_residues(df_residues)
-    # df_negative_data = find_contacts(df_residues)
-    df_remodelled = pd.read_csv(pathlib.Path.cwd() / 'training' / 'remodelled.csv', index=False)
-    df_negative_data = pd.read_csv(pathlib.Path.cwd() / 'training' / 'neg_data.csv', index=False)
+    csvs = find_all_csvs(path_to_labxchem_data_dir)
+    csvs = filter_csvs(csvs)
+    df = list_pandda_model_paths(csvs)
+    events_csv = find_events_all_datasets(df)
+    events_csv = filter_non_existent_paths(events_csv)
+    df_residues = calc_rmsds_from_csv(events_csv)
+    df_residues = find_remodelled_residues(df_residues)
+    df_remodelled = filter_remodelled_residues(df_residues)
+    df_negative_data = find_contacts(df_residues)
+    # df_remodelled = pd.read_csv(pathlib.Path.cwd() / 'training' / 'remodelled.csv', index=False)
+    # df_negative_data = pd.read_csv(pathlib.Path.cwd() / 'training' / 'neg_data.csv', index=False)
     df_training = gen_training_data_csv(df_remodelled, df_negative_data)
 
     
