@@ -275,7 +275,7 @@ def find_events_all_datasets(df_models):
 
     outfname = pathlib.Path.cwd() / 'training' / 'model_paths.csv'
     df_pandda_inspect.reset_index(drop=True)
-    df_pandda_inspect.to_csv(outfname)
+    df_pandda_inspect.to_csv(outfname, index=False)
 
     return df_pandda_inspect
 
@@ -462,7 +462,7 @@ def find_remodelled_residues(df_residues, threshold=0.8):
     df_residues = df_residues.drop_duplicates(keep='first')
     # print(df_residues)
     outfname = pathlib.Path.cwd() / 'training' / 'all_residues.csv'
-    df_residues.to_csv(outfname)
+    df_residues.to_csv(outfname, index=False)
 
     return df_residues
 
@@ -471,7 +471,7 @@ def filter_remodelled_residues(df_residues):
     df_remodelled = df_remodelled.reset_index(drop=True)
     print(df_remodelled)
     outfname = pathlib.Path.cwd() / 'training' / 'remodelled.csv'
-    df_remodelled.to_csv(outfname)
+    df_remodelled.to_csv(outfname, index=False)
     return df_remodelled
 
 def find_contacts(df_residues, fname='neg_data.csv'):
@@ -506,16 +506,16 @@ def find_contacts(df_residues, fname='neg_data.csv'):
     df_negative_data = df_negative_data.reset_index(drop=True)
     print(df_negative_data)
     outfname = pathlib.Path.cwd() / 'training' / fname
-    df_negative_data.to_csv(outfname)
+    df_negative_data.to_csv(outfname, index=False)
     
     return df_negative_data
 
 def gen_training_data_csv(df_remodelled, df_negative_data, fname='training_data.csv'):
     df_training = pd.concat([df_remodelled, df_negative_data])
-    df_training = df_training.reset_index(drop=True)
     df_training = df_training.sort_values(by=['dtag'])
+    df_training = df_training.reset_index(drop=True)
     outfname = pathlib.Path.cwd() / 'training' / fname
-    df_training.to_csv(outfname)
+    df_training.to_csv(outfname, index=False)
 
     return df_training
 
@@ -535,8 +535,8 @@ if __name__ == "__main__":
     # df_remodelled = filter_remodelled_residues(df_residues)
     # df_negative_data = find_contacts(df_residues)
 
-    df_remodelled = pd.read_csv(pathlib.Path.cwd() / 'training' / 'remodelled.csv')
-    df_negative_data = pd.read_csv(pathlib.Path.cwd() / 'training' / 'neg_data.csv')
+    df_remodelled = pd.read_csv(pathlib.Path.cwd() / 'training' / 'remodelled.csv', index=False)
+    df_negative_data = pd.read_csv(pathlib.Path.cwd() / 'training' / 'neg_data.csv', index=False)
     df_training = gen_training_data_csv(df_remodelled, df_negative_data)
 
     
