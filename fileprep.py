@@ -159,7 +159,7 @@ def if_high_confidence_ligand(csv_path: pathlib.Path) -> bool:
     return True
     
 
-def filter_csvs(csvs: List[pathlib.Path]) -> List[pathlib.path]: #filtering function
+def filter_csvs(csvs: List[pathlib.Path]) -> List[pathlib.Path]: #filtering function
     csvs_new = list(filter(if_high_confidence_ligand,csvs)) #easy to parallelise, and easy to read
     
     print(csvs_new)
