@@ -342,63 +342,94 @@ def calc_rmsd_per_model(model_input, model_output):
     return input_chain_idx, output_chain_idx, residue_input_idx_1, residue_output_idx_1, residue_name_1, rmsd_1
 
 
+def record_per_residue_rmsd_data(input_chain_idx, 
+        output_chain_idx, 
+        residue_input_idx, 
+        residue_output_idx, 
+        residue_name, 
+        rmsd, 
+        row) -> Dict:
+
+    return {'dtag': row.dtag,
+            'event_idx': row.event_idx, 
+            'x': row.x, 
+            'y': row.y, 
+            'z': row.z,
+            '1-BDC': row._6, 
+            'high_resolution': row.high_resolution,
+            'Ligand Placed': row._8, 
+            'Ligand Confidence': row._9,
+            'event_map': row.event_map,
+            'mtz': row.mtz,
+            'input_model': row.input_model,
+            'output_model': row.output_model, 
+            'input_chain_idx': input_chain_idx, 
+            'output_chain_idx': output_chain_idx, 
+            'residue_input_idx': residue_input_idx, 
+            'residue_output_idx': residue_output_idx, 
+            'residue_name': residue_name, 
+            'rmsd': rmsd
+            }
 
 def calc_rmsds_from_csv(df_pandda_inspect):
     #loop creating a list of dictionaries
     #each loop creates a dictionary with just one element
-    dict = {
-        'dtag': [],
-        'event_idx': [], 
-        'x': [], 
-        'y': [], 
-        'z': [],
-        '1-BDC': [], 
-        'high_resolution': [],
-        'Ligand Placed': [], 
-        'Ligand Confidence': [],
-        'event_map': [],
-        'mtz': [],
-        'input_model': [],
-        'output_model': [], 
-        'input_chain_idx': [], 
-        'output_chain_idx': [], 
-        'residue_input_idx': [], 
-        'residue_output_idx': [], 
-        'residue_name': [], 
-        'rmsd': []
+    # dict = {
+    #     'dtag': [],
+    #     'event_idx': [], 
+    #     'x': [], 
+    #     'y': [], 
+    #     'z': [],
+    #     '1-BDC': [], 
+    #     'high_resolution': [],
+    #     'Ligand Placed': [], 
+    #     'Ligand Confidence': [],
+    #     'event_map': [],
+    #     'mtz': [],
+    #     'input_model': [],
+    #     'output_model': [], 
+    #     'input_chain_idx': [], 
+    #     'output_chain_idx': [], 
+    #     'residue_input_idx': [], 
+    #     'residue_output_idx': [], 
+    #     'residue_name': [], 
+    #     'rmsd': []
 
-    }
+    # }
     records = []
     for row in df_pandda_inspect.itertuples():
         input = gemmi.read_structure(str(row.input_model))[0]
         output = gemmi.read_structure(str(row.output_model))[0]
         
         # input_chain_idxs, output_chain_idxs, residue_input_idxs, residue_output_idxs, residue_names, rmsds = calc_rmsd_per_model(input, output)
-
-        for (input_chain_idx, output_chain_idx, residue_input_idx, residue_output_idx, residue_name, rmsd) in zip(*calc_rmsd_per_model(input, output)):
+        record = map(record_per_residue_rmsd_data, 
+                    *calc_rmsd_per_model(input, output),
+                    itertools.repeat(row, len(calc_rmsd_per_model[0])))
+        records += record
+        # for (input_chain_idx, output_chain_idx, residue_input_idx, residue_output_idx, residue_name, rmsd) in zip(*calc_rmsd_per_model(input, output)):
             
-            records.append(
-                {
-                'dtag': row.dtag,
-                'event_idx': row.event_idx, 
-                'x': row.x, 
-                'y': row.y, 
-                'z': row.z,
-                '1-BDC': row._6, 
-                'high_resolution': row.high_resolution,
-                'Ligand Placed': row._8, 
-                'Ligand Confidence': row._9,
-                'event_map': row.event_map,
-                'mtz': row.mtz,
-                'input_model': row.input_model,
-                'output_model': row.output_model, 
-                'input_chain_idx': input_chain_idx, 
-                'output_chain_idx': output_chain_idx, 
-                'residue_input_idx': residue_input_idx, 
-                'residue_output_idx': residue_output_idx, 
-                'residue_name': residue_name, 
-                'rmsd': rmsd}
-            )
+        #     records.append(
+        #         {
+        #         'dtag': row.dtag,
+        #         'event_idx': row.event_idx, 
+        #         'x': row.x, 
+        #         'y': row.y, 
+        #         'z': row.z,
+        #         '1-BDC': row._6, 
+        #         'high_resolution': row.high_resolution,
+        #         'Ligand Placed': row._8, 
+        #         'Ligand Confidence': row._9,
+        #         'event_map': row.event_map,
+        #         'mtz': row.mtz,
+        #         'input_model': row.input_model,
+        #         'output_model': row.output_model, 
+        #         'input_chain_idx': input_chain_idx, 
+        #         'output_chain_idx': output_chain_idx, 
+        #         'residue_input_idx': residue_input_idx, 
+        #         'residue_output_idx': residue_output_idx, 
+        #         'residue_name': residue_name, 
+        #         'rmsd': rmsd}
+        #     )
 
         # dict['dtag'] += [row.dtag]*len(rmsd)
         # dict['event_idx'] += [row.event_idx]*len(rmsd)
@@ -420,7 +451,7 @@ def calc_rmsds_from_csv(df_pandda_inspect):
         # dict['residue_name'] += residue_name
         # dict['rmsd'] += rmsd
 
-    df_residues = pd.DataFrame.from_dict(dict) #pd.DataFrame(records)
+    df_residues = pd.DataFrame(records)
     df_residues = df_residues.drop_duplicates()
     df_residues = df_residues.reset_index(drop=True)
     print(df_residues)
