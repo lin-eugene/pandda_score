@@ -537,7 +537,7 @@ if __name__ == "__main__":
 
     df_remodelled = pd.read_csv(pathlib.Path.cwd() / 'training' / 'remodelled.csv')
     df_negative_data = pd.read_csv(pathlib.Path.cwd() / 'training' / 'neg_data.csv')
-    df_training = (df_remodelled, df_negative_data)
+    df_training = gen_training_data_csv(df_remodelled, df_negative_data)
 
     
 
