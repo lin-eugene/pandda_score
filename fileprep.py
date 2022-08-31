@@ -416,7 +416,7 @@ def find_contacts(df_residues, fname='neg_data.csv'):
                 ].to_dict('list')
             
             print(contact_row)
-            contact_row.pop('Unnamed: 0')
+            # contact_row.pop('Unnamed: 0')
             
             for dict_lists, contact_row_list in zip(dict.values(), contact_row.values()):
                 dict_lists += contact_row_list
