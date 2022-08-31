@@ -534,8 +534,8 @@ if __name__ == "__main__":
     df_residues = find_remodelled_residues(df_residues)
     df_remodelled = filter_remodelled_residues(df_residues)
     df_negative_data = find_contacts(df_residues)
-    df_remodelled = pd.read_csv(pathlib.Path.cwd() / 'training' / 'remodelled.csv', index=False)
-    df_negative_data = pd.read_csv(pathlib.Path.cwd() / 'training' / 'neg_data.csv', index=False)
+    # df_remodelled = pd.read_csv(pathlib.Path.cwd() / 'training' / 'remodelled.csv', index=False)
+    # df_negative_data = pd.read_csv(pathlib.Path.cwd() / 'training' / 'neg_data.csv', index=False)
     df_training = gen_training_data_csv(df_remodelled, df_negative_data)
 
     
