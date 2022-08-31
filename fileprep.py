@@ -512,8 +512,8 @@ def find_contacts(df_residues, fname='neg_data.csv'):
 
 def gen_training_data_csv(df_remodelled, df_negative_data, fname='training_data.csv'):
     df_training = pd.concat([df_remodelled, df_negative_data])
-    df_training = df_training.sort_values(by=['dtag'])
     df_training = df_training.reset_index(drop=True)
+    df_training = df_training.sort_values(by=['dtag'])
     outfname = pathlib.Path.cwd() / 'training' / fname
     df_training.to_csv(outfname)
 
