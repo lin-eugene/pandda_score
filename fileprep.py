@@ -219,7 +219,7 @@ def get_event_record(row: Any, panddas_path: pathlib.Path, model_building: pathl
         'output_model': output_model_path
     }
 
-def find_events_per_dataset(csv_path, panddas_path, model_building) -> list(Dict):
+def find_events_per_dataset(csv_path, panddas_path, model_building) -> list[Dict]:
     csv_path = pathlib.Path(csv_path)
     panddas_path = pathlib.Path(panddas_path)
     model_building = pathlib.Path(model_building)
