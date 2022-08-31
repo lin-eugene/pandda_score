@@ -189,15 +189,15 @@ def list_pandda_model_paths(csvs): #mapping function
     return df_models
 
 def get_event_record(row: Any, panddas_path: pathlib.Path, model_building: pathlib.Path) -> Dict:
-    dtag = str(row['dtag'])
-    event_idx = str(row['event_idx'])
-    x = str(row['x'])
-    y = str(row['y'])
-    z = str(row['z'])
-    occupancy = str(row['1-BDC'])
-    high_resolution = str(row['high_resolution'])
-    ligand_placed = str(row['Ligand Placed'])
-    ligand_confidence = str(row['Ligand Confidence'])
+    dtag = str(row.dtag)
+    event_idx = str(row.event_idx)
+    x = row.x
+    y = row.y
+    z = row.z
+    occupancy = row._6
+    high_resolution = row.high_resolution
+    ligand_placed = row._8
+    ligand_confidence = row._9
     event_path = panddas_path / 'processed_datasets' / f'{row.dtag}' / f'{row.dtag}-event_{row.event_idx}_1-BDC_{row._6}_map.native.ccp4'
     mtz_path = panddas_path / 'processed_datasets'  / f'{row.dtag}' / f'{row.dtag}-pandda-input.mtz'
     input_model_path = panddas_path / 'processed_datasets' / f'{row.dtag}' / f'{row.dtag}-pandda-input.pdb'
@@ -236,7 +236,7 @@ def find_events_per_dataset(csv_path, panddas_path, model_building) -> list[Dict
 
     event_records = list(map(
             get_event_record, 
-            pandda_inspect.iterrows(),
+            pandda_inspect.itertuples(),
             itertools.repeat(panddas_path, pandda_inspect.shape[0]),
             itertools.repeat(model_building, pandda_inspect.shape[0])
             ))
