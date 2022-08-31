@@ -379,7 +379,7 @@ def calc_rmsds_from_csv(df_pandda_inspect):
             residue_output_idx, \
             residue_name, \
             rmsd \
-            in calc_rmsd_per_model(input, output):
+            in zip(calc_rmsd_per_model(input, output)):
             
             records.append(
                 {
