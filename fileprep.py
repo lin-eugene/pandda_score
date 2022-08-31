@@ -342,7 +342,7 @@ def calc_rmsds_from_csv(df_pandda_inspect):
 
     df_residues = pd.DataFrame.from_dict(dict)
     df_residues = df_residues.drop_duplicates()
-    df_residues = df_residues.reset_index()
+    df_residues = df_residues.reset_index(drop=True)
     print(df_residues)
     return df_residues
 
@@ -361,7 +361,7 @@ def find_remodelled_residues(df_residues, threshold=0.8):
 
 def filter_remodelled_residues(df_residues):
     df_remodelled = df_residues.loc[df_residues['remodelled']==True]
-    df_remodelled = df_remodelled.reset_index()
+    df_remodelled = df_remodelled.reset_index(drop=True)
     print(df_remodelled)
     outfname = pathlib.Path.cwd() / 'training' / 'remodelled.csv'
     df_remodelled.to_csv(outfname)
@@ -422,7 +422,7 @@ def find_contacts(df_residues, fname='neg_data.csv'):
     df_negative_data = pd.DataFrame.from_dict(dict)
     print(df_negative_data)
     df_negative_data = df_negative_data.drop_duplicates()
-    df_negative_data = df_negative_data.reset_index()
+    df_negative_data = df_negative_data.reset_index(drop=True)
     print(df_negative_data)
     outfname = pathlib.Path.cwd() / 'training' / fname
     df_negative_data.to_csv(outfname)
@@ -432,7 +432,7 @@ def find_contacts(df_residues, fname='neg_data.csv'):
 def gen_training_data_csv(df_remodelled, df_negative_data, fname='training_data.csv'):
     df_training = pd.concat([df_remodelled, df_negative_data])
     df_training = df_training.sort_values(by=['dtag'])
-    df_training = df_training.reset_index()
+    df_training = df_training.reset_index(drop=True)
     outfname = pathlib.Path.cwd() / 'training' / fname
     df_training.to_csv(outfname)
 
@@ -454,6 +454,6 @@ if __name__ == "__main__":
     df_remodelled = filter_remodelled_residues(df_residues)
     df_negative_data = find_contacts(df_residues)
     df_training = (df_remodelled, df_negative_data)
-    
+
     
 
