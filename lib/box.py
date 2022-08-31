@@ -48,8 +48,7 @@ def rand_rotation_matrix(deflection=1.0, randnums=None):
     M = (np.outer(V, V) - np.eye(3)).dot(R)
     return M
 
-def get_grid_box(map: gemmi.Ccp4Map, 
-            residue: gemmi.Residue,
+def generate_gemmi_transform(residue: gemmi.Residue,
             box_size=10,
             spacing=0.5,
             rand_rot=False):
@@ -58,11 +57,7 @@ def get_grid_box(map: gemmi.Ccp4Map,
     CoM = rmsdcalc.calculate_CoM_residue(residue)
     CoM = CoM
     
-    #computing translation vector and matrix
-    vec = np.empty(3)
-    vec.fill(box_size/2)
-    mat = np.identity(3)*spacing
-
+    #computing translation vector and rotation matrix
     if rand_rot==True:
         M = rand_rotation_matrix() #random rotation matrix in Cartesian basis
         mat = mat @ M
@@ -70,6 +65,11 @@ def get_grid_box(map: gemmi.Ccp4Map,
         vec = np.empty(3)
         vec.fill(box_size/2)
         vec = M @ vec
+    
+    if rand_rot==False:
+        vec = np.empty(3)
+        vec.fill(box_size/2)
+        mat = np.identity(3)*spacing
         
     min = CoM - vec
     
@@ -85,11 +85,9 @@ def get_grid_box(map: gemmi.Ccp4Map,
     npoints = int(gridsize / spacing)
     grid_shape = (npoints,npoints,npoints)
     arr = np.zeros(grid_shape, dtype=np.float32)
-    map.grid.interpolate_values(arr,tr)
+    return arr, tr
 
-    return arr
-
-def gen_map_from_atoms(residue: gemmi.Residue):
+def gen_mask_from_atoms(grid, residue: gemmi.Residue):
     #initialising list of positions and vdw radii
     positions = []
     radii = []
@@ -99,14 +97,31 @@ def gen_map_from_atoms(residue: gemmi.Residue):
         positions.append(atom.pos)
         radii.append(atom.element.vdw_r)
 
-    map.grid.fill(0)
+    grid.fill(0)
     for i in range(len(positions)):
-        map.grid.set_points_around(positions[i],radius=radii[i],value=1)
+        grid.set_points_around(positions[i],radius=radii[i],value=1)
 
-    map.grid.symmetrize_max()
+    grid.symmetrize_max()
 
-    return map
+    return grid
 
 ###
 
+def data_augment_per_residue(row):
+    map = gemmi.read_ccp4_map(row.event_map)
+    grid = map.grid
+    mask_input = grid.clone()
+    mask_output = grid.clone()
+    input_model = gemmi.read_structure(row.input_model)[0]
+    output_model = gemmi.read_structure(row.output_model)[0]
+    input_residue = input_model[row.input_chain_idx][row.residue_input_idx]
+    output_residue = output_model[row.output_chain_idx][row.residue_output_idx]
     
+
+    mask_input = gen_mask_from_atoms(mask_input, input_residue)
+    mask_output = gen_mask_from_atoms(mask_output, output_residue)
+
+    arr_input_mask, tr_input_mask = generate_gemmi_transform(residue=input_residue, rand_rot=True)
+    arr_output_mask, tr_output_mask = generate_gemmi_transform(residue=output_residue, rand_rot=True)
+
+    grid.interpolate_values(arr,tr)
