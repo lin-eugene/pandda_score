@@ -373,7 +373,7 @@ def calc_rmsds_from_csv(df_pandda_inspect):
         input = gemmi.read_structure(str(row.input_model))[0]
         output = gemmi.read_structure(str(row.output_model))[0]
         
-        for (input_chain_idx, output_chain_idx, residue_input_idx, residue_output_idx, residue_name, rmsd) in zip(calc_rmsd_per_model(input, output)):
+        for (input_chain_idx, output_chain_idx, residue_input_idx, residue_output_idx, residue_name, rmsd) in calc_rmsd_per_model(input, output):
             
             records.append(
                 {
