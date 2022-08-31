@@ -3,6 +3,7 @@ import pathlib
 import scipy
 import numpy as np
 from lib import rmsdcalc
+import copy
 
 def rand_rotation_matrix(deflection=1.0, randnums=None):
     """
@@ -49,27 +50,24 @@ def rand_rotation_matrix(deflection=1.0, randnums=None):
     return M
 
 def generate_gemmi_transform(residue: gemmi.Residue,
+            rot_mat: np.ndarray,
             box_size=10,
             spacing=0.5,
-            rand_rot=False):
+            ):
     
     #calculating centre of mass of residue
     CoM = rmsdcalc.calculate_CoM_residue(residue)
     CoM = CoM
     
     #computing translation vector and rotation matrix
-    if rand_rot==True:
-        M = rand_rotation_matrix() #random rotation matrix in Cartesian basis
-        mat = mat @ M
+    vec = np.empty(3)
+    vec.fill(box_size/2)
+    mat = np.identity(3)*spacing
 
-        vec = np.empty(3)
-        vec.fill(box_size/2)
+    if 'rot_mat' in locals():
+        M = rot_mat #random rotation matrix in Cartesian basis
+        mat = mat @ M
         vec = M @ vec
-    
-    if rand_rot==False:
-        vec = np.empty(3)
-        vec.fill(box_size/2)
-        mat = np.identity(3)*spacing
         
     min = CoM - vec
     
@@ -121,7 +119,15 @@ def data_augment_per_residue(row):
     mask_input = gen_mask_from_atoms(mask_input, input_residue)
     mask_output = gen_mask_from_atoms(mask_output, output_residue)
 
-    arr_input_mask, tr_input_mask = generate_gemmi_transform(residue=input_residue, rand_rot=True)
-    arr_output_mask, tr_output_mask = generate_gemmi_transform(residue=output_residue, rand_rot=True)
+    rot_mat = rand_rotation_matrix()
+    arr_input_mask, tr_input = generate_gemmi_transform(residue=input_residue, rot_mat=rot_mat)
+    arr_output_mask, tr_output = generate_gemmi_transform(residue=output_residue, rot_mat=rot_mat)
+    arr_input_grid = copy.deepcopy(arr_input_mask)
+    arr_output_grid = copy.deepcopy(arr_output_mask)
 
-    grid.interpolate_values(arr,tr)
+    mask_input.interpolate_values(arr_input_mask, tr_input)
+    mask_output.interpolate_values(arr_output_mask, tr_output)
+    grid.interpolate_values(arr_input_grid, tr_input)
+    grid.interpolate_values(arr_output_grid, tr_output)
+
+    return arr_input_mask, arr_output_mask, arr_input_grid, arr_output_grid
