@@ -105,7 +105,7 @@ def gen_mask_from_atoms(grid, residue: gemmi.Residue):
 
 ###
 
-def data_augment_per_residue(row):
+def data_augmentation_per_residue(row):
     map = gemmi.read_ccp4_map(row.event_map)
     grid = map.grid
     mask_input = grid.clone()
@@ -131,3 +131,6 @@ def data_augment_per_residue(row):
     grid.interpolate_values(arr_output_grid, tr_output)
 
     return arr_input_mask, arr_output_mask, arr_input_grid, arr_output_grid
+
+if __name__ == "__main__":
+    pass
