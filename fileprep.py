@@ -1,7 +1,6 @@
-from ctypes import Union
 import itertools
 from this import d
-from typing import Any, Dict, List, Optional, Tuple
+from typing import Any, Dict, List, Optional, Tuple, Union
 import pandas as pd
 import pathlib
 import os
