@@ -53,7 +53,12 @@ def find_path_analysis(path_system: pathlib.Path) -> Optional[pathlib.Path]:
     if not access(path_system, R_OK):
         return None
     
+    path_processing = path_system / 'processing'
     path_analysis = path_system / 'processing' / 'analysis'
+    if not path_processing.is_dir():
+        return None
+    if not access(path_processing, R_OK):
+        return None
 
     if not path_analysis.is_dir():
         return None
