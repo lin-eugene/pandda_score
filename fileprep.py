@@ -1,3 +1,5 @@
+import argparse
+from importlib.resources import path
 import itertools
 from this import d
 from typing import Any, Dict, List, Optional, Tuple, Union
@@ -149,6 +151,17 @@ def find_all_csvs(path_data: str) -> list[pathlib.Path]:
     
     return csvs
 
+def find_pandda_inspect_csv_from_list_of_paths(list_of_paths: list[str]) -> list[pathlib.Path]:
+    csvs = []
+
+    for str_path in list_of_paths:
+        path = pathlib.Path(str_path)
+        csv_paths = find_csv_from_system_path(path)
+        csvs += csv_paths
+    
+    return csvs
+
+
 def if_high_confidence_ligand(csv_path: pathlib.Path) -> bool:
     df = pd.read_csv(csv_path)
     df_ligand_placed = df[(df['Ligand Placed']==True) & (df['Ligand Confidence']=='High')] # don't assign to
@@ -247,13 +260,9 @@ def find_events_all_datasets(df_models):
     df_pandda_inspect = pd.DataFrame(event_records)
     print(df_pandda_inspect)
 
-    outfname = pathlib.Path.cwd() / 'training' / 'model_paths.csv'
-    df_pandda_inspect.reset_index(drop=True)
-    df_pandda_inspect.to_csv(outfname, index=False)
-
     return df_pandda_inspect
 
-def filter_non_existent_paths(df_pandda_inspect):
+def filter_non_existent_paths(df_pandda_inspect, fname='model_paths.csv'):
     #filter operation
     drop = []
     for i, row in enumerate(df_pandda_inspect.itertuples()):
@@ -266,6 +275,9 @@ def filter_non_existent_paths(df_pandda_inspect):
             drop.append(i)
 
     df_pandda_inspect_new = df_pandda_inspect.drop(df_pandda_inspect.index[drop])
+    outfname = pathlib.Path.cwd() / 'training' / fname
+    df_pandda_inspect_new.reset_index(drop=True)
+    df_pandda_inspect_new.to_csv(outfname, index=False)
 
     return df_pandda_inspect_new
 
@@ -365,20 +377,20 @@ def calc_rmsds_from_csv(df_pandda_inspect):
     print(df_residues)
     return df_residues
 
-def find_remodelled_residues(df_residues, threshold=0.8):
+def find_remodelled_residues(df_residues, threshold=0.8, fname='all_residues.csv'):
     df_residues['remodelled'] = df_residues['rmsd'] > threshold
     df_residues = df_residues.drop_duplicates(keep='first')
     # print(df_residues)
-    outfname = pathlib.Path.cwd() / 'training' / 'all_residues.csv'
+    outfname = pathlib.Path.cwd() / 'training' / fname
     df_residues.to_csv(outfname, index=False)
 
     return df_residues
 
-def filter_remodelled_residues(df_residues):
+def filter_remodelled_residues(df_residues, fname='remodelled.csv'):
     df_remodelled = df_residues[df_residues['remodelled']==True]
     df_remodelled = df_remodelled.reset_index(drop=True)
     print(df_remodelled)
-    outfname = pathlib.Path.cwd() / 'training' / 'remodelled.csv'
+    outfname = pathlib.Path.cwd() / 'training' / fname
     df_remodelled.to_csv(outfname, index=False)
     return df_remodelled
 
@@ -427,24 +439,73 @@ def gen_training_data_csv(df_remodelled, df_negative_data, fname='training_data.
 
     return df_training
 
+######
+
+
+def look_for_training_data_to_csv(path_to_labxchem_data_dir, force=True):
+        model_paths_csv = pathlib.Path.cwd() / 'training' / 'model_paths.csv'
+        all_residues_csv = pathlib.Path.cwd() / 'training' / 'all_residues.csv'
+        remodelled_csv = pathlib.Path.cwd() / 'training' / 'remodelled.csv'
+        neg_data_csv = pathlib.Path.cwd() / 'training' / 'neg_data.csv'
+        training_data_csv = pathlib.Path.cwd() / 'training' / 'training_data.csv'
+        
+        if force:
+            csvs = find_all_csvs(path_to_labxchem_data_dir)
+            csvs = filter_csvs(csvs)
+            df = list_pandda_model_paths(csvs)
+            events_csv = find_events_all_datasets(df)
+            events_csv = filter_non_existent_paths(events_csv)
+            df_residues = calc_rmsds_from_csv(events_csv)
+            df_residues = find_remodelled_residues(df_residues)
+            df_remodelled = filter_remodelled_residues(df_residues)
+            df_negative_data = find_contacts(df_residues)
+            df_training = gen_training_data_csv(df_remodelled, df_negative_data)
+        
+        return None
+
 
 #######
 
 if __name__ == "__main__":
-    path_to_labxchem_data_dir = sys.argv[1]
+    parser = argparse.ArgumentParser()
+    parser.add_argument('-p', '--path',action='store',help='labxchem data path')
+    parser.add_argument('-c','--csvfile',action='store',help='csv with dataset paths')
 
-    csvs = find_all_csvs(path_to_labxchem_data_dir)
-    csvs = filter_csvs(csvs)
-    df = list_pandda_model_paths(csvs)
-    events_csv = find_events_all_datasets(df)
-    events_csv = filter_non_existent_paths(events_csv)
-    df_residues = calc_rmsds_from_csv(events_csv)
-    df_residues = find_remodelled_residues(df_residues)
-    df_remodelled = filter_remodelled_residues(df_residues)
-    df_negative_data = find_contacts(df_residues)
-    # df_remodelled = pd.read_csv(pathlib.Path.cwd() / 'training' / 'remodelled.csv', index=False)
-    # df_negative_data = pd.read_csv(pathlib.Path.cwd() / 'training' / 'neg_data.csv', index=False)
-    df_training = gen_training_data_csv(df_remodelled, df_negative_data)
+    args = parser.parse_args()
+    if not args.path is None:
+        path_to_labxchem_data_dir = args.path
+        look_for_training_data_to_csv(path_to_labxchem_data_dir)
+    if not args.csvfile is None:
+        path_to_csv_with_dataset_paths = args.csvfile
+        df_paths = pd.read_csv(path_to_csv_with_dataset_paths)
+        list_of_paths = df_paths['path'].tolist()
+        csvs = find_pandda_inspect_csv_from_list_of_paths(list_of_paths)
+        csvs = filter_csvs(csvs)
+        df = list_pandda_model_paths(csvs)
+        events_csv = find_events_all_datasets(df)
+        events_csv = filter_non_existent_paths(events_csv,fname='model_paths_testing.csv')
+        df_residues = calc_rmsds_from_csv(events_csv)
+        df_residues = find_remodelled_residues(df_residues,fname='all_residues_testing.csv')
+        df_remodelled = filter_remodelled_residues(df_residues, fname='remodelled_testing.csv')
+        df_negative_data = find_contacts(df_residues,fname='neg_data_testing.csv')
+        df_training = gen_training_data_csv(df_remodelled, df_negative_data,fname='testing_data.csv')
+
+
+
+
+    
+    
+
+
+    
+    
+
+
+
+        
+       
+        
+       
 
     
 
