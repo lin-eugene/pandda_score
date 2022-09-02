@@ -210,7 +210,7 @@ def list_pandda_model_paths(csvs): #mapping function
     return df_models
 
 def get_event_record(row: Any, panddas_path: pathlib.Path, model_building: pathlib.Path) -> Dict:
-    system = str(row.dtag)[0:-5]
+    system = str(row.dtag)[0:-6]
     dtag = str(row.dtag)
     event_idx = str(row.event_idx)
     x = row.x
