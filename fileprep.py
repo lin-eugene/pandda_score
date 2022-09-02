@@ -210,6 +210,7 @@ def list_pandda_model_paths(csvs): #mapping function
     return df_models
 
 def get_event_record(row: Any, panddas_path: pathlib.Path, model_building: pathlib.Path) -> Dict:
+    system = str(row.dtag)[0:-5]
     dtag = str(row.dtag)
     event_idx = str(row.event_idx)
     x = row.x
@@ -225,6 +226,7 @@ def get_event_record(row: Any, panddas_path: pathlib.Path, model_building: pathl
     output_model_path = model_building / f'{row.dtag}' / f'{row.dtag}-pandda-model.pdb'
 
     return {
+        'system' : system,
         'dtag': dtag,
         'event_idx': event_idx, 
         'x': x, 
@@ -247,7 +249,7 @@ def find_events_per_dataset(csv_path, panddas_path, model_building) -> list[Dict
 
     pandda_inspect = pd.read_csv(csv_path)
     pandda_inspect = pandda_inspect.loc[(pandda_inspect['Ligand Placed']==True) & (pandda_inspect['Ligand Confidence']=='High')]
-    pandda_inspect = pandda_inspect[['dtag','event_idx', 'x', 'y', 'z', '1-BDC', 'high_resolution','Ligand Placed', 'Ligand Confidence']]
+    pandda_inspect = pandda_inspect[['system','dtag','event_idx', 'x', 'y', 'z', '1-BDC', 'high_resolution','Ligand Placed', 'Ligand Confidence']]
     print(pandda_inspect)
 
     event_records = list(map(
@@ -347,15 +349,16 @@ def record_per_residue_rmsd_data(input_chain_idx,
         rmsd, 
         row) -> Dict:
 
-    return {'dtag': row.dtag,
+    return {'system': row.system,
+            'dtag': row.dtag,
             'event_idx': row.event_idx, 
             'x': row.x, 
             'y': row.y, 
             'z': row.z,
-            '1-BDC': row._6, 
+            '1-BDC': row._7, 
             'high_resolution': row.high_resolution,
-            'Ligand Placed': row._8, 
-            'Ligand Confidence': row._9,
+            'Ligand Placed': row._9, 
+            'Ligand Confidence': row._10,
             'event_map': row.event_map,
             'mtz': row.mtz,
             'input_model': row.input_model,
@@ -376,10 +379,12 @@ def calc_rmsds_from_csv(df_pandda_inspect):
     for row in df_pandda_inspect.itertuples():
         input = gemmi.read_structure(str(row.input_model))[0]
         output = gemmi.read_structure(str(row.output_model))[0]
+
+        rmsds = calc_rmsd_per_model(input, output)
         
         record = map(record_per_residue_rmsd_data, 
-                    *calc_rmsd_per_model(input, output),
-                    itertools.repeat(row, len(calc_rmsd_per_model(input,output)[0])))
+                    *rmsds,
+                    itertools.repeat(row, len(rmsds[0])))
         records += record
 
     df_residues = pd.DataFrame(records)
@@ -452,8 +457,7 @@ def gen_training_data_csv(df_remodelled, df_negative_data, fname='training_data.
 
 ######
 
-
-def look_for_training_data_to_csv(path_to_labxchem_data_dir, force=True):
+def look_for_training_data_to_csv(path_to_labxchem_data_dir: Optional[str], force=True):
         model_paths_csv = pathlib.Path.cwd() / 'training' / 'model_paths.csv'
         all_residues_csv = pathlib.Path.cwd() / 'training' / 'all_residues.csv'
         remodelled_csv = pathlib.Path.cwd() / 'training' / 'remodelled.csv'
@@ -473,7 +477,6 @@ def look_for_training_data_to_csv(path_to_labxchem_data_dir, force=True):
             df_training = gen_training_data_csv(df_remodelled, df_negative_data)
         
         return None
-
 
 #######
 
