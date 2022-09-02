@@ -249,7 +249,7 @@ def find_events_per_dataset(csv_path, panddas_path, model_building) -> list[Dict
 
     pandda_inspect = pd.read_csv(csv_path)
     pandda_inspect = pandda_inspect.loc[(pandda_inspect['Ligand Placed']==True) & (pandda_inspect['Ligand Confidence']=='High')]
-    pandda_inspect = pandda_inspect[['system','dtag','event_idx', 'x', 'y', 'z', '1-BDC', 'high_resolution','Ligand Placed', 'Ligand Confidence']]
+    pandda_inspect = pandda_inspect[['dtag','event_idx', 'x', 'y', 'z', '1-BDC', 'high_resolution','Ligand Placed', 'Ligand Confidence']]
     print(pandda_inspect)
 
     event_records = list(map(
