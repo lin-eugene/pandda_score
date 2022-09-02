@@ -141,6 +141,9 @@ def find_csvs_from_year(path_year: str) -> list[pathlib.Path]:
     
     return csvs
 
+
+######### 
+
 def find_all_csvs(path_data: str) -> list[pathlib.Path]:
     path_data = pathlib.Path(path_data)
     
@@ -286,6 +289,8 @@ def filter_non_existent_paths(df_pandda_inspect, fname='model_paths.csv'):
 
     return df_pandda_inspect_new
 
+
+########
 def calc_rmsd_per_chain(chain_input, chain_output):
     rmsd = []
     residue_input_idx = []
