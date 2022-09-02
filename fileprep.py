@@ -46,7 +46,8 @@ def check_panddas_inspect_csv(path_events_csv: pathlib.Path) -> Union[str, pathl
     return path_events_csv
 
 
-def find_path_analysis(path_system: pathlib.Path) -> Optional[pathlib.Path]:
+def find_path_analysis(path_system: pathlib.Path) -> Optional[pathlib.Path]: 
+    #note — this could cause problems down the line, because function returns different types according to different conditions
 
     if not path_system.is_dir():
         return None
