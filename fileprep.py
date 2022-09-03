@@ -210,7 +210,7 @@ def list_pandda_model_paths(csvs): #mapping function
     return df_models
 
 def get_event_record(row: Any, panddas_path: pathlib.Path, model_building: pathlib.Path) -> Dict:
-    system = str(row.dtag)[0:-6]
+    system = str(row.dtag).split('-x')[0]
     dtag = str(row.dtag)
     event_idx = str(row.event_idx)
     x = row.x
@@ -493,9 +493,9 @@ if __name__ == "__main__":
         path_to_csv_with_dataset_paths = args.csvfile
         df_paths = pd.read_csv(path_to_csv_with_dataset_paths)
         list_of_paths = df_paths['path'].tolist()
-        csvs = find_pandda_inspect_csv_from_list_of_paths(list_of_paths)
-        csvs = filter_csvs(csvs)
-        df = list_pandda_model_paths(csvs)
+        csvs_from_csv_with_dataset_paths = find_pandda_inspect_csv_from_list_of_paths(list_of_paths)
+        filtered_csvs_from_csv_with_dataset_paths = filter_csvs(csvs_from_csv_with_dataset_paths)
+        df = list_pandda_model_paths(filtered_csvs_from_csv_with_dataset_paths)
         events_csv = find_events_all_datasets(df)
         events_csv = filter_non_existent_paths(events_csv,fname='model_paths_testing.csv')
         df_residues = calc_rmsds_from_csv(events_csv)
