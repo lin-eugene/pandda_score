@@ -457,24 +457,31 @@ def gen_training_data_csv(df_remodelled, df_negative_data, fname='training_data.
 
 ######
 
-def look_for_training_data_to_csv(path_to_labxchem_data_dir: Optional[str], force=True):
+def look_for_training_data_to_csv(path_to_labxchem_data_dir: str, path_to_csv_with_dataset_paths: Optional[str]):
         model_paths_csv = pathlib.Path.cwd() / 'training' / 'model_paths.csv'
         all_residues_csv = pathlib.Path.cwd() / 'training' / 'all_residues.csv'
         remodelled_csv = pathlib.Path.cwd() / 'training' / 'remodelled.csv'
         neg_data_csv = pathlib.Path.cwd() / 'training' / 'neg_data.csv'
         training_data_csv = pathlib.Path.cwd() / 'training' / 'training_data.csv'
         
-        if force:
-            csvs = find_all_csvs(path_to_labxchem_data_dir)
-            csvs = filter_csvs(csvs)
-            df = list_pandda_model_paths(csvs)
-            events_csv = find_events_all_datasets(df)
-            events_csv = filter_non_existent_paths(events_csv)
-            df_residues = calc_rmsds_from_csv(events_csv)
-            df_residues = find_remodelled_residues(df_residues)
-            df_remodelled = filter_remodelled_residues(df_residues)
-            df_negative_data = find_contacts(df_residues)
-            df_training = gen_training_data_csv(df_remodelled, df_negative_data)
+        csvs = find_all_csvs(path_to_labxchem_data_dir)
+        filtered_csvs = filter_csvs(csvs)
+
+        if not path_to_csv_with_dataset_paths is None:
+            df_paths = pd.read_csv(path_to_csv_with_dataset_paths)
+            list_of_paths = df_paths['path'].tolist()
+            csvs_from_csv_with_dataset_paths = find_pandda_inspect_csv_from_list_of_paths(list_of_paths)
+            filtered_csvs_from_csv_with_dataset_paths = filter_csvs(csvs_from_csv_with_dataset_paths)
+            filtered_csvs += filtered_csvs_from_csv_with_dataset_paths
+
+        df = list_pandda_model_paths(filtered_csvs)
+        events_csv = find_events_all_datasets(df)
+        events_csv = filter_non_existent_paths(events_csv)
+        df_residues = calc_rmsds_from_csv(events_csv)
+        df_residues = find_remodelled_residues(df_residues)
+        df_remodelled = filter_remodelled_residues(df_residues)
+        df_negative_data = find_contacts(df_residues)
+        df_training = gen_training_data_csv(df_remodelled, df_negative_data)
         
         return None
 
@@ -482,27 +489,15 @@ def look_for_training_data_to_csv(path_to_labxchem_data_dir: Optional[str], forc
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
-    parser.add_argument('-p', '--path',action='store',help='labxchem data path')
+    parser.add_argument('-p', '--path',action='store',help='labxchem data path',required=True)
     parser.add_argument('-c','--csvfile',action='store',help='csv with dataset paths')
 
     args = parser.parse_args()
-    if not args.path is None:
-        path_to_labxchem_data_dir = args.path
-        look_for_training_data_to_csv(path_to_labxchem_data_dir)
-    if not args.csvfile is None:
-        path_to_csv_with_dataset_paths = args.csvfile
-        df_paths = pd.read_csv(path_to_csv_with_dataset_paths)
-        list_of_paths = df_paths['path'].tolist()
-        csvs_from_csv_with_dataset_paths = find_pandda_inspect_csv_from_list_of_paths(list_of_paths)
-        filtered_csvs_from_csv_with_dataset_paths = filter_csvs(csvs_from_csv_with_dataset_paths)
-        df = list_pandda_model_paths(filtered_csvs_from_csv_with_dataset_paths)
-        events_csv = find_events_all_datasets(df)
-        events_csv = filter_non_existent_paths(events_csv,fname='model_paths_testing.csv')
-        df_residues = calc_rmsds_from_csv(events_csv)
-        df_residues = find_remodelled_residues(df_residues,fname='all_residues_testing.csv')
-        df_remodelled = filter_remodelled_residues(df_residues, fname='remodelled_testing.csv')
-        df_negative_data = find_contacts(df_residues,fname='neg_data_testing.csv')
-        df_training = gen_training_data_csv(df_remodelled, df_negative_data,fname='testing_data.csv')
+    path_to_labxchem_data_dir = args.path
+    path_to_csv_with_dataset_paths = args.csvfile
+
+    look_for_training_data_to_csv(path_to_labxchem_data_dir, 
+                                path_to_csv_with_dataset_paths)
 
 
 
