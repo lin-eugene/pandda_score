@@ -457,13 +457,14 @@ def gen_training_data_csv(df_remodelled, df_negative_data, fname='training_data.
 
 ######
 
-def look_for_training_data_to_csv(path_to_labxchem_data_dir: str, path_to_csv_with_dataset_paths: Optional[str]):
-        model_paths_csv = pathlib.Path.cwd() / 'training' / 'model_paths.csv'
-        all_residues_csv = pathlib.Path.cwd() / 'training' / 'all_residues.csv'
-        remodelled_csv = pathlib.Path.cwd() / 'training' / 'remodelled.csv'
-        neg_data_csv = pathlib.Path.cwd() / 'training' / 'neg_data.csv'
+def look_for_training_data_to_csv(path_to_labxchem_data_dir: str, path_to_csv_with_dataset_paths: Optional[str], force=True):
         training_data_csv = pathlib.Path.cwd() / 'training' / 'training_data.csv'
         
+        if force==True:
+            pass
+        elif training_data_csv.is_file():
+            return None
+
         csvs = find_all_csvs(path_to_labxchem_data_dir)
         filtered_csvs = filter_csvs(csvs)
 

@@ -39,7 +39,7 @@ def superpose(polymer1: gemmi.ResidueSpan, polymer2: gemmi.ResidueSpan):
 
     return polymer2
 
-def calculate_CoM_residue(residue: gemmi.Residue):
+def calculate_CoM_residue(residue: gemmi.Residue) -> np.ndarray:
     """
     calculates the centre of mass for a single residue
     only looks at one conformer
