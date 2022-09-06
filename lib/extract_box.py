@@ -142,6 +142,20 @@ def gen_two_fo_fc_from_mtz(mtz_path: str) -> type[gemmi.FloatGrid]:
     
     return two_fofc_grid
 
+def copy_gemmi_floatgrid(float_grid: type[gemmi.FloatGrid]) -> type[gemmi.FloatGrid]:
+    new_float_grid = gemmi.FloatGrid()
+    new_float_grid.array = float_grid.array
+    new_float_grid.axis_order = float_grid.axis_order
+    new_float_grid.nu = float_grid.nu
+    new_float_grid.nv = float_grid.nv
+    new_float_grid.nw = float_grid.nw
+    new_float_grid.point_count = float_grid.point_count
+    new_float_grid.shape = float_grid.shape
+    new_float_grid.spacegroup = float_grid.spacegroup
+    new_float_grid.spacing = float_grid.spacing
+    new_float_grid.unit_cell = float_grid.unit_cell
+
+    return new_float_grid
 ###
 
 def data_augmentation_per_residue(row):

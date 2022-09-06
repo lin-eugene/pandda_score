@@ -56,12 +56,28 @@ class ResidueDataset(Dataset):
         return sample
 
 
+class RandRot(object):
+    """
+    sampling random rotations
+    """
+    def __call__(self, sample):
+        
+
+
+class ToTensor(object):
+    """
+    convert ndarrays into torch tensors
+    """
+    def __call__(self, sample):
+
+
+
+
 if __name__ == '__main__':
     csv_file = pathlib.Path(__file__).parent.parent.resolve() / 'training' / 'training_data.csv'
     residues_dataset = ResidueDataset(csv_file)
     
     print(len(residues_dataset))
-    idx = 114
     for i in range(len(residues_dataset)):
         sample = residues_dataset[i]
         print(sample['event_map'],

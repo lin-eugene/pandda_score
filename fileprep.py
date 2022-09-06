@@ -1,18 +1,17 @@
 import argparse
-from importlib.resources import path
 import itertools
-from this import d
 from typing import Any, Dict, List, Optional, Tuple, Union
 import pandas as pd
 import pathlib
 import os
 from os import access, R_OK
-import pickle
-import gemmi
 
-from lib import rmsdcalc, contact_search
+import gemmi
 import sys
 import numpy as np
+
+from lib import rmsdcalc, contact_search
+
 
 def list_systems(path_year: pathlib.Path):
 
