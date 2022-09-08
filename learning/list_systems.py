@@ -17,4 +17,4 @@ if __name__=='__main__':
 
     args = parser.parse_args()
     dataset_csv = args.dataset_csv
-    list_systems(dataset_csv)
+    list_systems_in_dataset(dataset_csv)
