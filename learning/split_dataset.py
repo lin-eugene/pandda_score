@@ -12,6 +12,7 @@ def check_systems_in_selection(systems_list: List[str], selection: List[str]) ->
     """
     for system in selection:
         if system not in systems_list:
+            print(system)
             return False
 
     return True
