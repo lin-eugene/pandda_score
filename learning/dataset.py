@@ -28,15 +28,6 @@ def fetch_grid_from_pandda_map(map: type[gemmi.Ccp4Map]) -> type[gemmi.FloatGrid
     
     return grid
 
-def list_systems(training_csv_path: str) -> List[str]:
-    """
-    returns list of systems from training csv
-    """
-    training_dframe = pd.read_csv(training_csv_path)
-    systems = training_dframe['system'].value_counts()
-    print(systems)
-    return systems
-
 class ResidueDataset(Dataset):
     def __init__(self, residues_dframe: type[pd.DataFrame], transform=None):
         self.residues_dframe = residues_dframe
@@ -132,7 +123,7 @@ if __name__ == '__main__':
                                             RandRot(),
                                             ToTensor()
                                         ]))
-    list_systems(csv_file)
+
     for i in range(len(transformed_dataset)):
         sample = transformed_dataset[i]
         print(i, sample['event_map'].shape, sample['input_residue'].shape, sample['labels_remodelled_yes_no'])
@@ -140,14 +131,14 @@ if __name__ == '__main__':
         if i == 3:
             break
     
-    # dataloader = DataLoader(transformed_dataset, batch_size=4, shuffle=True, num_workers=4)
+    dataloader = DataLoader(transformed_dataset, batch_size=4, shuffle=True, num_workers=4)
 
-    # dataset = ResidueDataset(csv_file=csv_file)
+    dataset = ResidueDataset(csv_file=csv_file)
 
-    # for i in range(len(dataset)):
-    #     sample = dataset[i]
-    #     print(i, sample['event_map'], sample['input_residue'], sample['labels_remodelled_yes_no'])
+    for i in range(len(dataset)):
+        sample = dataset[i]
+        print(i, sample['event_map'], sample['input_residue'], sample['labels_remodelled_yes_no'])
         
-    #     if i == 3:
-    #         break
+        if i == 3:
+            break
 

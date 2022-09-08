@@ -486,14 +486,7 @@ def look_for_training_data_to_csv(path_to_labxchem_data_dir: str, path_to_csv_wi
         return None
 
 #####
-def list_systems(training_csv_path: str) -> List[str]:
-    """
-    returns list of systems from training csv
-    """
-    training_dframe = pd.read_csv(training_csv_path)
-    systems = training_dframe['system'].value_counts()
-    print(systems)
-    return systems
+
 
 
 #######
@@ -503,20 +496,16 @@ if __name__ == "__main__":
     parser.add_argument('-p', '--path',action='store',help='labxchem data path',required=True)
     parser.add_argument('-c','--csvfile',action='store',help='csv with dataset paths')
     parser.add_argument('-f','--force',action='store_true',help='force overwrite of training_data.csv')
-    parser.add_argument('-l', '--list',action='store_true',help='list number of systems in csv')
 
     args = parser.parse_args()
     path_to_labxchem_data_dir = args.path
     path_to_csv_with_dataset_paths = args.csvfile
     force=args.force
-    l = args.list
 
     look_for_training_data_to_csv(path_to_labxchem_data_dir, 
                                 path_to_csv_with_dataset_paths,
                                 force=args)
     
-    if l:
-        list_systems(str(pathlib.Path.cwd() / 'training' / 'training_data.csv'))
 
 
 
