@@ -1,10 +1,6 @@
 import pathlib
 import gemmi
 import numpy as np
-import pandas as pd
-import matplotlib.pyplot as plt
-import plotly.express as px
-import plotly.io as pio
 
 def map_chains(input_model: gemmi.Model, output_model: gemmi.Model):  
     """
@@ -15,15 +11,15 @@ def map_chains(input_model: gemmi.Model, output_model: gemmi.Model):
     chain_idx = []
     #renaming chains in two models to match each other if they are aligned
     print('mapping chains')
-    for i, chain_gt in enumerate(input_model):
-        for j, chain_rsr in enumerate(output_model):
-            gt_CoM = chain_gt.calculate_center_of_mass() #gemmi.Position
-            rsr_CoM = chain_rsr.calculate_center_of_mass() #gemmi.Position
+    for i, chain_input in enumerate(input_model):
+        for j, chain_output in enumerate(output_model):
+            input_chain_centre_of_mass = chain_input.calculate_center_of_mass() #gemmi.Position
+            output_chain_centre_of_mass = chain_output.calculate_center_of_mass() #gemmi.Position
 
-            dist = gt_CoM.dist(rsr_CoM)
+            dist = input_chain_centre_of_mass.dist(output_chain_centre_of_mass)
 
             if dist < 1:
-                chain.append([chain_gt,chain_rsr])
+                chain.append([chain_input,chain_output])
                 chain_idx.append([i,j])
 
     return chain, chain_idx
@@ -39,7 +35,7 @@ def superpose(polymer1: gemmi.ResidueSpan, polymer2: gemmi.ResidueSpan):
 
     return polymer2
 
-def calculate_CoM_residue(residue: gemmi.Residue) -> np.ndarray:
+def calculate_com_residue(residue: gemmi.Residue) -> np.ndarray:
     """
     calculates the centre of mass for a single residue
     only looks at one conformer
@@ -50,14 +46,13 @@ def calculate_CoM_residue(residue: gemmi.Residue) -> np.ndarray:
         coords.append(atom.pos.tolist())
         mass.append(atom.element.weight)
     
-    coords = np.asarray(coords)
-    mass = np.asarray(mass)
+    coords = np.array(coords) #np.asarray(coords)
+    mass = np.array(mass) #np.asarray(mass)
     mass = mass.reshape(-1,1) #convert into column vector
 
-    CoM = np.sum((mass * coords),axis=0) / np.sum(mass) # calculating centre of mass
-    #print(CoM) 
+    centre_of_mass = np.sum((mass * coords),axis=0) / np.sum(mass) # calculating centre of mass
 
-    return CoM
+    return centre_of_mass
 
 def calc_dist_diff(polymer1: gemmi.ResidueSpan, polymer2: gemmi.ResidueSpan):
     """
@@ -69,8 +64,8 @@ def calc_dist_diff(polymer1: gemmi.ResidueSpan, polymer2: gemmi.ResidueSpan):
     for residue1 in polymer1:
         for residue2 in polymer2:
             if (str(residue1) == str(residue2)) and (residue1.het_flag == 'A' and residue2.het_flag == 'A'):
-                com1 = calculate_CoM_residue(residue1)
-                com2 = calculate_CoM_residue(residue2)
+                com1 = calculate_com_residue(residue1)
+                com2 = calculate_com_residue(residue2)
                 calc_dist = np.linalg.norm(com1-com2) #calculate euclidean dist between 2 CoMs
 
                 dist_diff[str(residue1)] = calc_dist
