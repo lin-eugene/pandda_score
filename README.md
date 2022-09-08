@@ -9,3 +9,9 @@ conda install -c conda-forge -y pandas=1.4.3 plotly-5.10.0 matplotlib=2.2.3 fire
 
 pip install notebook
 ```
+
+#splitting dataset into training and test sets
+```shell
+python learning/split_dataset.py training/training_data.csv --test HERC2A,INPP5DA,NSP14,IMPA1A -s
+
+```

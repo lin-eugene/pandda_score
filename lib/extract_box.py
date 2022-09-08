@@ -3,13 +3,25 @@ import pathlib
 import numpy as np
 from lib import rmsdcalc
 from typing import Optional, Tuple
-import copy
 
 def gen_two_fo_fc_from_mtz(mtz_path: str) -> type[gemmi.FloatGrid]:
     mtz = gemmi.read_mtz_file(mtz_path)
     two_fofc_grid = mtz.transform_f_phi_to_map('FWT', 'PHWT')
     
     return two_fofc_grid
+
+def fetch_grid_from_pandda_map(map: type[gemmi.Ccp4Map]) -> type[gemmi.FloatGrid]:
+    """
+    reads in map
+    modifies space group to P1 in header
+    returns gemmi grid object
+
+    """
+    grid = map.grid
+    grid.spacegroup = gemmi.find_spacegroup_by_name('P 1')
+    map.setup()
+    
+    return grid
 
 def gen_mask_from_atoms(grid_from_experimental_map: type[gemmi.FloatGrid], 
                 residue: type[gemmi.Residue],
@@ -95,11 +107,11 @@ def create_numpy_array_with_gemmi_interpolate(
     return array
 
 def make_gemmi_zeros_float_grid(grid: type[gemmi.FloatGrid]) -> type[gemmi.FloatGrid]:
-    grid_copy = gemmi.FloatGrid(np.zeros(grid.shape, dtype=np.float32),
+    zeros_grid = gemmi.FloatGrid(np.zeros(grid.shape, dtype=np.float32),
                                 grid.unit_cell, 
                                 grid.spacegroup)
     
-    return grid_copy
+    return zeros_grid
 
 def copy_gemmi_float_grid(grid: type[gemmi.FloatGrid]) -> type[gemmi.FloatGrid]:
     arr = grid.get_subarray(0,0,0,grid.shape[0],grid.shape[1],grid.shape[2])
