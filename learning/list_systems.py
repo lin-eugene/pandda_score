@@ -2,19 +2,22 @@ from typing import List
 import pandas as pd
 import argparse
 
-def list_systems_in_dataset(dataset_csv: str) -> List[str]:
+def list_systems_in_dataset(dataset_dframe: pd.DataFrame) -> List[str]:
     """
     returns list of systems from training csv
     """
-    dataset_dframe = pd.read_csv(dataset_csv)
     systems = dataset_dframe['system'].value_counts()
     print(systems)
     return systems
 
-if __name__=='__main__':
+def main():
     parser = argparse.ArgumentParser()
-    parser.add_argument('dataset_csv', type=str, help='path to csv file')
-
+    parser.add_argument('dataset_csv_path', type=str, help='path to csv file')
     args = parser.parse_args()
-    dataset_csv = args.dataset_csv
-    list_systems_in_dataset(dataset_csv)
+
+    dataset_dframe = pd.read_csv(args.dataset_csv_path)
+    list_systems_in_dataset(dataset_dframe)
+
+
+if __name__=='__main__':
+    main()

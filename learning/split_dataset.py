@@ -19,12 +19,10 @@ def check_systems_in_selection(systems_list: List[str], selection: List[str]) ->
 class DatasetSplitter():
     def __init__(self, 
                 dataset_csv_path: str, 
-                training_selection: List[str], 
                 test_selection: List[str],
                 save=False):
 
         self.dataset_csv_path = pathlib.Path(dataset_csv_path).resolve()
-        self.training_selection = training_selection
         self.test_selection = test_selection
 
         self.split_dataset()
@@ -36,10 +34,12 @@ class DatasetSplitter():
         """
         splits dataset into training and testing
         """
-        training_selection = self.training_selection
-        test_selection = self.test_selection
+        
         dataset_dframe = pd.read_csv(self.dataset_csv_path)
-        systems_list = list_systems_in_dataset(self.dataset_csv_path).index.to_list()
+        systems_list = list_systems_in_dataset(dataset_dframe).index.to_list()
+        
+        test_selection = self.test_selection
+        training_selection = [system for system in systems_list if system not in test_selection]
 
         if not check_systems_in_selection(systems_list, training_selection):
             raise ValueError('systems in training selection not in dataset')
@@ -49,6 +49,12 @@ class DatasetSplitter():
         
         self.training_set_frame = dataset_dframe[dataset_dframe['system'].isin(training_selection)]
         self.test_set_frame = dataset_dframe[dataset_dframe['system'].isin(test_selection)]
+
+
+        print('training set:')
+        list_systems_in_dataset(self.training_set_frame)
+        print('test set:')
+        list_systems_in_dataset(self.test_set_frame)
 
         return self.training_set_frame, self.test_set_frame
 
@@ -62,16 +68,14 @@ class DatasetSplitter():
 def main():
     parser = argparse.ArgumentParser()
     parser.add_argument('dataset_csv', type=str, help='path to csv file')
-    parser.add_argument('-tr','--training', type=str, help='comma delimited list input')
-    parser.add_argument('-t','--test', type=str, help='comma odelimited list input')
+    parser.add_argument('-t','--test', type=str, help='comma delimited list input')
     parser.add_argument('-s', '--save', action='store_true', help='save training and test sets to csv')
 
     args = parser.parse_args()
     dataset_csv = args.dataset_csv
-    training_selection = [item for item in args.training.split(',')]
     test_selection = [item for item in args.test.split(',')]
 
-    DatasetSplitter(dataset_csv, training_selection, test_selection, save=args.save)
+    DatasetSplitter(dataset_csv, test_selection, save=args.save)
 
 
 if __name__ == '__main__':
