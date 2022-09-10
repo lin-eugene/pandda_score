@@ -2,7 +2,7 @@ import torch
 import torch.nn as nn
 import torch.nn.init as init
 
-__all__ = ['SqueezeNet', 'squeezenet1_0', 'squeezenet1_1']
+__all__ = ['SqueezeNet', 'squeezenet1_0', 'squeezenet1_1'] #defines what modules can be imported from this file
 
 model_urls = {
     'squeezenet1_0': 'https://download.pytorch.org/models/squeezenet1_0-a815701f.pth',

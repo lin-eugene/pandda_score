@@ -1,3 +1,4 @@
+from cProfile import label
 from typing import Dict, Union, List
 import numpy as np
 import torch
@@ -55,14 +56,14 @@ class ResidueDataset(Dataset):
 
         return sample
 
-class RandRot(object):
+class SamplingRandomRotations(object):
     """
     Data Augmentation — sampling random rotations and translations
     """
-    def __call__(self, sample) -> Dict[str, Union[np.ndarray, List]]:
+    def __call__(self, sample) -> Dict[str, np.ndarray]:
         event_map_grid = sample['event_map']
         input_residue = sample['input_residue']
-        labels_remodelled_yes_no = sample['labels_remodelled_yes_no']
+        labels_remodelled_yes_no = np.array(sample['labels_remodelled_yes_no']) #needs remodelling = 1, doesn't need remodelling = 0
         
         # print(type(input_residue))
         # print(f'event_map_grid = {event_map_grid}')
@@ -85,6 +86,22 @@ class RandRot(object):
             'input_residue': input_residue_array,
             'labels_remodelled_yes_no': labels_remodelled_yes_no
         }
+    
+class ConcatEventResidueToTwoChannels(object):
+    """
+    Combine event map and input residue into two channels
+    """
+    def __call__(self, sample) -> Dict[str, Union[np.ndarray, List]]:
+        event_map_array = sample['event_map']
+        input_residue_array = sample['input_residue']
+        labels_remodelled_yes_no = sample['labels_remodelled_yes_no']
+
+        event_residue_array = np.stack((event_map_array, input_residue_array), axis=0) #order of channels along axis 0 = event map, input residue
+        
+        return {
+            'event_residue_array': event_residue_array,
+            'labels_remodelled_yes_no': labels_remodelled_yes_no
+        }
 
 class ToTensor(object):
     """
@@ -92,25 +109,28 @@ class ToTensor(object):
     MIGHT NOT BE NECESSARY
     """
     def __call__(self, sample):
-        event_map_array = sample['event_map']
-        input_residue_array = sample['input_residue']
-        labels_remodelled_yes_no = np.array(sample['labels_remodelled_yes_no'])
+        event_residue_array = sample['event_residue_array']
+        labels_remodelled_yes_no = sample['labels_remodelled_yes_no']
 
         return {
-            'event_map': torch.from_numpy(event_map_array),
-            'input_residue': torch.from_numpy(input_residue_array),
+            'event_residue_array': torch.from_numpy(event_residue_array),
             'labels_remodelled_yes_no': torch.from_numpy(labels_remodelled_yes_no)
         }
+
+def generate_dataset(residues_dframe):
+    tsfm = transforms.Compose([
+                        SamplingRandomRotations(),
+                        ConcatEventResidueToTwoChannels(),
+                        ToTensor()
+                    ])
+    dataset = ResidueDataset(residues_dframe, transform=tsfm)
+    return dataset
 
 if __name__ == '__main__':
     
     csv_file = pathlib.Path(__file__).parent.parent / 'training' / 'training_data.csv'
     residues_dframe=pd.read_csv(csv_file)
-    transformed_dataset = ResidueDataset(residues_dframe=residues_dframe,
-                                        transform=transforms.Compose([
-                                            RandRot(),
-                                            ToTensor()
-                                        ]))
+    transformed_dataset = generate_dataset(residues_dframe)
 
     for i in range(len(transformed_dataset)):
         sample = transformed_dataset[i]
@@ -120,13 +140,15 @@ if __name__ == '__main__':
             break
     
     dataloader = DataLoader(transformed_dataset, batch_size=4, shuffle=True, num_workers=4)
+    
+    for i_batch, sample_batched in enumerate(dataloader):
+        print(i_batch, sample_batched['event_map'].size(), sample_batched['input_residue'].size(), sample_batched['labels_remodelled_yes_no'])
 
-    dataset = ResidueDataset(csv_file=csv_file)
-
-    for i in range(len(dataset)):
-        sample = dataset[i]
-        print(i, sample['event_map'], sample['input_residue'], sample['labels_remodelled_yes_no'])
-        
-        if i == 3:
+        if i_batch == 3:
             break
+    
+    sample1 = next(iter(dataloader))
 
+    print(f'event_map shape = {sample1["event_map"].shape}')
+    print(f'residue shape = {sample1["input_residue"].shape}')
+    print(f'labels shape = {sample1["labels_remodelled_yes_no"].shape}')

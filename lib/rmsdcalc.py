@@ -1,6 +1,7 @@
 import pathlib
 import gemmi
 import numpy as np
+from typing import Union, Dict
 
 def map_chains(input_model: gemmi.Model, output_model: gemmi.Model):  
     """
@@ -13,10 +14,10 @@ def map_chains(input_model: gemmi.Model, output_model: gemmi.Model):
     print('mapping chains')
     for i, chain_input in enumerate(input_model):
         for j, chain_output in enumerate(output_model):
-            input_chain_centre_of_mass = chain_input.calculate_center_of_mass() #gemmi.Position
-            output_chain_centre_of_mass = chain_output.calculate_center_of_mass() #gemmi.Position
+            input_chain_centre_of_mass = calculate_com_chain(chain_input) #np.array
+            output_chain_centre_of_mass = calculate_com_chain(chain_output) #np.array
 
-            dist = input_chain_centre_of_mass.dist(output_chain_centre_of_mass)
+            dist = np.linalg.norm(input_chain_centre_of_mass-output_chain_centre_of_mass) #calculate euclidean dist between 2 CoMs
 
             if dist < 1:
                 chain.append([chain_input,chain_output])
@@ -35,26 +36,59 @@ def superpose(polymer1: gemmi.ResidueSpan, polymer2: gemmi.ResidueSpan):
 
     return polymer2
 
+def read_coords_and_mass_of_atom(atom: gemmi.Atom) -> np.ndarray:
+    """
+    reads the coordinates and mass of a single atom
+    """
+    coords = atom.pos.tolist()
+    mass = atom.element.weight
+
+    return coords, mass
+
 def calculate_com_residue(residue: gemmi.Residue) -> np.ndarray:
     """
     calculates the centre of mass for a single residue
     only looks at one conformer
     """
-    coords = []
-    mass = []
-    for atom in residue.first_conformer(): #just looking at one conformer
-        coords.append(atom.pos.tolist())
-        mass.append(atom.element.weight)
-    
-    coords = np.array(coords) #np.asarray(coords)
-    mass = np.array(mass) #np.asarray(mass)
+
+    coords_mass_list = list(zip(*map(
+                                read_coords_and_mass_of_atom, 
+                                residue.first_conformer() # only looking at first conformer of residue
+                                )))
+
+    coords = np.array(coords_mass_list[0])
+    mass = np.array(coords_mass_list[1])
+
     mass = mass.reshape(-1,1) #convert into column vector
 
     centre_of_mass = np.sum((mass * coords),axis=0) / np.sum(mass) # calculating centre of mass
 
+    return centre_of_mass, np.sum(mass)
+
+def calculate_com_chain(chain: gemmi.Chain) -> np.ndarray:
+    """
+    calculates the centre of mass for a single chain
+    """
+    coords = []
+    mass = []
+    coords_mass_list = list(zip(*map(
+                                calculate_com_residue, 
+                                chain)))     
+    
+    coords = np.array(coords_mass_list[0])
+    mass = np.array(coords_mass_list[1])
+    mass = mass.reshape(-1,1)
+    
+    centre_of_mass = np.sum((mass * coords),axis=0) / np.sum(mass) # calculating centre of mass
+
     return centre_of_mass
 
-def calc_dist_diff(polymer1: gemmi.ResidueSpan, polymer2: gemmi.ResidueSpan):
+
+
+#######
+
+def calc_dist_diff(polymer1: Union[type[gemmi.Chain], type[gemmi.ResidueSpan]], 
+                    polymer2: Union[type[gemmi.Chain], type[gemmi.ResidueSpan]]) -> Dict[str,float]:
     """
     calculates centre of mass difference for each residue in two protein chains
     """

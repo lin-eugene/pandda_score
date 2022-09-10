@@ -7,7 +7,6 @@ import os
 from os import access, R_OK
 
 import gemmi
-import sys
 import numpy as np
 
 from lib import rmsdcalc, contact_search
@@ -145,7 +144,7 @@ def find_csvs_from_year(path_year: str) -> list[pathlib.Path]:
 ######### 
 
 def find_all_csvs(path_data: str) -> list[pathlib.Path]:
-    path_data = pathlib.Path(path_data)
+    path_data = pathlib.Path(path_data).resolve()
     
     csvs = []
     paths_year = [x for x in path_data.iterdir() if x.is_dir()]
@@ -305,9 +304,9 @@ def calc_rmsd_per_chain(chain_input, chain_output):
         for j, residue_output in enumerate(chain_output):
             if ((str(residue_input) == str(residue_output)) and 
                 (residue_input.het_flag == 'A' and residue_output.het_flag == 'A')):
-                CoM_input = rmsdcalc.calculate_com_residue(residue_input)
-                CoM_output = rmsdcalc.calculate_com_residue(residue_output)
-                dist = np.linalg.norm(CoM_input-CoM_output)
+                centre_of_mass_input, _ = rmsdcalc.calculate_com_residue(residue_input)
+                centre_of_mass_output, _ = rmsdcalc.calculate_com_residue(residue_output)
+                dist = np.linalg.norm(centre_of_mass_input-centre_of_mass_output)
 
                 rmsd.append(dist)
                 residue_input_idx.append(i)
@@ -459,9 +458,7 @@ def gen_training_data_csv(df_remodelled, df_negative_data, fname='training_data.
 def look_for_training_data_to_csv(path_to_labxchem_data_dir: str, path_to_csv_with_dataset_paths: Optional[str], force=False):
         training_data_csv = pathlib.Path.cwd() / 'training' / 'training_data.csv'
         
-        if force==True:
-            pass
-        elif training_data_csv.is_file():
+        if training_data_csv.is_file() and force is not True:
             return None
 
         csvs = find_all_csvs(path_to_labxchem_data_dir)
@@ -504,7 +501,7 @@ if __name__ == "__main__":
 
     look_for_training_data_to_csv(path_to_labxchem_data_dir, 
                                 path_to_csv_with_dataset_paths,
-                                force=args)
+                                force=force)
     
 
 

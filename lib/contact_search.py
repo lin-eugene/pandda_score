@@ -4,8 +4,8 @@ from lib import rmsdcalc
 def find_contacts_per_residue(structure: gemmi.Structure, residue: gemmi.Residue, radius=5):
     """function finding contacts close to specific residue"""
 
-    CoM = rmsdcalc.calculate_com_residue(residue)
-    point = gemmi.Position(CoM[0], CoM[1], CoM[2])
+    centre_of_mass, _ = rmsdcalc.calculate_com_residue(residue)
+    point = gemmi.Position(centre_of_mass[0], centre_of_mass[1], centre_of_mass[2])
 
     contacts = []
     ns = gemmi.NeighborSearch(structure[0], structure.cell, radius).populate(include_h=False)

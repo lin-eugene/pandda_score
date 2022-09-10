@@ -1,5 +1,4 @@
 import gemmi
-import pathlib
 import numpy as np
 from lib import rmsdcalc
 from typing import Optional, Tuple
@@ -65,7 +64,7 @@ def generate_gemmi_transform(residue: type[gemmi.Residue],
             ) -> Tuple[np.ndarray, type[gemmi.Transform]]:
     
     #calculating centre of mass of residue
-    centre_of_mass = rmsdcalc.calculate_com_residue(residue)
+    centre_of_mass, _ = rmsdcalc.calculate_com_residue(residue)
     if vec_rand is not None:
         centre_of_mass = centre_of_mass + vec_rand
     
