@@ -12,6 +12,7 @@ import os
 import pathlib
 import pandas as pd
 
+from datetime import datetime
 import pickle
 
 import logging
@@ -56,7 +57,7 @@ model_0_results = train(model=model,
                         loss_fn=loss_fn, 
                         epochs=NUM_EPOCHS)
 
-pickle_fname = str(pathlib.Path.cwd() / "model_0_results.pkl")
+pickle_fname = f'{str(pathlib.Path.cwd() / "model_0_results.pkl")}_{datetime.now().strftime("%Y_%m_%d-%I_%M_%S_%p}")}'
 with open(pickle_fname, 'wb') as handle:
     pickle.dump(model_0_results, handle, protocol=pickle.HIGHEST_PROTOCOL)
 
