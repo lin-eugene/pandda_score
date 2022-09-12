@@ -23,7 +23,7 @@ class ResidueDataset(Dataset):
         self.transform=transform
         
     def __len__(self):
-        print(f'length of dataset: {len(self.residues_dframe)}')
+        logging.debug(f'length of dataset: {len(self.residues_dframe)}')
         return len(self.residues_dframe)
     
     def __getitem__(self, idx):
@@ -66,9 +66,9 @@ class SamplingRandomRotations(object):
         input_residue = sample['input_residue']
         labels_remodelled_yes_no = np.array(sample['labels_remodelled_yes_no']).astype(np.float32) #needs remodelling = 1, doesn't need remodelling = 0
         
-        # print(type(input_residue))
-        # print(f'event_map_grid = {event_map_grid}')
-        # print(f'axis_order = {event_map_grid.axis_order}')
+        # logging.debug(type(input_residue))
+        # logging.debug(f'event_map_grid = {event_map_grid}')
+        # logging.debug(f'axis_order = {event_map_grid.axis_order}')
 
         event_map_grid_copy = extract_box.make_gemmi_zeros_float_grid(event_map_grid)
         input_residue_masked_grid = extract_box.gen_mask_from_atoms(
@@ -135,7 +135,7 @@ if __name__ == '__main__':
 
     for i in range(len(transformed_dataset)):
         sample = transformed_dataset[i]
-        print(i, sample['event_residue_array'].shape, sample['labels_remodelled_yes_no'])
+        logging.debug(i, sample['event_residue_array'].shape, sample['labels_remodelled_yes_no'])
 
         if i == 3:
             break
@@ -143,12 +143,12 @@ if __name__ == '__main__':
     dataloader = DataLoader(transformed_dataset, batch_size=4, shuffle=True, num_workers=4)
     
     for i_batch, sample_batched in enumerate(dataloader):
-        print(i_batch, sample_batched['event_residue_array'].size(), sample_batched['labels_remodelled_yes_no'])
+        logging.debug(i_batch, sample_batched['event_residue_array'].size(), sample_batched['labels_remodelled_yes_no'])
 
         if i_batch == 3:
             break
     
     sample1 = next(iter(dataloader))
 
-    print(f'event_map shape = {sample1["event_residue_array"].shape}')
-    print(f'labels shape = {sample1["labels_remodelled_yes_no"].shape}')
+    logging.debug(f'event_map shape = {sample1["event_residue_array"].shape}')
+    logging.debug(f'labels shape = {sample1["labels_remodelled_yes_no"].shape}')

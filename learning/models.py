@@ -1,6 +1,7 @@
 import torch
 import torch.nn as nn
 import torch.nn.init as init
+import logging
 
 """
 This module contains the neural network architecture for the learning model.
@@ -79,13 +80,13 @@ class SqueezeNet(nn.Module):
 
     def forward(self, x):
         x = self.features(x)
-        print(f'features={x}')
+        # logging.debug(f'features={x}')
         x = self.classifier(x)
-        # print(x)
+        # logging.debug(x)
 
         # x = x.view(-1, x.shape[1] * x.shape[2] * x.shape[3] * x.shape[4]) #reshapes tensor
         x = x.view(-1)
-        # print(x)
+        # logging.debug(x)
         # x = x.item() #converts tensor to scalar
 
         return self.act(x)

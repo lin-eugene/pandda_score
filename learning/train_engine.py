@@ -1,6 +1,7 @@
 import torch
 import torch.nn as nn
 from tqdm.auto import tqdm
+import logging
 device = "cuda" if torch.cuda.is_available() else "cpu"
 
 def train_step(model: torch.nn.Module,
@@ -23,8 +24,8 @@ def train_step(model: torch.nn.Module,
         # 1. Forward pass
         label_pred = model(event_residue_array_batch)
 
-        print('label pred =',label_pred)
-        print('label batch =',labels_batch)
+        logging.debug('label pred =',label_pred)
+        logging.debug('label batch =',labels_batch)
         # 2. Calculate  and accumulate loss
         loss = loss_fn(label_pred, labels_batch)
         train_loss += loss.item() # .item() - returns scalar value of 1-element tensor
