@@ -7,7 +7,7 @@ import logging
 This module contains the neural network architecture for the learning model.
 """
 
-__all__ = ['SqueezeNet']
+__all__ = ['SqueezeNet', 'SqueezeNetOriginal']
 
 class Fire(nn.Module):
     """fire module for SqueezeNet"""
@@ -61,10 +61,65 @@ class SqueezeNet(nn.Module):
         self.classifier = nn.Sequential(
             nn.Dropout(p=0.5),
             final_conv,
-            nn.ReLU(inplace=True),
+            # nn.ReLU(inplace=True), # remove ReLU to allow negative values for sigmoid activation
             nn.AdaptiveAvgPool3d((1,1,1)) 
             #average pooling where hyperparameters (stride, kernel size) are automatically adjusted
             #only output size is specified — output size is (1, 1, 1, 1, 1) (N, C, D, W, H) in this case — i.e. one sample. one channel, 1x1x1 tensor/scalar
+        )
+
+        #initialising weights
+        for m in self.modules(): 
+            if isinstance(m, nn.Conv3d):
+                if m is final_conv:
+                    init.normal_(m.weight, mean=0.0, std=0.01)
+                else:
+                    init.kaiming_uniform_(m.weight)
+                if m.bias is not None:
+                    init.constant_(m.bias, 0)
+
+        self.act = nn.Sigmoid() #sigmoid activation function for binary classifier
+
+    def forward(self, x):
+        x = self.features(x)
+        # logging.debug(f'features={x}')
+        x = self.classifier(x)
+        # logging.debug(x)
+
+        # x = x.view(-1, x.shape[1] * x.shape[2] * x.shape[3] * x.shape[4]) #reshapes tensor
+        x = x.view(-1)
+        # logging.debug(x)
+        # x = x.item() #converts tensor to scalar
+
+        return self.act(x)
+    
+class SqueezeNetOriginal(nn.Module):
+
+    def __init__(self, num_classes=1):
+        super(SqueezeNetOriginal, self).__init__()
+        self.num_classes = num_classes
+        self.features = nn.Sequential(
+                nn.Conv3d(2, 64, kernel_size=3, stride=2),
+                nn.ReLU(inplace=True),
+                nn.MaxPool3d(kernel_size=3, stride=2, ceil_mode=True),
+                Fire(64, 16, 64, 64),
+                Fire(128, 16, 64, 64),
+                nn.MaxPool3d(kernel_size=3, stride=2, ceil_mode=True),
+                Fire(128, 32, 128, 128),
+                Fire(256, 32, 128, 128),
+                nn.MaxPool3d(kernel_size=3, stride=2, ceil_mode=True),
+                Fire(256, 48, 192, 192),
+                Fire(384, 48, 192, 192),
+                Fire(384, 64, 256, 256),
+                Fire(512, 64, 256, 256),
+            )
+
+        # Final convolution is initialized differently from the rest
+        final_conv = nn.Conv3d(512, self.num_classes, kernel_size=1)
+        self.classifier = nn.Sequential(
+            nn.Dropout(p=0.5),
+            final_conv,
+            nn.ReLU(inplace=True),
+            nn.AdaptiveAvgPool3d((1, 1, 1))
         )
 
         for m in self.modules():
@@ -90,3 +145,4 @@ class SqueezeNet(nn.Module):
         # x = x.item() #converts tensor to scalar
 
         return self.act(x)
+        

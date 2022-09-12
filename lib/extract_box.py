@@ -98,9 +98,15 @@ def create_numpy_array_with_gemmi_interpolate(
     residue: type[gemmi.Residue],
     grid: type[gemmi.FloatGrid],
     rot_mat: Optional[np.ndarray]=None,
-    vec_rand: Optional[np.ndarray]=None) -> np.ndarray:
+    vec_rand: Optional[np.ndarray]=None,
+    box_size: float = 10,
+    spacing: float = 0.5) -> np.ndarray:
     
-    array, transform = generate_gemmi_transform(residue, rot_mat=rot_mat, vec_rand=vec_rand)
+    array, transform = generate_gemmi_transform(residue, 
+                                            rot_mat=rot_mat, 
+                                            vec_rand=vec_rand,
+                                            box_size=box_size,
+                                            spacing=spacing)
     grid.interpolate_values(array, transform)
 
     return array

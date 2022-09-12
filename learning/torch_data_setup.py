@@ -80,10 +80,10 @@ class SamplingRandomRotations(object):
         
         event_map_array = extract_box.create_numpy_array_with_gemmi_interpolate(input_residue, event_map_grid, rot_mat, vec_rand)
         input_residue_array = extract_box.create_numpy_array_with_gemmi_interpolate(input_residue, input_residue_masked_grid, rot_mat, vec_rand)
-        
-
+        event_map_array_norm = (event_map_array - np.mean(event_map_array)) / np.std(event_map_array)
+        # input_residue_array_norm = (input_residue_array - 0.5) * 2 #normalise to -1 to 1
         return {
-            'event_map': event_map_array,
+            'event_map': event_map_array_norm,
             'input_residue': input_residue_array,
             'labels_remodelled_yes_no': labels_remodelled_yes_no
         }
