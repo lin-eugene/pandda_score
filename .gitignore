@@ -5,3 +5,5 @@ BAZ2BA-x481/
 training/
 coot-backup/
 panddascore.egg-info/
+.idea
+.ipynb_checkpoints
