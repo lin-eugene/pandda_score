@@ -135,7 +135,7 @@ if __name__ == '__main__':
 
     for i in range(len(transformed_dataset)):
         sample = transformed_dataset[i]
-        logging.debug(i, sample['event_residue_array'].shape, sample['labels_remodelled_yes_no'])
+        print(i, sample['event_residue_array'].shape, sample['labels_remodelled_yes_no'])
 
         if i == 3:
             break
@@ -143,12 +143,12 @@ if __name__ == '__main__':
     dataloader = DataLoader(transformed_dataset, batch_size=4, shuffle=True, num_workers=4)
     
     for i_batch, sample_batched in enumerate(dataloader):
-        logging.debug(i_batch, sample_batched['event_residue_array'].size(), sample_batched['labels_remodelled_yes_no'])
+        print(i_batch, sample_batched['event_residue_array'].size(), sample_batched['labels_remodelled_yes_no'])
 
         if i_batch == 3:
             break
     
     sample1 = next(iter(dataloader))
 
-    logging.debug(f'event_map shape = {sample1["event_residue_array"].shape}')
-    logging.debug(f'labels shape = {sample1["labels_remodelled_yes_no"].shape}')
+    print(f'event_map shape = {sample1["event_residue_array"].shape}')
+    print(f'labels shape = {sample1["labels_remodelled_yes_no"].shape}')
