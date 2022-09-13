@@ -46,13 +46,13 @@ def check_cuda(training_dataloader,
     logging.info(f'{next(model.parameters()).is_cuda=}')
 
     train_test = train_step(model=model,
-                            training_dataloader=training_dataloader,        
+                            dataloader=training_dataloader,        
                             loss_fn=loss_fn,
                             optimiser=optimizer,
                             device=device)
 
     test_test = test_step(model=model,
-                            test_dataloader=test_dataloader,
+                            dataloader=test_dataloader,
                             loss_fn=loss_fn,
                             device=device)
 
