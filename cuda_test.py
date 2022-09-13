@@ -8,6 +8,9 @@ from learning.torch_data_setup import *
 import os
 from learning.models import SqueezeNet
 
+
+logging.basicConfig(level=logging.DEBUG)
+
 device = "cuda" if torch.cuda.is_available() else "cpu"
 
 training_csv = pathlib.Path.cwd() / "training" / "training_set.csv"
