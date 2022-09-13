@@ -79,7 +79,8 @@ test_dataloader = DataLoader(dataset=test_dataset,
                             num_workers=os.cpu_count())
 print(f'test_dataloader length is {len(test_dataloader)}')
 
-check_cuda()
+check_cuda(training_dataloader, test_dataloader, model)
+
 # Train model_0 
 model_0_results = train(model=model, 
                         train_dataloader=training_dataloader,
