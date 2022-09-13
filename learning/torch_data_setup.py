@@ -124,7 +124,8 @@ class AddGaussianNoise(object):
         self.mean = mean
         
     def __call__(self, sample):
-        event_residue_array = sample['event_residue_array'] + torch.randn(sample['event_residue_array'].size()) * self.std + self.mean
+        event_residue_array = sample['event_residue_array']
+        event_residue_array[1] = event_residue_array[1] + torch.randn(event_residue_array[1].size()) * self.std + self.mean
         return {
             'event_residue_array': event_residue_array,
             'labels_remodelled_yes_no': sample['labels_remodelled_yes_no']
@@ -138,7 +139,7 @@ def generate_dataset(residues_dframe):
                         SamplingRandomRotations(),
                         ConcatEventResidueToTwoChannels(),
                         ToTensor(),
-                        AddGaussianNoise()
+                        # AddGaussianNoise()
                     ])
     dataset = ResidueDataset(residues_dframe, transform=tsfm)
     return dataset

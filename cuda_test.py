@@ -57,4 +57,4 @@ def check_cuda(training_dataloader,
                             device=device)
 
 
-check_cuda(training_dataloader, test_dataloader, model)
+check_cuda(training_dataloader, test_dataloader, model, device)
