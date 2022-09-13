@@ -28,7 +28,10 @@ NUM_EPOCHS = 20
 BATCH_SIZE = 4
 
 # Create an instance of SqueezeNet
-model = SqueezeNet()
+model = SqueezeNet(
+            kernel_size=3,
+            stride=1
+            )
 
 # Setup loss function and optimizer
 loss_fn = nn.BCELoss()
