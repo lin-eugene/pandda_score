@@ -21,6 +21,23 @@ logging.basicConfig(level=logging.DEBUG)
 torch.manual_seed(42) 
 torch.cuda.manual_seed(42)
 
+
+def check_cuda(training_dataloader,
+                test_dataloader,
+                model):
+    logging.debug(f'{torch.cuda.is_available()=}')
+    logging.debug(f'{next(model.parameters()).is_cuda=}')
+
+    train_sample = next(iter(training_dataloader))
+    logging.debug(f'{train_sample["event_residue_array"].is_cuda=}')
+    logging.debug(f'{train_sample["labels_remodelled_yes_no"].is_cuda=}')
+
+    test_sample = next(iter(test_dataloader))
+    logging.debug(f'{test_sample["event_residue_array"].is_cuda=}')
+    logging.debug(f'{test_sample["labels_remodelled_yes_no"].is_cuda=}')
+
+        
+
 device = "cuda" if torch.cuda.is_available() else "cpu"
 
 # Set number of epochs
@@ -32,6 +49,8 @@ model = SqueezeNet(
             kernel_size=3,
             stride=1
             )
+model.to(device)
+
 
 # Setup loss function and optimizer
 loss_fn = nn.BCELoss()
