@@ -24,8 +24,9 @@ def train_step(model: torch.nn.Module,
         # 1. Forward pass
         label_pred = model(event_residue_array_batch)
 
-        logging.debug(f'label pred = {label_pred}')
-        logging.debug(f'label batch = {labels_batch}')
+        logging.debug(f'{label_pred=}')
+        logging.debug(f'{labels_batch=}')
+        
         # 2. Calculate  and accumulate loss
         loss = loss_fn(label_pred, labels_batch)
         train_loss += loss.item() # .item() - returns scalar value of 1-element tensor
