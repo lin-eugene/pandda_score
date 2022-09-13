@@ -81,13 +81,13 @@ class SqueezeNet(nn.Module):
 
     def forward(self, x):
         x = self.features(x)
-        # logging.debug(f'features={x}')
+        # logging.info(f'features={x}')
         x = self.classifier(x)
-        # logging.debug(x)
+        # logging.info(x)
 
         # x = x.view(-1, x.shape[1] * x.shape[2] * x.shape[3] * x.shape[4]) #reshapes tensor
         x = x.view(-1)
-        # logging.debug(x)
+        # logging.info(x)
         # x = x.item() #converts tensor to scalar
 
         return self.act(x)
@@ -135,13 +135,13 @@ class SqueezeNetOriginal(nn.Module):
 
     def forward(self, x):
         x = self.features(x)
-        # logging.debug(f'features={x}')
+        # logging.info(f'features={x}')
         x = self.classifier(x)
-        # logging.debug(x)
+        # logging.info(x)
 
         # x = x.view(-1, x.shape[1] * x.shape[2] * x.shape[3] * x.shape[4]) #reshapes tensor
         x = x.view(-1)
-        # logging.debug(x)
+        # logging.info(x)
         # x = x.item() #converts tensor to scalar
 
         return self.act(x)

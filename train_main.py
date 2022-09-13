@@ -16,7 +16,7 @@ from datetime import datetime
 import pickle
 
 import logging
-logging.basicConfig(level=logging.DEBUG)
+logging.basicConfig(level=logging.INFO)
 
 torch.manual_seed(42) 
 torch.cuda.manual_seed(42)
@@ -25,16 +25,16 @@ torch.cuda.manual_seed(42)
 def check_cuda(training_dataloader,
                 test_dataloader,
                 model):
-    logging.debug(f'{torch.cuda.is_available()=}')
-    logging.debug(f'{next(model.parameters()).is_cuda=}')
+    logging.info(f'{torch.cuda.is_available()=}')
+    logging.info(f'{next(model.parameters()).is_cuda=}')
 
     train_sample = next(iter(training_dataloader))
-    logging.debug(f'{train_sample["event_residue_array"].is_cuda=}')
-    logging.debug(f'{train_sample["labels_remodelled_yes_no"].is_cuda=}')
+    logging.info(f'{train_sample["event_residue_array"].is_cuda=}')
+    logging.info(f'{train_sample["labels_remodelled_yes_no"].is_cuda=}')
 
     test_sample = next(iter(test_dataloader))
-    logging.debug(f'{test_sample["event_residue_array"].is_cuda=}')
-    logging.debug(f'{test_sample["labels_remodelled_yes_no"].is_cuda=}')
+    logging.info(f'{test_sample["event_residue_array"].is_cuda=}')
+    logging.info(f'{test_sample["labels_remodelled_yes_no"].is_cuda=}')
 
         
 

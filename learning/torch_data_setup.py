@@ -23,7 +23,7 @@ class ResidueDataset(Dataset):
         self.transform=transform
         
     def __len__(self):
-        logging.debug(f'length of dataset: {len(self.residues_dframe)}')
+        logging.info(f'length of dataset: {len(self.residues_dframe)}')
         return len(self.residues_dframe)
     
     def __getitem__(self, idx):
@@ -66,9 +66,9 @@ class SamplingRandomRotations(object):
         input_residue = sample['input_residue']
         labels_remodelled_yes_no = np.array(sample['labels_remodelled_yes_no']).astype(np.float32) #needs remodelling = 1, doesn't need remodelling = 0
         
-        # logging.debug(type(input_residue))
-        # logging.debug(f'event_map_grid = {event_map_grid}')
-        # logging.debug(f'axis_order = {event_map_grid.axis_order}')
+        # logging.info(type(input_residue))
+        # logging.info(f'event_map_grid = {event_map_grid}')
+        # logging.info(f'axis_order = {event_map_grid.axis_order}')
 
         event_map_grid_copy = extract_box.make_gemmi_zeros_float_grid(event_map_grid)
         input_residue_masked_grid = extract_box.gen_mask_from_atoms(

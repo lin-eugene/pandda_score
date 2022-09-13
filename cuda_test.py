@@ -2,12 +2,13 @@ import logging
 import torch
 
 from torch.utils.data import DataLoader
+from torch import nn as nn
 import pathlib
 import pandas as pd
 from learning.torch_data_setup import *
 import os
 from learning.models import SqueezeNet
-
+from learning.train_engine import train_step, test_step
 
 logging.basicConfig(level=logging.DEBUG)
 
@@ -30,25 +31,30 @@ test_dataloader = DataLoader(dataset=test_dataset,
                             shuffle=True, 
                             num_workers=os.cpu_count())
 
-model = SqueezeNet(
-            kernel_size=3,
-            stride=1
-            )
+model = SqueezeNet(kernel_size=3,
+                    stride=1)
+
 model.to(device)
 
 def check_cuda(training_dataloader,
                 test_dataloader,
-                model):
-    logging.debug(f'{torch.cuda.is_available()=}')
-    logging.debug(f'{next(model.parameters()).is_cuda=}')
+                model,
+                device):
+    loss_fn = nn.BCELoss()
+    optimizer = torch.optim.Adam(params=model.parameters(), lr=0.001)
+    logging.info(f'{torch.cuda.is_available()=}')
+    logging.info(f'{next(model.parameters()).is_cuda=}')
 
-    train_sample = next(iter(training_dataloader))
-    logging.debug(f'{train_sample["event_residue_array"].is_cuda=}')
-    logging.debug(f'{train_sample["labels_remodelled_yes_no"].is_cuda=}')
+    train_test = train_step(model=model,
+                            training_dataloader=training_dataloader,        
+                            loss_fn=loss_fn,
+                            optimiser=optimizer,
+                            device=device)
 
-    test_sample = next(iter(test_dataloader))
-    logging.debug(f'{test_sample["event_residue_array"].is_cuda=}')
-    logging.debug(f'{test_sample["labels_remodelled_yes_no"].is_cuda=}')
+    test_test = test_step(model=model,
+                            test_dataloader=test_dataloader,
+                            loss_fn=loss_fn,
+                            device=device)
 
 
 check_cuda(training_dataloader, test_dataloader, model)

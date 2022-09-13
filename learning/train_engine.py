@@ -2,12 +2,12 @@ import torch
 import torch.nn as nn
 from tqdm.auto import tqdm
 import logging
-device = "cuda" if torch.cuda.is_available() else "cpu"
 
 def train_step(model: torch.nn.Module,
                 dataloader: torch.utils.data.DataLoader,
                 loss_fn: torch.nn.Module,
-                optimiser: torch.optim.Optimizer):
+                optimiser: torch.optim.Optimizer,
+                device: torch.device):
 
     # put model in train mode
     model.train()
@@ -20,12 +20,14 @@ def train_step(model: torch.nn.Module,
         # Send data to target device
         event_residue_array_batch = sample['event_residue_array'].to(device)
         labels_batch = sample['labels_remodelled_yes_no'].to(device)
+        logging.debug(f'{event_residue_array_batch.is_cuda=}')
+        logging.debug(f'{labels_batch.is_cuda=}')
 
         # 1. Forward pass
         label_pred = model(event_residue_array_batch)
 
-        logging.debug(f'{label_pred=}')
-        logging.debug(f'{labels_batch=}')
+        logging.info(f'{label_pred=}')
+        logging.info(f'{labels_batch=}')
         
         # 2. Calculate  and accumulate loss
         loss = loss_fn(label_pred, labels_batch)
@@ -53,7 +55,8 @@ def train_step(model: torch.nn.Module,
 
 def test_step(model: torch.nn.Module,
                 dataloader: torch.utils.data.DataLoader,
-                loss_fn: torch.nn.Module):
+                loss_fn: torch.nn.Module,
+                device: torch.device):
     """
     Test function:
     same as train_step function
@@ -74,7 +77,10 @@ def test_step(model: torch.nn.Module,
             # Send data to target device
             event_residue_array_batch = sample['event_residue_array'].to(device)
             labels_batch = sample['labels_remodelled_yes_no'].to(device)
-    
+
+            logging.debug(f'{event_residue_array_batch.is_cuda=}')
+            logging.debug(f'{labels_batch.is_cuda=}')    
+
             # 1. Forward pass
             test_pred_logits = model(event_residue_array_batch)
 
@@ -101,8 +107,9 @@ def train(model: torch.nn.Module,
           train_dataloader: torch.utils.data.DataLoader, 
           test_dataloader: torch.utils.data.DataLoader, 
           optimiser: torch.optim.Optimizer,
-          loss_fn: torch.nn.Module = nn.BCELoss(), # BCELoss for binary classification
-          epochs: int = 5):
+          loss_fn: torch.nn.Module, # BCELoss for binary classification
+          epochs: int,
+          device: torch.device):
         
     
      # 2. Create empty results dictionary
@@ -117,10 +124,12 @@ def train(model: torch.nn.Module,
         train_loss, train_acc = train_step(model=model,
                                            dataloader=train_dataloader,
                                            loss_fn=loss_fn,
-                                           optimiser=optimiser)
+                                           optimiser=optimiser,
+                                           device=device)
         test_loss, test_acc = test_step(model=model,
-            dataloader=test_dataloader,
-            loss_fn=loss_fn)
+                                    dataloader=test_dataloader,
+                                    loss_fn=loss_fn,
+                                    device=device)
         
         # 4. Print out what's happening
         print(
