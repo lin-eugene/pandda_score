@@ -9,5 +9,7 @@
 np=$(cat ${PBS_NODEFILE} | wc -l);
 
 conda activate pandda_env
+python -m torch.utils.collect_env
+
 cd /dls/labxchem/data/2018/lb18145-80/processing/analysis/eugene/panddaproject
 python cuda_test.py
