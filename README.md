@@ -1,10 +1,10 @@
 # panddaproject
 
-# dependencies
+# dependencies for diamond clusters
 ```shell
 conda create -n pandda_env python=3.9.13 biopython=1.78 pandas=1.4.3
 conda activate pandda_env
-conda install -y pytorch==1.10.1 torchvision==0.11.2 torchaudio==0.10.1 -c pytorch
+conda install -y pytorch==1.10.1 torchvision==0.11.2 torchaudio==0.10.1 cudatoolkit=11.3 -c pytorch
 conda install -y tqdm=4.64.0
 conda install -c conda-forge -y gemmi=0.4.5 torchinfo=1.7.0
 conda install -c conda-forge -y plotly-5.10.0 matplotlib=2.2.3 fire=0.4.0
