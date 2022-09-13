@@ -81,10 +81,10 @@ class SamplingRandomRotations(object):
         event_map_array = extract_box.create_numpy_array_with_gemmi_interpolate(input_residue, event_map_grid, rot_mat, vec_rand)
         input_residue_array = extract_box.create_numpy_array_with_gemmi_interpolate(input_residue, input_residue_masked_grid, rot_mat, vec_rand)
         event_map_array_norm = (event_map_array - np.mean(event_map_array)) / np.std(event_map_array)
-        # input_residue_array_norm = (input_residue_array - 0.5) * 2 #normalise to -1 to 1
+        input_residue_array_norm = (input_residue_array - 0.5) #normalise to -0.5 to 0.5
         return {
             'event_map': event_map_array_norm,
-            'input_residue': input_residue_array,
+            'input_residue': input_residue_array_norm,
             'labels_remodelled_yes_no': labels_remodelled_yes_no
         }
     
@@ -118,11 +118,27 @@ class ToTensor(object):
             'labels_remodelled_yes_no': torch.from_numpy(labels_remodelled_yes_no)
         }
 
+class AddGaussianNoise(object):
+    def __init__(self, mean=0., std=1.):
+        self.std = std
+        self.mean = mean
+        
+    def __call__(self, sample):
+        event_residue_array = sample['event_residue_array'] + torch.randn(sample['event_residue_array'].size()) * self.std + self.mean
+        return {
+            'event_residue_array': event_residue_array,
+            'labels_remodelled_yes_no': sample['labels_remodelled_yes_no']
+        }
+    
+    def __repr__(self):
+        return self.__class__.__name__ + '(mean={0}, std={1})'.format(self.mean, self.std)
+
 def generate_dataset(residues_dframe):
     tsfm = transforms.Compose([
                         SamplingRandomRotations(),
                         ConcatEventResidueToTwoChannels(),
-                        ToTensor()
+                        ToTensor(),
+                        AddGaussianNoise()
                     ])
     dataset = ResidueDataset(residues_dframe, transform=tsfm)
     return dataset

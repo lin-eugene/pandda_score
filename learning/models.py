@@ -37,22 +37,22 @@ class Fire(nn.Module):
 
 class SqueezeNet(nn.Module):
 
-    def __init__(self, num_classes=1): #binary classification, so num_classes = 1
+    def __init__(self, num_classes=1, kernel_size=2, stride=2): #binary classification, so num_classes = 1
         super(SqueezeNet, self).__init__()
         self.num_classes = num_classes
         self.features = nn.Sequential(
-                nn.Conv3d(2, 96, kernel_size=2, stride=1), # 2 input channels (event_map, residue mask), 96 output channels, 7x7x7 kernel size, stride 2
+                nn.Conv3d(2, 96, kernel_size=kernel_size, stride=stride), # 2 input channels (event_map, residue mask), 96 output channels, 7x7x7 kernel size, stride 2
                 nn.ReLU(inplace=True), # inplace used to save memory
-                nn.MaxPool3d(kernel_size=2, stride=1, ceil_mode=True), # 3x3x3 kernel size, stride 2, ceil_mode adds padding if necessary so that output size not reduced: https://stackoverflow.com/questions/59906456/in-pytorchs-maxpool2d-is-padding-added-depending-on-ceil-mode
+                nn.MaxPool3d(kernel_size=kernel_size, stride=stride, ceil_mode=True), # 3x3x3 kernel size, stride 2, ceil_mode adds padding if necessary so that output size not reduced: https://stackoverflow.com/questions/59906456/in-pytorchs-maxpool2d-is-padding-added-depending-on-ceil-mode
                 Fire(96, 16, 64, 64), # 96 input feature maps, squeeze layer squeezes input to 16 feature maps, 64+64=128 output feature maps (64 from 1x1 conv, 64 from 3x3 conv in expand layers)
                 Fire(128, 16, 64, 64), # 128 input feature maps, 128 output feature maps
                 Fire(128, 32, 128, 128), #128 input feature maps, 256 output feature maps
-                nn.MaxPool3d(kernel_size=2, stride=1, ceil_mode=True),
+                nn.MaxPool3d(kernel_size=kernel_size, stride=stride, ceil_mode=True),
                 Fire(256, 32, 128, 128), #256 input feature maps, 256 output feature maps
                 Fire(256, 48, 192, 192), #256 input feature maps, 384 output feature maps
                 Fire(384, 48, 192, 192), #384 input feature maps, 384 output feature maps
                 Fire(384, 64, 256, 256), #384 input feature maps, 512 output feature maps
-                nn.MaxPool3d(kernel_size=2, stride=1, ceil_mode=True),
+                nn.MaxPool3d(kernel_size=kernel_size, stride=stride, ceil_mode=True),
                 Fire(512, 64, 256, 256), #512 input feature maps, 512 output feature maps
             )
 
