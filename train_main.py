@@ -91,7 +91,11 @@ model_0_results = train(model=model,
                         epochs=NUM_EPOCHS,
                         device=device)
 
-pickle_fname = f'{str(pathlib.Path(__file__).resolve() / "training_results" / "model_0_results.pkl")}_{datetime.now().strftime("%Y_%m_%d-%I_%M_%S_%p}")}'
+training_results_path = pathlib.Path(__file__).resolve / "training_results"
+training_results_path.mkdir(parents=True, exist_ok=True)
+SUFFIX = datetime.now().strftime("%Y_%m_%d-%I_%M_%S_%p}")
+pickle_fname = training_results_path / f"model_0_results_{SUFFIX}.pkl"
+
 
 with open(pickle_fname, 'wb') as handle:
     pickle.dump(model_0_results, handle, protocol=pickle.HIGHEST_PROTOCOL)
