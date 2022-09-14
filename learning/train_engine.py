@@ -16,7 +16,7 @@ def train_step(model: torch.nn.Module,
     train_loss, train_acc = 0, 0
     
     # Loop through data loader data batches
-    for batch_idx, sample in enumerate(dataloader):
+    for sample in dataloader:
         # Send data to target device
         event_residue_array_batch = sample['event_residue_array'].to(device)
         labels_batch = sample['labels_remodelled_yes_no'].to(device)
@@ -43,9 +43,11 @@ def train_step(model: torch.nn.Module,
         optimiser.step() # updates parameters based on current gradients x.grad (computed by loss.backward())
     
         # Calculate and accumulate accuracy metric across all batches
-        # y_pred_class = torch.argmax(torch.sigmoid(label_pred), dim=0) #torch.argmax — return max value of elements in tensor
-        # print(y_pred_class)
-        train_acc += (label_pred == labels_batch).sum().item()/len(label_pred)
+        if label_pred.size(dim=1) > 1:
+            y_pred_class = torch.argmax(label_pred, dim=1) #torch.argmax — return max value of elements in tensor
+            train_acc += (y_pred_class == labels_batch).sum().item()/len(label_pred)
+        else:
+            train_acc += (label_pred == labels_batch).sum().item()/len(label_pred)
     
     # Adjust metrics to get average loss and accuracy per batch 
     train_loss = train_loss / len(dataloader)
@@ -73,7 +75,7 @@ def test_step(model: torch.nn.Module,
     # Turn on inference context manager
     with torch.inference_mode():
         # Loop through DataLoader batches
-        for batch_idx, sample in enumerate(dataloader):
+        for sample in dataloader:
             # Send data to target device
             event_residue_array_batch = sample['event_residue_array'].to(device)
             labels_batch = sample['labels_remodelled_yes_no'].to(device)
@@ -91,9 +93,11 @@ def test_step(model: torch.nn.Module,
 
             # Calculate and accumulate accuracy
             # print(f'test_pred_logits: {test_pred_logits}')
-            # test_pred_labels = test_pred_logits.argmax(dim=0) #for multiclass classification
-            # print(f'test_pred_labels={test_pred_labels}')
-            test_acc += ((test_pred_logits == labels_batch).sum().item()/len(test_pred_logits))
+            if test_pred_logits.size(dim=1) > 1:
+                test_pred_labels = torch.argmax(test_pred_logits, dim=1) #for multiclass classification
+                test_acc += (test_pred_labels == labels_batch).sum().item()/len(test_pred_logits)
+            else:
+                test_acc += (test_pred_logits == labels_batch).sum().item()/len(test_pred_logits)
             
     # Adjust metrics to get average loss and accuracy per batch 
     test_loss = test_loss / len(dataloader)

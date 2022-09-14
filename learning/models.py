@@ -76,8 +76,7 @@ class SqueezeNet(nn.Module):
                     init.kaiming_uniform_(m.weight)
                 if m.bias is not None:
                     init.constant_(m.bias, 0)
-
-        self.act = nn.Sigmoid() #sigmoid activation function for binary classifier
+        
 
     def forward(self, x):
         x = self.features(x)
@@ -85,12 +84,14 @@ class SqueezeNet(nn.Module):
         x = self.classifier(x)
         # logging.info(x)
 
-        # x = x.view(-1, x.shape[1] * x.shape[2] * x.shape[3] * x.shape[4]) #reshapes tensor
-        x = x.view(-1)
-        # logging.info(x)
-        # x = x.item() #converts tensor to scalar
-
-        return self.act(x)
+        if self.num_classes == 1:
+            x = x.view(-1)
+            act = nn.Sigmoid()
+            return act(x)
+        
+        x = x.view(-1, x.shape[1] * x.shape[2] * x.shape[3] * x.shape[4]) #reshapes tensor
+        act = nn.Softmax(dim=1)
+        return act(x)
     
 class SqueezeNetOriginal(nn.Module):
 
@@ -131,18 +132,15 @@ class SqueezeNetOriginal(nn.Module):
                 if m.bias is not None:
                     init.constant_(m.bias, 0)
 
-        self.act = nn.Sigmoid() #sigmoid activation function for binary classifier
-
-    def forward(self, x):
+    def forward(self, x, one_hot=False):
         x = self.features(x)
         # logging.info(f'features={x}')
         x = self.classifier(x)
         # logging.info(x)
 
-        # x = x.view(-1, x.shape[1] * x.shape[2] * x.shape[3] * x.shape[4]) #reshapes tensor
-        x = x.view(-1)
-        # logging.info(x)
-        # x = x.item() #converts tensor to scalar
-
-        return self.act(x)
+        if not one_hot:
+            x = x.view(-1)
+            return nn.Sigmoid(x)
         
+        x = x.view(-1, x.shape[1] * x.shape[2] * x.shape[3] * x.shape[4]) #reshapes tensor
+        return nn.Softmax(x)

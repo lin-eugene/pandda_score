@@ -4,7 +4,7 @@ import sys, pathlib
 import argparse
 # codebase_path = pathlib.Path(__file__).parent.parent.absolute()
 # sys.path.append(str(codebase_path))
-from learning.data_setup.list_systems import list_systems_in_dataset
+from learning.pull_data.list_systems import list_systems_in_dataset
 
 def check_systems_in_selection(systems_list: List[str], 
                             selection: List[str]) -> bool:

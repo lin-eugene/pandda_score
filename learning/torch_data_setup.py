@@ -109,13 +109,14 @@ class ToTensor(object):
     converts ndarrays into torch tensors
     MIGHT NOT BE NECESSARY
     """
-    def __call__(self, sample):
+
+    def __call__(self, sample) -> Dict[str, torch.Tensor]:
         event_residue_array = sample['event_residue_array']
         labels_remodelled_yes_no = sample['labels_remodelled_yes_no']
 
         return {
             'event_residue_array': torch.from_numpy(event_residue_array),
-            'labels_remodelled_yes_no': torch.from_numpy(labels_remodelled_yes_no)
+            'labels_remodelled_yes_no': torch.from_numpy(labels_remodelled_yes_no).long()
         }
 
 class AddGaussianNoise(object):
@@ -126,6 +127,7 @@ class AddGaussianNoise(object):
     def __call__(self, sample):
         event_residue_array = sample['event_residue_array']
         event_residue_array[1] = event_residue_array[1] + torch.randn(event_residue_array[1].size()) * self.std + self.mean
+        
         return {
             'event_residue_array': event_residue_array,
             'labels_remodelled_yes_no': sample['labels_remodelled_yes_no']
@@ -134,12 +136,11 @@ class AddGaussianNoise(object):
     def __repr__(self):
         return self.__class__.__name__ + '(mean={0}, std={1})'.format(self.mean, self.std)
 
-def generate_dataset(residues_dframe):
+def generate_dataset(residues_dframe, one_hot=False):
     tsfm = transforms.Compose([
                         SamplingRandomRotations(),
                         ConcatEventResidueToTwoChannels(),
                         ToTensor(),
-                        # AddGaussianNoise()
                     ])
     dataset = ResidueDataset(residues_dframe, transform=tsfm)
     return dataset

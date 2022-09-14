@@ -47,13 +47,14 @@ BATCH_SIZE = 4
 # Create an instance of SqueezeNet
 model = SqueezeNet(
             kernel_size=3,
-            stride=1
+            stride=1,
+            num_classes=2
             )
 model.to(device)
 
 
 # Setup loss function and optimizer
-loss_fn = nn.BCELoss()
+loss_fn = nn.CrossEntropyLoss()
 optimiser = torch.optim.Adam(params=model.parameters(), lr=0.001)
 
 # Start the timer
@@ -87,9 +88,11 @@ model_0_results = train(model=model,
                         test_dataloader=test_dataloader,
                         optimiser=optimiser,
                         loss_fn=loss_fn, 
-                        epochs=NUM_EPOCHS)
+                        epochs=NUM_EPOCHS,
+                        device=device)
 
-pickle_fname = f'{str(pathlib.Path.cwd() / "training_results" / "model_0_results.pkl")}_{datetime.now().strftime("%Y_%m_%d-%I_%M_%S_%p}")}'
+pickle_fname = f'{str(pathlib.Path(__file__).resolve() / "training_results" / "model_0_results.pkl")}_{datetime.now().strftime("%Y_%m_%d-%I_%M_%S_%p}")}'
+
 with open(pickle_fname, 'wb') as handle:
     pickle.dump(model_0_results, handle, protocol=pickle.HIGHEST_PROTOCOL)
 
