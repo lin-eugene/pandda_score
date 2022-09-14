@@ -83,12 +83,12 @@ print(f'test_dataloader length is {len(test_dataloader)}')
 check_cuda(training_dataloader, test_dataloader, model)
 
 # Train model_0 
-model_0_results = train(model=model, 
-                        train_dataloader=training_dataloader,
-                        test_dataloader=test_dataloader,
-                        optimiser=optimiser,
-                        loss_fn=loss_fn, 
-                        epochs=NUM_EPOCHS,
+model_0_results = train(model=model, \
+                        train_dataloader=training_dataloader, \
+                        test_dataloader=test_dataloader, \
+                        optimiser=optimiser, \
+                        loss_fn=loss_fn, \
+                        epochs=NUM_EPOCHS, \
                         device=device)
 
 training_results_path = pathlib.Path(__file__).resolve / "training_results"
