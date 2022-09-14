@@ -95,6 +95,7 @@ training_results_path = pathlib.Path(__file__).resolve / "training_results"
 training_results_path.mkdir(parents=True, exist_ok=True)
 SUFFIX = datetime.now().strftime("%Y_%m_%d-%I_%M_%S_%p}")
 pickle_fname = training_results_path / f"model_0_results_{SUFFIX}.pkl"
+print(f'Pickling results to {pickle_fname.name}')
 
 
 with open(pickle_fname, 'wb') as handle:
