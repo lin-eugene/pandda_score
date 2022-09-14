@@ -61,7 +61,7 @@ class SqueezeNet(nn.Module):
         self.classifier = nn.Sequential(
             nn.Dropout(p=0.5),
             final_conv,
-            # nn.ReLU(inplace=True), # remove ReLU to allow negative values for sigmoid activation
+            nn.ReLU(inplace=True), #NOTE -- remove ReLU to allow negative values for sigmoid activation
             nn.AdaptiveAvgPool3d((1,1,1)) 
             #average pooling where hyperparameters (stride, kernel size) are automatically adjusted
             #only output size is specified — output size is (1, 1, 1, 1, 1) (N, C, D, W, H) in this case — i.e. one sample. one channel, 1x1x1 tensor/scalar
@@ -86,12 +86,10 @@ class SqueezeNet(nn.Module):
 
         if self.num_classes == 1:
             x = x.view(-1)
-            act = nn.Sigmoid()
-            return act(x)
+            return x #returns logit (without activation function)
         
         x = x.view(-1, x.shape[1] * x.shape[2] * x.shape[3] * x.shape[4]) #reshapes tensor
-        act = nn.Softmax(dim=1)
-        return act(x)
+        return x #returns logits (without activation function)
     
 class SqueezeNetOriginal(nn.Module):
 

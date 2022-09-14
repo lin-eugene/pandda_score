@@ -25,9 +25,6 @@ def train_step(model: torch.nn.Module,
 
         # 1. Forward pass
         label_pred = model(event_residue_array_batch)
-
-        logging.info(f'{label_pred=}')
-        logging.info(f'{labels_batch=}')
         
         # 2. Calculate  and accumulate loss
         loss = loss_fn(label_pred, labels_batch)
@@ -44,10 +41,15 @@ def train_step(model: torch.nn.Module,
     
         # Calculate and accumulate accuracy metric across all batches
         if label_pred.size(dim=1) > 1:
-            y_pred_class = torch.argmax(label_pred, dim=1) #torch.argmax — return max value of elements in tensor
-            train_acc += (y_pred_class == labels_batch).sum().item()/len(label_pred)
+            y_pred_class = torch.argmax(torch.softmax(label_pred, dim=1), dim=1) #torch.argmax — return max value of elements in tensor
         else:
-            train_acc += (label_pred == labels_batch).sum().item()/len(label_pred)
+            y_pred_class = torch.round(torch.sigmoid(label_pred))
+        
+        logging.info(f'{torch.softmax(label_pred, dim=1)=}')
+        logging.info(f'{y_pred_class=}')
+        logging.info(f'{labels_batch=}')
+
+        train_acc += (y_pred_class == labels_batch).sum().item()/len(label_pred)
     
     # Adjust metrics to get average loss and accuracy per batch 
     train_loss = train_loss / len(dataloader)
@@ -94,10 +96,16 @@ def test_step(model: torch.nn.Module,
             # Calculate and accumulate accuracy
             # print(f'test_pred_logits: {test_pred_logits}')
             if test_pred_logits.size(dim=1) > 1:
-                test_pred_labels = torch.argmax(test_pred_logits, dim=1) #for multiclass classification
-                test_acc += (test_pred_labels == labels_batch).sum().item()/len(test_pred_logits)
+                test_pred_labels = torch.argmax(torch.softmax(test_pred_logits, dim=1), dim=1) #for multiclass classification
+
             else:
-                test_acc += (test_pred_logits == labels_batch).sum().item()/len(test_pred_logits)
+                test_pred_labels = torch.round(torch.sigmoid(test_pred_logits)) #for binary classification
+                
+            logging.info(f'{torch.softmax(test_pred_logits, dim=1)=}')
+            logging.info(f'{test_pred_labels=}')
+            logging.info(f'{labels_batch=}')
+
+            test_acc += (test_pred_labels == labels_batch).sum().item()/len(test_pred_logits)
             
     # Adjust metrics to get average loss and accuracy per batch 
     test_loss = test_loss / len(dataloader)
@@ -111,7 +119,7 @@ def train(model: torch.nn.Module,
           train_dataloader: torch.utils.data.DataLoader, 
           test_dataloader: torch.utils.data.DataLoader, 
           optimiser: torch.optim.Optimizer,
-          loss_fn: torch.nn.Module, # BCELoss for binary classification
+          loss_fn: torch.nn.Module,
           epochs: int,
           device: torch.device):
         

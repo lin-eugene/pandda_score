@@ -23,7 +23,7 @@ class ResidueDataset(Dataset):
         self.transform=transform
         
     def __len__(self):
-        logging.info(f'length of dataset: {len(self.residues_dframe)}')
+        logging.debug(f'length of dataset: {len(self.residues_dframe)}')
         return len(self.residues_dframe)
     
     def __getitem__(self, idx):
