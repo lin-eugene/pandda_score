@@ -54,7 +54,7 @@ model.to(device)
 
 
 # Setup loss function and optimizer
-loss_fn = nn.CrossEntropyLoss(weight=torch.tensor([1, 2.158])) #NOTE — PyTorch combines softmax and cross entropy loss in one function
+loss_fn = nn.CrossEntropyLoss(weight=torch.tensor([1, 2.158]).to(device)) #NOTE — PyTorch combines softmax and cross entropy loss in one function
 optimiser = torch.optim.Adam(params=model.parameters(), lr=0.001)
 
 # Start the timer
