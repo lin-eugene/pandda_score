@@ -25,8 +25,7 @@ def train_main(training_csv_path: str,
                loss_fn: torch.nn.Module,
                optimiser: torch.optim.Optimizer,
                BATCH_SIZE: int,
-               NUM_EPOCHS: int,
-               save: bool = True,):
+               NUM_EPOCHS: int,):
     
     training_csv_path = pathlib.Path(training_csv_path).resolve()
     test_csv_path = pathlib.Path(test_csv_path).resolve()
@@ -56,6 +55,23 @@ def train_main(training_csv_path: str,
         
     return model_results, model
 
+def print_hyperparams(model: torch.nn.Module,
+                      loss_fn: torch.nn.Module,
+                      optimiser: torch.optim.Optimizer,
+                      NUM_EPOCHS: int,
+                      BATCH_SIZE: int,
+                      LEARNING_RATE: float,
+                      OUTPUT_LOGITS: int,
+                      LOSS_FN_WEIGHTS = torch.tensor):
+
+    print(f"{model=}")
+    print(f"{loss_fn=}")
+    print(f"{optimiser=}")
+    print(f"{NUM_EPOCHS=}")
+    print(f"{BATCH_SIZE=}")
+    print(f"{LEARNING_RATE=}")
+    print(f"{OUTPUT_LOGITS=}")
+    print(f"{LOSS_FN_WEIGHTS=}")
 
 #####
 
@@ -97,6 +113,15 @@ if __name__ == "__main__":
     # Setup loss function and optimizer
     loss_fn = nn.CrossEntropyLoss(weight=LOSS_FN_WEIGHTS.to(device)) #NOTE — PyTorch combines softmax and cross entropy loss in one function
     optimiser = torch.optim.Adam(params=model.parameters(), lr=LEARNING_RATE)
+
+    print_hyperparams(model=model,
+                      loss_fn=loss_fn,
+                      optimiser=optimiser,
+                      NUM_EPOCHS=NUM_EPOCHS,
+                      BATCH_SIZE=BATCH_SIZE,
+                      LEARNING_RATE=LEARNING_RATE,
+                      OUTPUT_LOGITS=OUTPUT_LOGITS,
+                      LOSS_FN_WEIGHTS=LOSS_FN_WEIGHTS)
 
     start_time = timer()
 

@@ -81,6 +81,7 @@ def save_hyperparameters(model_name: str,
     
     txt_save_path = target_dir_path / f'{model_name}_hyperparameters.txt'
     
+    print('saving hyperparameters to: ', txt_save_path)
     with open(str(txt_save_path), 'w') as f:
         f.write(txt)
     
