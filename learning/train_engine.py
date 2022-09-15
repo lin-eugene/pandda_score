@@ -113,7 +113,6 @@ def test_step(model: torch.nn.Module,
     return test_loss, test_acc
 
 
-
 # 1. Take in various parameters required for training and test steps
 def train(model: torch.nn.Module, 
           train_dataloader: torch.utils.data.DataLoader, 
