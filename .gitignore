@@ -9,4 +9,4 @@ training_results/
 *.idea
 *.ipynb_checkpoints
 *.pkl
-train.pbs.*
+*.pbs.*

@@ -1,21 +1,23 @@
+import os
+import pathlib
+from datetime import datetime
+from timeit import default_timer as timer 
+import logging
+import argparse
+
+#PyTorch and Data
 import torch
 import torch.nn as nn
 from torch.utils.data import DataLoader
+import pandas as pd
 
+#Custom packages
 from learning.torch_data_setup import *
 from learning.models import SqueezeNet
 from learning.train_engine import train
-import os
-
-import pathlib
-import pandas as pd
-
-from datetime import datetime
 from learning.utils import *
-from timeit import default_timer as timer 
 
-import logging
-import argparse
+
 
 
 ####################

@@ -37,7 +37,7 @@ class Fire(nn.Module):
 
 class SqueezeNet(nn.Module):
 
-    def __init__(self, num_classes=1, kernel_size=2, stride=2): #binary classification, so num_classes = 1
+    def __init__(self, num_classes=2, kernel_size=3, stride=1): #binary classification, so num_classes = 1
         super(SqueezeNet, self).__init__()
         self.num_classes = num_classes
         self.features = nn.Sequential(

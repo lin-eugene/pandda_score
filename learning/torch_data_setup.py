@@ -35,10 +35,13 @@ class ResidueDataset(Dataset):
         if torch.is_tensor(idx):
             idx = idx.tolist() # i don't understand why this works, but it works
         
+        row_idx = self.residues_dframe.index[idx]
+        dtag = self.residues_dframe['dtag'][idx]
         event_map_name = self.residues_dframe['event_map'][idx]
         input_structure_name = self.residues_dframe['input_model'][idx]
         input_chain_idx = self.residues_dframe['input_chain_idx'][idx]
         input_residue_idx = self.residues_dframe['residue_input_idx'][idx]
+
         labels_remodelled_yes_no = int(self.residues_dframe['remodelled'][idx]) # whether residue needs remodelling
 
         #fetch event_map and input residue
@@ -47,6 +50,9 @@ class ResidueDataset(Dataset):
         input_residue = gemmi.read_structure(input_structure_name)[0][input_chain_idx][input_residue_idx]
         
         sample = {
+            'row_idx': row_idx,
+            'dtag': dtag,
+            'input_chain_idx': input_chain_idx,
             'event_map': event_map_grid,
             'input_residue': input_residue,
             'labels_remodelled_yes_no': labels_remodelled_yes_no
@@ -64,6 +70,7 @@ class SamplingRandomRotations(object):
     def __call__(self, sample) -> Dict[str, np.ndarray]:
         event_map_grid = sample['event_map']
         input_residue = sample['input_residue']
+        input_residue_name = str(input_residue)
         labels_remodelled_yes_no = np.array(sample['labels_remodelled_yes_no']).astype(np.float32) #needs remodelling = 1, doesn't need remodelling = 0
         
         # logging.info(type(input_residue))
@@ -83,6 +90,10 @@ class SamplingRandomRotations(object):
         event_map_array_norm = (event_map_array - np.mean(event_map_array)) / np.std(event_map_array)
         input_residue_array_norm = (input_residue_array - 0.5) #normalise to -0.5 to 0.5
         return {
+            'row_idx': sample['row_idx'],
+            'dtag': sample['dtag'],
+            'input_chain_idx': sample['input_chain_idx'],
+            'input_residue_name': input_residue_name,
             'event_map': event_map_array_norm,
             'input_residue': input_residue_array_norm,
             'labels_remodelled_yes_no': labels_remodelled_yes_no
@@ -100,6 +111,10 @@ class ConcatEventResidueToTwoChannels(object):
         event_residue_array = np.stack((event_map_array, input_residue_array), axis=0) #order of channels along axis 0 = event map, input residue
         
         return {
+            'row_idx': sample['row_idx'],
+            'dtag': sample['dtag'],
+            'input_chain_idx': sample['input_chain_idx'],
+            'input_residue_name': sample['input_residue_name'],
             'event_residue_array': event_residue_array,
             'labels_remodelled_yes_no': labels_remodelled_yes_no
         }
@@ -115,6 +130,10 @@ class ToTensor(object):
         labels_remodelled_yes_no = sample['labels_remodelled_yes_no']
 
         return {
+            'row_idx': sample['row_idx'],
+            'dtag': sample['dtag'],
+            'input_chain_idx': sample['input_chain_idx'],
+            'input_residue_name': sample['input_residue_name'],
             'event_residue_array': torch.from_numpy(event_residue_array),
             'labels_remodelled_yes_no': torch.from_numpy(labels_remodelled_yes_no).long()
         }
@@ -129,6 +148,10 @@ class AddGaussianNoise(object):
         event_residue_array[1] = event_residue_array[1] + torch.randn(event_residue_array[1].size()) * self.std + self.mean
         
         return {
+            'row_idx': sample['row_idx'],
+            'dtag': sample['dtag'],
+            'input_chain_idx': sample['input_chain_idx'],
+            'input_residue_name': sample['input_residue_name'],
             'event_residue_array': event_residue_array,
             'labels_remodelled_yes_no': sample['labels_remodelled_yes_no']
         }
@@ -168,5 +191,7 @@ if __name__ == '__main__':
     
     sample1 = next(iter(dataloader))
 
+    print(f'{sample1["row_idx"].tolist()=}')
+    print(f'{sample1["dtag"]=}')
     print(f'event_map shape = {sample1["event_residue_array"].shape}')
     print(f'labels shape = {sample1["labels_remodelled_yes_no"].shape}')
