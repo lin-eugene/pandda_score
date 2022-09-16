@@ -140,7 +140,7 @@ if __name__ == "__main__":
     print(f"Total training time: {end_time-start_time:.3f} seconds")
 
     # Save model_results and model
-    SUFFIX = datetime.now().strftime("%Y_%m_%d-%I_%M_%S_%p}")
+    SUFFIX = datetime.now().strftime("%Y_%m_%d-%I_%M_%S_%p")
     target_dir = pathlib.Path(__file__).resolve().parent / "training_results" / SUFFIX
     model_name = f"model_{SUFFIX}"
 

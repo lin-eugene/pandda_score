@@ -11,7 +11,7 @@ if __name__ == "__main__":
     args = parser.parse_args()
     path = args.path
 
-    with open(path, 'r') as handle:
+    with open(path, 'rb') as handle:
         model_results = pickle.load(handle)
 
     plot_loss_curves(model_results)
