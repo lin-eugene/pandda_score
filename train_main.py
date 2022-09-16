@@ -62,7 +62,7 @@ def print_hyperparams(model: torch.nn.Module,
                       BATCH_SIZE: int,
                       LEARNING_RATE: float,
                       OUTPUT_LOGITS: int,
-                      LOSS_FN_WEIGHTS = torch.tensor):
+                      LOSS_FN_WEIGHTS: torch.tensor):
 
     print(f"{model=}")
     print(f"{loss_fn=}")
@@ -87,9 +87,12 @@ if __name__ == "__main__":
     parser.add_argument('-b', '--batch_size', type=int, default=4)
     parser.add_argument('-lr', '--learning_rate', type=float, default=0.0001)
     parser.add_argument('-o', '--output_logits', type=int, default=2)
-    parser.add_argument('-nl', '--nolog',)
+    parser.add_argument('-nl', '--nolog', action='store_true')
 
     args = parser.parse_args()
+
+    if args.nolog:
+        logging.basicConfig(leve=logging.ERROR)
 
     # Set hyperparameters
     NUM_EPOCHS = args.epochs
