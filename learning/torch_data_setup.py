@@ -21,6 +21,8 @@ class ResidueDataset(Dataset):
     def __init__(self, residues_dframe: type[pd.DataFrame], transform=None):
         self.residues_dframe = residues_dframe
         self.transform=transform
+
+        self.residues_dframe.index += 1 # so that the index starts at 1, not 0
         
     def __len__(self):
         logging.debug(f'length of dataset: {len(self.residues_dframe)}')
