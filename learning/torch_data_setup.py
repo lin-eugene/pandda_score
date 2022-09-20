@@ -38,13 +38,13 @@ class ResidueDataset(Dataset):
             idx = idx.tolist()
         
         row_idx = self.residues_dframe.index[idx]
-        dtag = self.residues_dframe['dtag'][idx]
-        event_map_name = self.residues_dframe['event_map'][idx]
-        input_structure_name = self.residues_dframe['input_model'][idx]
-        input_chain_idx = self.residues_dframe['input_chain_idx'][idx]
-        input_residue_idx = self.residues_dframe['residue_input_idx'][idx]
+        dtag = self.residues_dframe.iloc[idx]['dtag']
+        event_map_name = self.residues_dframe.iloc[idx]['event_map']
+        input_structure_name = self.residues_dframe.iloc[idx]['input_model']
+        input_chain_idx = self.residues_dframe.iloc[idx]['input_chain_idx']
+        input_residue_idx = self.residues_dframe.iloc[idx]['residue_input_idx']
 
-        labels_remodelled_yes_no = int(self.residues_dframe['remodelled'][idx]) # whether residue needs remodelling
+        labels_remodelled_yes_no = int(self.residues_dframe.iloc[idx]['remodelled']) # whether residue needs remodelling
 
         #fetch event_map and input residue
         event_map = gemmi.read_ccp4_map(event_map_name) #change space group of event map
@@ -147,6 +147,7 @@ class ToTensor(object):
             'event_map_name': sample['event_map_name'],
             'input_chain_idx': sample['input_chain_idx'],
             'input_residue_idx': sample['input_residue_idx'],
+            'input_residue_name': sample['input_residue_name'],
             'event_residue_array': torch.from_numpy(event_residue_array),
             'labels_remodelled_yes_no': torch.from_numpy(labels_remodelled_yes_no).long()
         }
@@ -167,6 +168,7 @@ class AddGaussianNoise(object):
             'event_map_name': sample['event_map_name'],
             'input_chain_idx': sample['input_chain_idx'],
             'input_residue_idx': sample['input_residue_idx'],
+            'input_residue_name': sample['input_residue_name'],
             'event_residue_array': event_residue_array,
             'labels_remodelled_yes_no': sample['labels_remodelled_yes_no']
         }
