@@ -58,7 +58,10 @@ def plot_loss_curves(results: Dict[str, List[float]]):
 #####
 def get_training_results_per_residue(row_idx,
                                     dtag,
+                                    input_model,
+                                    event_map_name,
                                     input_chain_idx,
+                                    input_residue_idx,
                                     input_residue_name,
                                     labels_remodelled_yes_no,
                                     test_pred_label):
@@ -66,19 +69,26 @@ def get_training_results_per_residue(row_idx,
     return {
         'row_idx': row_idx,
         'dtag': dtag,
+        'input_model': input_model,
+        'event_map_name': event_map_name,
         'input_chain_idx': input_chain_idx,
+        'input_residue_idx': input_residue_idx,
         'input_residue_name': input_residue_name,
         'labels_remodelled_yes_no': labels_remodelled_yes_no,
         'pred_labels': test_pred_label
 
     }
 
+
 def log_training_results_per_batch(batch: Dict[str, Any],
                                     test_pred_labels: torch.Tensor,):
     
     row_idx = batch['row_idx'].tolist()
     dtag = batch['dtag']
+    input_model = batch['input_model']
+    event_map_name = batch['event_map_name']
     input_chain_idx = batch['input_chain_idx'].tolist()
+    input_residue_idx = batch['input_residue_idx'].tolist()
     input_residue_name = batch['input_residue_name']
     labels_remodelled_yes_no = batch['labels_remodelled_yes_no'].tolist()
     pred_labels = test_pred_labels.tolist()
@@ -86,7 +96,10 @@ def log_training_results_per_batch(batch: Dict[str, Any],
     return list(map(get_training_results_per_residue, 
                     row_idx,
                     dtag,
+                    input_model,
+                    event_map_name,
                     input_chain_idx,
+                    input_residue_idx,
                     input_residue_name,
                     labels_remodelled_yes_no,
                     pred_labels))
@@ -148,11 +161,14 @@ def debug_loop(model: torch.nn.Module,
 def save_output_labels(output_labels, model_path):
     df = pd.DataFrame(output_labels)
     df['wrong_prediction'] = df['labels_remodelled_yes_no'] != df['pred_labels']
+    df_wrong_predictions = df[df['wrong_prediction'] == True]
     output_dir = pathlib.Path(model_path).resolve().parent
     output_file = output_dir / 'output_labels.csv'
+    output_file_wrong_predictions = output_dir / 'output_labels_wrong_predictions.csv'
 
     print('saving output labels to csv...')
     df.to_csv(output_file, index=False)
+    df_wrong_predictions.to_csv(output_file_wrong_predictions, index=False)
     
     return None
 

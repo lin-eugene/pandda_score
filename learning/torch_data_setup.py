@@ -35,7 +35,7 @@ class ResidueDataset(Dataset):
         """
 
         if torch.is_tensor(idx):
-            idx = idx.tolist() # i don't understand why this works, but it works
+            idx = idx.tolist()
         
         row_idx = self.residues_dframe.index[idx]
         dtag = self.residues_dframe['dtag'][idx]
@@ -54,7 +54,10 @@ class ResidueDataset(Dataset):
         sample = {
             'row_idx': row_idx,
             'dtag': dtag,
+            'input_model': input_structure_name,
+            'event_map_name': event_map_name,
             'input_chain_idx': input_chain_idx,
+            'input_residue_idx': input_residue_idx,
             'event_map': event_map_grid,
             'input_residue': input_residue,
             'labels_remodelled_yes_no': labels_remodelled_yes_no
@@ -94,7 +97,10 @@ class SamplingRandomRotations(object):
         return {
             'row_idx': sample['row_idx'],
             'dtag': sample['dtag'],
+            'input_model': sample['input_model'],
+            'event_map_name': sample['event_map_name'],
             'input_chain_idx': sample['input_chain_idx'],
+            'input_residue_idx': sample['input_residue_idx'],
             'input_residue_name': input_residue_name,
             'event_map': event_map_array_norm,
             'input_residue': input_residue_array_norm,
@@ -115,7 +121,10 @@ class ConcatEventResidueToTwoChannels(object):
         return {
             'row_idx': sample['row_idx'],
             'dtag': sample['dtag'],
+            'input_model': sample['input_model'],
+            'event_map_name': sample['event_map_name'],
             'input_chain_idx': sample['input_chain_idx'],
+            'input_residue_idx': sample['input_residue_idx'],
             'input_residue_name': sample['input_residue_name'],
             'event_residue_array': event_residue_array,
             'labels_remodelled_yes_no': labels_remodelled_yes_no
@@ -134,8 +143,10 @@ class ToTensor(object):
         return {
             'row_idx': sample['row_idx'],
             'dtag': sample['dtag'],
+            'input_model': sample['input_model'],
+            'event_map_name': sample['event_map_name'],
             'input_chain_idx': sample['input_chain_idx'],
-            'input_residue_name': sample['input_residue_name'],
+            'input_residue_idx': sample['input_residue_idx'],
             'event_residue_array': torch.from_numpy(event_residue_array),
             'labels_remodelled_yes_no': torch.from_numpy(labels_remodelled_yes_no).long()
         }
@@ -152,8 +163,10 @@ class AddGaussianNoise(object):
         return {
             'row_idx': sample['row_idx'],
             'dtag': sample['dtag'],
+            'input_model': sample['input_model'],
+            'event_map_name': sample['event_map_name'],
             'input_chain_idx': sample['input_chain_idx'],
-            'input_residue_name': sample['input_residue_name'],
+            'input_residue_idx': sample['input_residue_idx'],
             'event_residue_array': event_residue_array,
             'labels_remodelled_yes_no': sample['labels_remodelled_yes_no']
         }
