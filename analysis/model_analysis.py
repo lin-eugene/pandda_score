@@ -57,23 +57,27 @@ def plot_loss_curves(results: Dict[str, List[float]]):
 
 #####
 def get_training_results_per_residue(row_idx,
+                                    system,
                                     dtag,
                                     input_model,
                                     event_map_name,
                                     input_chain_idx,
                                     input_residue_idx,
                                     input_residue_name,
+                                    rmsd,
                                     labels_remodelled_yes_no,
                                     test_pred_label):
 
     return {
         'row_idx': row_idx,
+        'system': system,
         'dtag': dtag,
         'input_model': input_model,
         'event_map_name': event_map_name,
         'input_chain_idx': input_chain_idx,
         'input_residue_idx': input_residue_idx,
         'input_residue_name': input_residue_name,
+        'rmsd': rmsd,
         'labels_remodelled_yes_no': labels_remodelled_yes_no,
         'pred_labels': test_pred_label
 
@@ -84,23 +88,27 @@ def log_training_results_per_batch(batch: Dict[str, Any],
                                     test_pred_labels: torch.Tensor,):
     
     row_idx = batch['row_idx'].tolist()
+    system = batch['system']
     dtag = batch['dtag']
     input_model = batch['input_model']
     event_map_name = batch['event_map_name']
     input_chain_idx = batch['input_chain_idx'].tolist()
     input_residue_idx = batch['input_residue_idx'].tolist()
     input_residue_name = batch['input_residue_name']
+    rmsd = batch['rmsd'].tolist()
     labels_remodelled_yes_no = batch['labels_remodelled_yes_no'].tolist()
     pred_labels = test_pred_labels.tolist()
 
     return list(map(get_training_results_per_residue, 
                     row_idx,
+                    system,
                     dtag,
                     input_model,
                     event_map_name,
                     input_chain_idx,
                     input_residue_idx,
                     input_residue_name,
+                    rmsd,
                     labels_remodelled_yes_no,
                     pred_labels))
                     

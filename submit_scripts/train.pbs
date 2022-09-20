@@ -9,4 +9,4 @@ np=$(cat ${PBS_NODEFILE} | wc -l);
 
 conda activate pandda_env
 cd /dls/labxchem/data/2018/lb18145-80/processing/analysis/eugene/panddaproject
-python train_main.py -e 100 -lr 0.0003
+python train_main.py -e 40 -lr 0.0001

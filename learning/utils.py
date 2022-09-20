@@ -64,7 +64,8 @@ def save_hyperparameters(model_name: str,
                         BATCH_SIZE: int,
                         LEARNING_RATE: float,
                         OUTPUT_LOGITS: int,
-                        LOSS_FN_WEIGHTS = torch.tensor):
+                        LOSS_FN_WEIGHTS: torch.tensor,
+                        translation_radius: float):
     
     target_dir_path = pathlib.Path(target_dir).resolve()
     target_dir_path.mkdir(parents=True, exist_ok=True)
@@ -77,7 +78,8 @@ def save_hyperparameters(model_name: str,
             f"{BATCH_SIZE=} \n"
             f"{LEARNING_RATE=} \n"
             f"{OUTPUT_LOGITS=} \n"
-            f"{LOSS_FN_WEIGHTS=} \n")
+            f"{LOSS_FN_WEIGHTS=} \n"
+            f"{translation_radius=} \n")
     
     txt_save_path = target_dir_path / f'{model_name}_hyperparameters.txt'
     

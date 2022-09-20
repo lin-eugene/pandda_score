@@ -18,8 +18,6 @@ from learning.train_engine import train
 from learning.utils import *
 
 
-
-
 ####################
 def train_main(training_csv_path: str,
                test_csv_path: str,
@@ -27,15 +25,31 @@ def train_main(training_csv_path: str,
                loss_fn: torch.nn.Module,
                optimiser: torch.optim.Optimizer,
                BATCH_SIZE: int,
-               NUM_EPOCHS: int,):
+               NUM_EPOCHS: int,
+               translation_radius: float,):
     
     training_csv_path = pathlib.Path(training_csv_path).resolve()
     test_csv_path = pathlib.Path(test_csv_path).resolve()
     training_dframe = pd.read_csv(training_csv_path)
     test_dframe = pd.read_csv(test_csv_path)
 
-    training_dataset = generate_dataset(residues_dframe=training_dframe)
-    test_dataset = generate_dataset(residues_dframe=test_dframe)
+    #Create dataset
+    training_tsfm = transforms.Compose([
+                        SamplingRandomRotations(translation_radius=translation_radius),
+                        ConcatEventResidueToTwoChannels(),
+                        ToTensor(),
+                    ])
+    test_tsfm = transforms.Compose([
+                        SamplingRandomRotations(translation_radius=0, 
+                                                random_rotation=False),
+                        ConcatEventResidueToTwoChannels(),
+                        ToTensor()
+                    ])
+
+    training_dataset = ResidueDataset(training_dframe,
+                                    training_tsfm)
+    test_dataset = ResidueDataset(test_dframe, 
+                                test_tsfm)
 
     training_dataloader = DataLoader(dataset=training_dataset, 
                                 batch_size=BATCH_SIZE, 
@@ -64,7 +78,8 @@ def print_hyperparams(model: torch.nn.Module,
                       BATCH_SIZE: int,
                       LEARNING_RATE: float,
                       OUTPUT_LOGITS: int,
-                      LOSS_FN_WEIGHTS: torch.tensor):
+                      LOSS_FN_WEIGHTS: torch.tensor,
+                      translation_radius: float):
 
     print(f"{model=}")
     print(f"{loss_fn=}")
@@ -74,6 +89,7 @@ def print_hyperparams(model: torch.nn.Module,
     print(f"{LEARNING_RATE=}")
     print(f"{OUTPUT_LOGITS=}")
     print(f"{LOSS_FN_WEIGHTS=}")
+    print(f"{translation_radius=}")
 
 #####
 
@@ -89,6 +105,7 @@ if __name__ == "__main__":
     parser.add_argument('-b', '--batch_size', type=int, default=4)
     parser.add_argument('-lr', '--learning_rate', type=float, default=0.0001)
     parser.add_argument('-o', '--output_logits', type=int, default=2)
+    parser.add_argument('-r', '--translation_radius', type=float, default=1)
     parser.add_argument('-nl', '--nolog', action='store_true')
 
     args = parser.parse_args()
@@ -102,8 +119,9 @@ if __name__ == "__main__":
     LEARNING_RATE = args.learning_rate
     OUTPUT_LOGITS = args.output_logits
     LOSS_FN_WEIGHTS = torch.tensor([1, 2.158])
+    translation_radius = args.translation_radius
 
-    # Define data
+    # Define data paths
     training_csv_path = pathlib.Path.cwd() / "training" / "training_set.csv"
     test_csv_path = pathlib.Path.cwd() / "training" / "test_set.csv"
 
@@ -126,7 +144,8 @@ if __name__ == "__main__":
                       BATCH_SIZE=BATCH_SIZE,
                       LEARNING_RATE=LEARNING_RATE,
                       OUTPUT_LOGITS=OUTPUT_LOGITS,
-                      LOSS_FN_WEIGHTS=LOSS_FN_WEIGHTS)
+                      LOSS_FN_WEIGHTS=LOSS_FN_WEIGHTS,
+                      translation_radius=translation_radius)
 
     start_time = timer()
 
@@ -136,7 +155,8 @@ if __name__ == "__main__":
                                       loss_fn=loss_fn,
                                       optimiser=optimiser,
                                       BATCH_SIZE=BATCH_SIZE,
-                                      NUM_EPOCHS=NUM_EPOCHS)
+                                      NUM_EPOCHS=NUM_EPOCHS,
+                                      translation_radius=translation_radius)
     
     end_time = timer()
     print(f"Total training time: {end_time-start_time:.3f} seconds")
@@ -163,5 +183,10 @@ if __name__ == "__main__":
                             BATCH_SIZE=BATCH_SIZE,
                             LEARNING_RATE=LEARNING_RATE,
                             OUTPUT_LOGITS=OUTPUT_LOGITS,
-                            LOSS_FN_WEIGHTS=LOSS_FN_WEIGHTS)
-                            
+                            LOSS_FN_WEIGHTS=LOSS_FN_WEIGHTS,
+                            translation_radius=translation_radius)
+    
+    ### run analysis 
+    from analysis import model_analysis
+    model_path = target_dir / f'{model_name}_saved.pth'
+    model_analysis.main(model_path, training_csv_path)

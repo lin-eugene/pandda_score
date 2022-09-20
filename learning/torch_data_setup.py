@@ -13,9 +13,11 @@ codebase_path = pathlib.Path(__file__).parent.parent.absolute()
 sys.path.append(str(codebase_path))
 from lib import extract_box, random_sampling
 
+
 """
 PyTorch Documentation on Custom Datasets: https://pytorch.org/tutorials/beginner/data_loading_tutorial.html
 """
+
 
 class ResidueDataset(Dataset):
     def __init__(self, residues_dframe: type[pd.DataFrame], transform=None):
@@ -26,6 +28,7 @@ class ResidueDataset(Dataset):
         
     def __len__(self):
         logging.debug(f'length of dataset: {len(self.residues_dframe)}')
+        
         return len(self.residues_dframe)
     
     def __getitem__(self, idx):
@@ -38,11 +41,13 @@ class ResidueDataset(Dataset):
             idx = idx.tolist()
         
         row_idx = self.residues_dframe.index[idx]
+        system = self.residues_dframe.iloc[idx]['system']
         dtag = self.residues_dframe.iloc[idx]['dtag']
         event_map_name = self.residues_dframe.iloc[idx]['event_map']
         input_structure_name = self.residues_dframe.iloc[idx]['input_model']
         input_chain_idx = self.residues_dframe.iloc[idx]['input_chain_idx']
         input_residue_idx = self.residues_dframe.iloc[idx]['residue_input_idx']
+        rmsd = self.residues_dframe.iloc[idx]['rmsd']
 
         labels_remodelled_yes_no = int(self.residues_dframe.iloc[idx]['remodelled']) # whether residue needs remodelling
 
@@ -53,12 +58,14 @@ class ResidueDataset(Dataset):
         
         sample = {
             'row_idx': row_idx,
+            'system': system,
             'dtag': dtag,
             'input_model': input_structure_name,
             'event_map_name': event_map_name,
             'input_chain_idx': input_chain_idx,
             'input_residue_idx': input_residue_idx,
             'event_map': event_map_grid,
+            'rmsd': rmsd,
             'input_residue': input_residue,
             'labels_remodelled_yes_no': labels_remodelled_yes_no
         }
@@ -68,45 +75,72 @@ class ResidueDataset(Dataset):
 
         return sample
 
+
 class SamplingRandomRotations(object):
+    
     """
     Data Augmentation — sampling random rotations and translations
     """
+    def __init__(self, translation_radius=0, random_rotation=True):
+        self.translation_radius = translation_radius
+        self.random_rotation = random_rotation
+
     def __call__(self, sample) -> Dict[str, np.ndarray]:
         event_map_grid = sample['event_map']
         input_residue = sample['input_residue']
         input_residue_name = str(input_residue)
         labels_remodelled_yes_no = np.array(sample['labels_remodelled_yes_no']).astype(np.float32) #needs remodelling = 1, doesn't need remodelling = 0
         
-        # logging.info(type(input_residue))
-        # logging.info(f'event_map_grid = {event_map_grid}')
-        # logging.info(f'axis_order = {event_map_grid.axis_order}')
+        # logging.debug(type(input_residue))
+        # logging.debug(f'event_map_grid = {event_map_grid}')
+        # logging.debug(f'axis_order = {event_map_grid.axis_order}')
 
         event_map_grid_copy = extract_box.make_gemmi_zeros_float_grid(event_map_grid)
         input_residue_masked_grid = extract_box.gen_mask_from_atoms(
             event_map_grid_copy,
             input_residue)
 
-        vec_rand = random_sampling.rand_translations()
-        rot_mat = random_sampling.rand_rotation_matrix()
+        # setting random translation vector and random rotation matrix
+        if self.translation_radius == 0:
+            vec_rand = None
+        else:
+            vec_rand = random_sampling.rand_translations(R=self.translation_radius)
         
-        event_map_array = extract_box.create_numpy_array_with_gemmi_interpolate(input_residue, event_map_grid, rot_mat, vec_rand)
-        input_residue_array = extract_box.create_numpy_array_with_gemmi_interpolate(input_residue, input_residue_masked_grid, rot_mat, vec_rand)
+        if self.random_rotation == True:
+            rot_mat = random_sampling.rand_rotation_matrix()
+        else:
+            rot_mat = None
+        
+        # extracting numpy array from event map and voxelised input residue
+        event_map_array = extract_box.create_numpy_array_with_gemmi_interpolate(input_residue, 
+                                                                                event_map_grid, 
+                                                                                rot_mat, 
+                                                                                vec_rand)
+        input_residue_array = extract_box.create_numpy_array_with_gemmi_interpolate(input_residue, 
+                                                                                    input_residue_masked_grid, 
+                                                                                    rot_mat, 
+                                                                                    vec_rand)
+        
+        # normalising array values
         event_map_array_norm = (event_map_array - np.mean(event_map_array)) / np.std(event_map_array)
         input_residue_array_norm = (input_residue_array - 0.5) #normalise to -0.5 to 0.5
+        
         return {
             'row_idx': sample['row_idx'],
+            'system': sample['system'],
             'dtag': sample['dtag'],
             'input_model': sample['input_model'],
             'event_map_name': sample['event_map_name'],
             'input_chain_idx': sample['input_chain_idx'],
             'input_residue_idx': sample['input_residue_idx'],
             'input_residue_name': input_residue_name,
+            'rmsd': sample['rmsd'],
             'event_map': event_map_array_norm,
             'input_residue': input_residue_array_norm,
             'labels_remodelled_yes_no': labels_remodelled_yes_no
         }
-    
+
+
 class ConcatEventResidueToTwoChannels(object):
     """
     Combine event map and input residue into two channels
@@ -120,15 +154,18 @@ class ConcatEventResidueToTwoChannels(object):
         
         return {
             'row_idx': sample['row_idx'],
+            'system': sample['system'],
             'dtag': sample['dtag'],
             'input_model': sample['input_model'],
             'event_map_name': sample['event_map_name'],
             'input_chain_idx': sample['input_chain_idx'],
             'input_residue_idx': sample['input_residue_idx'],
             'input_residue_name': sample['input_residue_name'],
+            'rmsd': sample['rmsd'],
             'event_residue_array': event_residue_array,
             'labels_remodelled_yes_no': labels_remodelled_yes_no
         }
+
 
 class ToTensor(object):
     """
@@ -142,12 +179,14 @@ class ToTensor(object):
 
         return {
             'row_idx': sample['row_idx'],
+            'system': sample['system'],
             'dtag': sample['dtag'],
             'input_model': sample['input_model'],
             'event_map_name': sample['event_map_name'],
             'input_chain_idx': sample['input_chain_idx'],
             'input_residue_idx': sample['input_residue_idx'],
             'input_residue_name': sample['input_residue_name'],
+            'rmsd': sample['rmsd'],
             'event_residue_array': torch.from_numpy(event_residue_array),
             'labels_remodelled_yes_no': torch.from_numpy(labels_remodelled_yes_no).long()
         }
@@ -156,19 +195,21 @@ class AddGaussianNoise(object):
     def __init__(self, mean=0., std=1.):
         self.std = std
         self.mean = mean
-        
+    
     def __call__(self, sample):
         event_residue_array = sample['event_residue_array']
         event_residue_array[1] = event_residue_array[1] + torch.randn(event_residue_array[1].size()) * self.std + self.mean
         
         return {
             'row_idx': sample['row_idx'],
+            'systme': sample['system'],
             'dtag': sample['dtag'],
             'input_model': sample['input_model'],
             'event_map_name': sample['event_map_name'],
             'input_chain_idx': sample['input_chain_idx'],
             'input_residue_idx': sample['input_residue_idx'],
             'input_residue_name': sample['input_residue_name'],
+            'rmsd': sample['rmsd'],
             'event_residue_array': event_residue_array,
             'labels_remodelled_yes_no': sample['labels_remodelled_yes_no']
         }
@@ -176,20 +217,23 @@ class AddGaussianNoise(object):
     def __repr__(self):
         return self.__class__.__name__ + '(mean={0}, std={1})'.format(self.mean, self.std)
 
-def generate_dataset(residues_dframe, one_hot=False):
-    tsfm = transforms.Compose([
-                        SamplingRandomRotations(),
+
+def generate_dataset(residues_dframe, translation_radius=0, one_hot=False):
+    training_tsfm = transforms.Compose([
+                        SamplingRandomRotations(translation_radius),
                         ConcatEventResidueToTwoChannels(),
                         ToTensor(),
                     ])
-    dataset = ResidueDataset(residues_dframe, transform=tsfm)
+    dataset = ResidueDataset(residues_dframe, transform=training_tsfm)
     return dataset
 
 if __name__ == '__main__':
-    
+    """
+    testing out if things are coded up properly
+    """
     csv_file = pathlib.Path(__file__).parent.parent / 'training' / 'training_data.csv'
     residues_dframe=pd.read_csv(csv_file)
-    transformed_dataset = generate_dataset(residues_dframe)
+    transformed_dataset = generate_dataset(residues_dframe,translation_radius=0)
 
     for i in range(len(transformed_dataset)):
         sample = transformed_dataset[i]
