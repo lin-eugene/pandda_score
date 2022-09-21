@@ -112,7 +112,7 @@ def show_metadata(sample, dataframe):
 
 def open_coot(sample):
     "opens coot on Diamond Remote Desktop"
-    event_map = sample['event_map'][0]
+    event_map = sample['event_map_name'][0]
     input_model = sample['input_model'][0]
     
     cmd = f'module load ccp4/7.0.067 && coot --pdb {input_model} --map {event_map}'
