@@ -1,6 +1,7 @@
 import pandas as pd
 from sklearn.metrics import confusion_matrix
 import seaborn as sn
+import numpy as np
 
 def compute_true_false_positives_and_negatives(results_frame: pd.DataFrame):
     
@@ -32,10 +33,12 @@ def compute_confusion_matrix(true_pos,
     return true_pos_count, true_neg_count, false_pos_count, false_neg_count
 
 def compute_and_plot_confusion_matrix(results_frame: pd.DataFrame):
-    cm = confusion_matrix(y_true=results_frame['labels_remodelled_yes_no'],
-                          y_pred=results_frame['pred_labels'])
+    cm = confusion_matrix(y_true=results_frame['labels_remodelled_yes_no'].tolist(),
+                          y_pred=results_frame['pred_labels'].tolist())
+    print(results_frame['labels_remodelled_yes_no'])
+    print(results_frame['pred_labels'])
     classes = ['needs_remodeling', 'no_remodeling']
-    df_cm = pd.DataFrame(cm, index = [i for i in classes],
+    df_cm = pd.DataFrame(cm/np.sum(cm) *10, index = [i for i in classes],
                   columns = [i for i in classes])
     sn.heatmap(df_cm, annot=True)
 
