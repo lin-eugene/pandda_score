@@ -95,6 +95,7 @@ class SamplingRandomRotations(object):
         # logging.debug(f'event_map_grid = {event_map_grid}')
         # logging.debug(f'axis_order = {event_map_grid.axis_order}')
 
+        normalized_event_map_grid = extract_box.copy_normalized_gemmi_float_grid(event_map_grid)
         event_map_grid_copy = extract_box.make_gemmi_zeros_float_grid(event_map_grid)
         input_residue_masked_grid = extract_box.gen_mask_from_atoms(
             event_map_grid_copy,
@@ -113,7 +114,7 @@ class SamplingRandomRotations(object):
         
         # extracting numpy array from event map and voxelised input residue
         event_map_array = extract_box.create_numpy_array_with_gemmi_interpolate(input_residue, 
-                                                                                event_map_grid, 
+                                                                                normalized_event_map_grid, 
                                                                                 rot_mat, 
                                                                                 vec_rand)
         input_residue_array = extract_box.create_numpy_array_with_gemmi_interpolate(input_residue, 
@@ -122,8 +123,8 @@ class SamplingRandomRotations(object):
                                                                                     vec_rand)
         
         # normalising array values
-        event_map_array_norm = (event_map_array - np.mean(event_map_array)) / np.std(event_map_array)
-        input_residue_array_norm = (input_residue_array - 0.5) #normalise to -0.5 to 0.5
+        # event_map_array_norm = (event_map_array - np.mean(event_map_array)) / np.std(event_map_array)
+        # input_residue_array_norm = (input_residue_array - 0.5) #normalise to -0.5 to 0.5
         
         return {
             'row_idx': sample['row_idx'],
@@ -135,8 +136,8 @@ class SamplingRandomRotations(object):
             'input_residue_idx': sample['input_residue_idx'],
             'input_residue_name': input_residue_name,
             'rmsd': sample['rmsd'],
-            'event_map': event_map_array_norm,
-            'input_residue': input_residue_array_norm,
+            'event_map': event_map_array,
+            'input_residue': input_residue_array,
             'labels_remodelled_yes_no': labels_remodelled_yes_no
         }
 

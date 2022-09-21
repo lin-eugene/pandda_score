@@ -107,6 +107,7 @@ def create_numpy_array_with_gemmi_interpolate(
                                             vec_rand=vec_rand,
                                             box_size=box_size,
                                             spacing=spacing)
+    
     grid.interpolate_values(array, transform)
 
     return array
@@ -118,9 +119,10 @@ def make_gemmi_zeros_float_grid(grid: type[gemmi.FloatGrid]) -> type[gemmi.Float
     
     return zeros_grid
 
-def copy_gemmi_float_grid(grid: type[gemmi.FloatGrid]) -> type[gemmi.FloatGrid]:
+def copy_normalized_gemmi_float_grid(grid: type[gemmi.FloatGrid]) -> type[gemmi.FloatGrid]:
     arr = grid.get_subarray(0,0,0,grid.shape[0],grid.shape[1],grid.shape[2])
-    grid_copy = gemmi.FloatGrid(arr,
+    arr_normalized = (arr - np.mean(arr)) / np.std(arr)
+    grid_copy = gemmi.FloatGrid(arr_normalized,
                                 grid.unit_cell,
                                 grid.spacegroup)
     
