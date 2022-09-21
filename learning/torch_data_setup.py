@@ -228,6 +228,65 @@ def generate_dataset(residues_dframe, translation_radius=0, one_hot=False):
     dataset = ResidueDataset(residues_dframe, transform=training_tsfm)
     return dataset
 
+#####
+# DEBUGGING
+class DebugResidueDataset(Dataset):
+    def __init__(self, residues_dframe: type[pd.DataFrame], transform=None):
+        self.residues_dframe = residues_dframe
+        self.transform=transform
+
+        self.residues_dframe.index += 1 # so that the index starts at 1, not 0
+        
+    def __len__(self):
+        logging.debug(f'length of dataset: {len(self.residues_dframe)}')
+        
+        return len(self.residues_dframe)
+    
+    def __getitem__(self, idx):
+        """
+        items - (1) event map, (2) 2fo-fc map, (3) input structure, (4) output structure at specified residue
+        event map and 2fo-fc map at residue at input position
+        """
+
+        if torch.is_tensor(idx):
+            idx = idx.tolist()
+        
+        row_idx = self.residues_dframe.iloc[idx]['row_idx']
+        system = self.residues_dframe.iloc[idx]['system']
+        dtag = self.residues_dframe.iloc[idx]['dtag']
+        event_map_name = self.residues_dframe.iloc[idx]['event_map_name']
+        input_structure_name = self.residues_dframe.iloc[idx]['input_model']
+        input_chain_idx = self.residues_dframe.iloc[idx]['input_chain_idx']
+        input_residue_idx = self.residues_dframe.iloc[idx]['input_residue_idx']
+        rmsd = self.residues_dframe.iloc[idx]['rmsd']
+
+        labels_remodelled_yes_no = int(self.residues_dframe.iloc[idx]['labels_remodelled_yes_no']) # whether residue needs remodelling
+
+        #fetch event_map and input residue
+        event_map = gemmi.read_ccp4_map(event_map_name) #change space group of event map
+        event_map_grid = extract_box.fetch_grid_from_pandda_map(event_map)
+        input_residue = gemmi.read_structure(input_structure_name)[0][input_chain_idx][input_residue_idx]
+        
+        sample = {
+            'row_idx': row_idx,
+            'system': system,
+            'dtag': dtag,
+            'input_model': input_structure_name,
+            'event_map_name': event_map_name,
+            'input_chain_idx': input_chain_idx,
+            'input_residue_idx': input_residue_idx,
+            'event_map': event_map_grid,
+            'rmsd': rmsd,
+            'input_residue': input_residue,
+            'labels_remodelled_yes_no': labels_remodelled_yes_no
+        }
+
+        if self.transform:
+            sample = self.transform(sample)
+
+        return sample
+
+
 if __name__ == '__main__':
     """
     testing out if things are coded up properly
