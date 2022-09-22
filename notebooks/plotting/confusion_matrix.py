@@ -38,13 +38,27 @@ def compute_and_plot_confusion_matrix(results_frame: pd.DataFrame):
     
     cm = confusion_matrix(y_true=results_frame['labels_remodelled_yes_no'].tolist(),
                           y_pred=results_frame['pred_labels'].tolist())
-    print(results_frame['labels_remodelled_yes_no'])
-    print(results_frame['pred_labels'])
+
+    group_names = ['True Neg','False Pos','False Neg','True Pos']
+    group_counts = ["{0:0.0f}".format(value) for value in
+                cm.flatten()]
+    
+    group_percentages = ["{0:.2%}".format(value) for value in
+                     cm.flatten()/np.sum(cm)]
+
+    labels = [f"{v1}\n{v2}\n{v3}" for v1, v2, v3 in
+          zip(group_names,group_counts,group_percentages)]
+    
+    labels = np.asarray(labels).reshape(2,2)
+
+
+
     classes = ['no_remodeling', 'needs_remodeling']
-    df_cm = pd.DataFrame(cm/np.sum(cm) *10, index = [i for i in classes],
+    df_cm = pd.DataFrame(cm, index = [i for i in classes],
                   columns = [i for i in classes])
+
     plt.figure()
-    sn.heatmap(df_cm, annot=True)
+    sn.heatmap(df_cm, annot=labels, fmt='', cmap='Blues')
 
 
     return cm
