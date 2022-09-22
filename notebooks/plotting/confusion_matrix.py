@@ -3,6 +3,7 @@ from sklearn.metrics import confusion_matrix
 import seaborn as sn
 import numpy as np
 import matplotlib.pyplot as plt
+from typing import Optional
 
 def compute_true_false_positives_and_negatives(results_frame: pd.DataFrame):
     
@@ -33,7 +34,8 @@ def compute_confusion_matrix(true_pos,
 
     return true_pos_count, true_neg_count, false_pos_count, false_neg_count
 
-def compute_and_plot_confusion_matrix(results_frame: pd.DataFrame):
+def compute_and_plot_confusion_matrix(results_frame: pd.DataFrame,
+                                    title: Optional[str]=None):
     # TODO — https://medium.com/@dtuk81/confusion-matrix-visualization-fc31e3f30fea
     
     cm = confusion_matrix(y_true=results_frame['labels_remodelled_yes_no'].tolist(),
@@ -51,8 +53,6 @@ def compute_and_plot_confusion_matrix(results_frame: pd.DataFrame):
     
     labels = np.asarray(labels).reshape(2,2)
 
-
-
     classes = ['no_remodeling', 'needs_remodeling']
     df_cm = pd.DataFrame(cm, index = [i for i in classes],
                   columns = [i for i in classes])
@@ -61,6 +61,8 @@ def compute_and_plot_confusion_matrix(results_frame: pd.DataFrame):
     sn.heatmap(df_cm, annot=labels, fmt='', cmap='Blues')
     plt.ylabel('True label')
     plt.xlabel('Predicted label')
+    if title is not None:
+        plt.title(title)
 
 
     return cm
