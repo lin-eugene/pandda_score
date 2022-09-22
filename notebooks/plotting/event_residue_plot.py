@@ -128,6 +128,6 @@ class ShowMetadata():
         y = self.chain[self.input_residue_idx][0].pos.y
         z = self.chain[self.input_residue_idx][0].pos.z
         
-        cmd = f'module load ccp4/7.0.067 && coot --pdb {self.input_model} --map {event_map} --c "set_rotation_center {x} {y} {z}"'
+        cmd = f'module load ccp4/7.0.067 && coot --pdb {self.input_model} --map {event_map} --python "set_rotation_center {x} {y} {z}"'
         subprocess.Popen(cmd, shell=True)
 
