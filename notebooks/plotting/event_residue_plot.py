@@ -124,16 +124,16 @@ class ShowMetadata():
         "opens coot on Diamond Remote Desktop"
         event_map = self.sample['event_map_name'][0]
         # coordinates
-        x = self.chain[self.input_residue_idx][0].pos.x
-        print(x)
-        y = self.chain[self.input_residue_idx][0].pos.y
-        z = self.chain[self.input_residue_idx][0].pos.z
-        script = f'set_rotation_center({x},{y},{z})'
-        target_dir = pathlib.Path(__file__).parent
-        script_filename = target_dir / 'coot_script'
+        # x = self.chain[self.input_residue_idx][0].pos.x
+        # print(x)
+        # y = self.chain[self.input_residue_idx][0].pos.y
+        # z = self.chain[self.input_residue_idx][0].pos.z
+        # script = f'set_rotation_center({x},{y},{z})'
+        # target_dir = pathlib.Path(__file__).parent
+        # script_filename = target_dir / 'coot_script.py'
 
-        with open(script_filename, 'w') as f:
-            f.write(script)
+        # with open(script_filename, 'w') as f:
+        #     f.write(script)
 
         cmd = f'module load ccp4/7.0.067 && coot --pdb {self.input_model} --map {event_map} --script {str(script_filename)}'
         subprocess.Popen(cmd, shell=True)
