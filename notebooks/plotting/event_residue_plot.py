@@ -137,9 +137,9 @@ class ShowMetadata():
             f.write(script)
         
         if show_output_model:
-            cmd = f'module load ccp4/7.0.067 && coot --pdb {self.input_model} --pdb {self.output_model} -map {event_map} --script {str(script_filename)}'
+            cmd = f'module load ccp4/7.0.067 && coot --pdb {self.input_model} --pdb {self.output_model} --map {event_map} --script {str(script_filename)}'
         else:
-            cmd = f'module load ccp4/7.0.067 && coot --pdb {self.input_model} -map {event_map} --script {str(script_filename)}'
+            cmd = f'module load ccp4/7.0.067 && coot --pdb {self.input_model} --map {event_map} --script {str(script_filename)}'
 
         subprocess.Popen(cmd, shell=True)
 
