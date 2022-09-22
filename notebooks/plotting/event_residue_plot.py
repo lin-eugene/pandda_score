@@ -14,7 +14,7 @@ def plot(sample):
     event_map_channel = 0
     input_residue_channel = 1
     event_map_values = event_residue_array[0][event_map_channel].flatten()
-    input_residue_values = event_residue_array[0][input_residue_channel].flatten()
+    input_residue_values = (event_residue_array[0][input_residue_channel]+0.5).flatten()
 
     fig_event_map = go.Figure(
         data=[
