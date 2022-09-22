@@ -67,6 +67,38 @@ def compute_and_plot_confusion_matrix(results_frame: pd.DataFrame,
 
     return cm
 
+
+def find_true_positive_rate(cm):
+    """ TPR == Recall """
+    true_positives = cm[1][1]
+    false_negatives = cm[1][0]
+    true_positive_rate = true_positives / (true_positives + false_negatives)
+    print(f'{true_positive_rate=}')
+    return true_positive_rate
+
+def find_false_positive_rate(cm):
+    false_positives = cm[0][1]
+    true_negatives = cm[0][0]
+    false_positive_rate = false_positives / (false_positives + true_negatives)
+    print(f'{false_positive_rate=}')
+    return false_positive_rate
+
+def find_precision(cm):
+    true_positives = cm[1][1]
+    false_positives = cm[0][1]
+    precision = true_positives / (true_positives + false_positives)
+    print(f'{precision=}')
+    return precision
+
+def find_accuracy(cm):
+    true_positives = cm[1][1]
+    true_negatives = cm[0][0]
+    false_positives = cm[0][1]
+    false_negatives = cm[1][0]
+    accuracy = (true_positives + true_negatives) / (true_positives + true_negatives + false_positives + false_negatives)
+    print(f'{accuracy=}')
+    return accuracy
+
 def read_residue_name(residue: str):
     res_name = residue[-4:-1]
     return res_name
@@ -75,4 +107,5 @@ def classify_residues(results_frame: pd.DataFrame):
     results_frame['residue_type'] = list(map(read_residue_name, results_frame['input_residue_name']))
 
     return results_frame
+
 
