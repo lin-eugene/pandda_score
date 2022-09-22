@@ -73,21 +73,21 @@ def find_true_positive_rate(cm):
     true_positives = cm[1][1]
     false_negatives = cm[1][0]
     true_positive_rate = true_positives / (true_positives + false_negatives)
-    print(f'{true_positive_rate=}')
+    # print(f'{true_positive_rate=}')
     return true_positive_rate
 
 def find_false_positive_rate(cm):
     false_positives = cm[0][1]
     true_negatives = cm[0][0]
     false_positive_rate = false_positives / (false_positives + true_negatives)
-    print(f'{false_positive_rate=}')
+    # print(f'{false_positive_rate=}')
     return false_positive_rate
 
 def find_precision(cm):
     true_positives = cm[1][1]
     false_positives = cm[0][1]
     precision = true_positives / (true_positives + false_positives)
-    print(f'{precision=}')
+    # print(f'{precision=}')
     return precision
 
 def find_accuracy(cm):
@@ -96,7 +96,7 @@ def find_accuracy(cm):
     false_positives = cm[0][1]
     false_negatives = cm[1][0]
     accuracy = (true_positives + true_negatives) / (true_positives + true_negatives + false_positives + false_negatives)
-    print(f'{accuracy=}')
+    # print(f'{accuracy=}')
     return accuracy
 
 def read_residue_name(residue: str):
