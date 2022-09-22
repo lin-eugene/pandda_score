@@ -83,38 +83,50 @@ def plot(sample):
 
     return None
 
-def show_metadata(sample, dataframe):
-    row_idx = sample['row_idx'].item()
-    system = sample['system'][0]
-    dtag = sample['dtag'][0]
-    input_model = sample['input_model'][0]
+class ShowMetadata():
+    def __init__(self, sample, dataframe):
+        self.sample = sample
+        self.dataframe = dataframe
+        
+        self.load_data()
+        
+    def load_data(self):
+        self.row_idx = self.sample['row_idx'].item()
+        self.system = self.sample['system'][0]
+        self.dtag = self.sample['dtag'][0]
+        self.input_model = self.sample['input_model'][0]
 
-    input_chain_idx = sample['input_chain_idx']
-    input_residue_name = sample['input_residue_name'][0]
+        self.input_chain_idx = self.sample['input_chain_idx']
+        self.input_residue_idx = self.sample['input_residue_idx']
+        self.input_residue_name = self.sample['input_residue_name'][0]
 
-    st = gemmi.read_structure(input_model)[0]
-    chain = st[input_chain_idx]
-    chain_name = chain.name
+        self.st = gemmi.read_structure(self.input_model)[0]
+        self.chain = self.st[self.input_chain_idx]
+        self.chain_name = self.chain.name
 
-    row = dataframe.loc[dataframe['row_idx'] == row_idx]
-    gt_label = row['labels_remodelled_yes_no']
-    pred_label = row['pred_labels']
-    res_name = read_residue_name(input_residue_name)
+        row = self.dataframe.loc[self.dataframe['row_idx'] == self.row_idx]
+        self.gt_label = row['labels_remodelled_yes_no']
+        self.pred_label = row['pred_labels']
+        self.res_type = read_residue_name(self.input_residue_name)
 
-    print(f'{row_idx=}')
-    print(f'{system=}')
-    print(f'{dtag=}')
-    print(f'{chain_name=}')
-    print(f'{input_residue_name=}')
-    print(f'{gt_label=}')
-    print(f'{pred_label=}')
-    print(f'{res_name=}')
+    def show_metadata(self):
+        print(f'{self.row_idx=}')
+        print(f'{self.system=}')
+        print(f'{self.dtag=}')
+        print(f'{self.chain_name=}')
+        print(f'{self.input_residue_name=}')
+        print(f'{self.gt_label=}')
+        print(f'{self.pred_label=}')
+        print(f'{self.res_type=}')
 
-def open_coot(sample):
-    "opens coot on Diamond Remote Desktop"
-    event_map = sample['event_map_name'][0]
-    input_model = sample['input_model'][0]
-    
-    cmd = f'module load ccp4/7.0.067 && coot --pdb {input_model} --map {event_map}'
-    subprocess.Popen(cmd, shell=True)
+    def open_coot(self):
+        "opens coot on Diamond Remote Desktop"
+
+        # coordinates
+        x = self.chain[self.input_residue_idx][0].pos.x
+        y = self.chain[self.input_residue_idx][0].pos.y
+        z = self.chain[self.input_residue_idx][0].pos.z
+        
+        cmd = f'module load ccp4/7.0.067 && coot --pdb {self.input_model} --map {self.event_map} --script "set_rotation_center {x} {y} {z}"'
+        subprocess.Popen(cmd, shell=True)
 

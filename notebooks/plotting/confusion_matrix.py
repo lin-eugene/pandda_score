@@ -34,11 +34,13 @@ def compute_confusion_matrix(true_pos,
     return true_pos_count, true_neg_count, false_pos_count, false_neg_count
 
 def compute_and_plot_confusion_matrix(results_frame: pd.DataFrame):
+    # TODO — https://medium.com/@dtuk81/confusion-matrix-visualization-fc31e3f30fea
+    
     cm = confusion_matrix(y_true=results_frame['labels_remodelled_yes_no'].tolist(),
                           y_pred=results_frame['pred_labels'].tolist())
     print(results_frame['labels_remodelled_yes_no'])
     print(results_frame['pred_labels'])
-    classes = ['needs_remodeling', 'no_remodeling']
+    classes = ['no_remodeling', 'needs_remodeling']
     df_cm = pd.DataFrame(cm/np.sum(cm) *10, index = [i for i in classes],
                   columns = [i for i in classes])
     plt.figure()
