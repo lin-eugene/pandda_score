@@ -60,6 +60,7 @@ def get_training_results_per_residue(row_idx,
                                     system,
                                     dtag,
                                     input_model,
+                                    output_model,
                                     event_map_name,
                                     input_chain_idx,
                                     input_residue_idx,
@@ -73,6 +74,7 @@ def get_training_results_per_residue(row_idx,
         'system': system,
         'dtag': dtag,
         'input_model': input_model,
+        'output_model': output_model,
         'event_map_name': event_map_name,
         'input_chain_idx': input_chain_idx,
         'input_residue_idx': input_residue_idx,
@@ -91,6 +93,7 @@ def log_training_results_per_batch(batch: Dict[str, Any],
     system = batch['system']
     dtag = batch['dtag']
     input_model = batch['input_model']
+    output_model = batch['output_model']
     event_map_name = batch['event_map_name']
     input_chain_idx = batch['input_chain_idx'].tolist()
     input_residue_idx = batch['input_residue_idx'].tolist()
@@ -104,6 +107,7 @@ def log_training_results_per_batch(batch: Dict[str, Any],
                     system,
                     dtag,
                     input_model,
+                    output_model,
                     event_map_name,
                     input_chain_idx,
                     input_residue_idx,
