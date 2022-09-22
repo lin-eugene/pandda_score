@@ -59,6 +59,8 @@ def compute_and_plot_confusion_matrix(results_frame: pd.DataFrame):
 
     plt.figure()
     sn.heatmap(df_cm, annot=labels, fmt='', cmap='Blues')
+    plt.ylabel('True label')
+    plt.xlabel('Predicted label')
 
 
     return cm
