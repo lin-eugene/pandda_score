@@ -199,6 +199,8 @@ class ToTensor(object):
 
 class AddGaussianNoise(object):
     def __init__(self, mean=0., std=1.):
+
+        ##### NOT USED #####
         self.std = std
         self.mean = mean
     
@@ -262,6 +264,7 @@ class DebugResidueDataset(Dataset):
         dtag = self.residues_dframe.iloc[idx]['dtag']
         event_map_name = self.residues_dframe.iloc[idx]['event_map_name']
         input_structure_name = self.residues_dframe.iloc[idx]['input_model']
+        output_structure_name = self.residues_dframe.iloc[idx]['output_model']
         input_chain_idx = self.residues_dframe.iloc[idx]['input_chain_idx']
         input_residue_idx = self.residues_dframe.iloc[idx]['input_residue_idx']
         rmsd = self.residues_dframe.iloc[idx]['rmsd']
@@ -278,6 +281,7 @@ class DebugResidueDataset(Dataset):
             'system': system,
             'dtag': dtag,
             'input_model': input_structure_name,
+            'output_model': output_structure_name,
             'event_map_name': event_map_name,
             'input_chain_idx': input_chain_idx,
             'input_residue_idx': input_residue_idx,

@@ -31,10 +31,10 @@ def list_residues_in_structure(structure):
 def record_per_residue_data(event_map_path, structure_path, chain_idx, residue_idx, residue_name):
    
     return {
-        'event_map_path': event_map_path,
-        'structure_path': structure_path,
-        'chain_idx': chain_idx,
-        'residue_idx': residue_idx,
+        'event_map': event_map_path,
+        'input_model': structure_path,
+        'input_chain_idx': chain_idx,
+        'input_residue_idx': residue_idx,
         'residue_name': residue_name,
     }
 
@@ -53,13 +53,11 @@ def structure_to_dataframe(event_map_path, structure_path):
 ####
 
 if __name__ == '__main__':
-    import os
-    import sys
     import argparse
 
     parser = argparse.ArgumentParser(description='Convert structure to dataframe')
-    parser.add_argument('--event_map_path', type=str, required=True)
-    parser.add_argument('--structure_path', type=str, required=True)
+    parser.add_argument('-e', '--event_map_path', type=str, required=True)
+    parser.add_argument('-s', '--structure_path', type=str, required=True)
     # parser.add_argument('--output_path', type=str, required=True)
 
     args = parser.parse_args()
