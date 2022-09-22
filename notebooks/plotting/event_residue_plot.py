@@ -89,7 +89,7 @@ class ShowMetadata():
         self.dataframe = dataframe
         
         self.load_data()
-        
+
     def load_data(self):
         self.row_idx = self.sample['row_idx'].item()
         self.system = self.sample['system'][0]
@@ -121,12 +121,12 @@ class ShowMetadata():
 
     def open_coot(self):
         "opens coot on Diamond Remote Desktop"
-
+        event_map = self.sample['event_map_name'][0]
         # coordinates
         x = self.chain[self.input_residue_idx][0].pos.x
         y = self.chain[self.input_residue_idx][0].pos.y
         z = self.chain[self.input_residue_idx][0].pos.z
         
-        cmd = f'module load ccp4/7.0.067 && coot --pdb {self.input_model} --map {self.event_map} --script "set_rotation_center {x} {y} {z}"'
+        cmd = f'module load ccp4/7.0.067 && coot --pdb {self.input_model} --map {event_map} --script "set_rotation_center {x} {y} {z}"'
         subprocess.Popen(cmd, shell=True)
 
