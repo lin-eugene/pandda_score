@@ -135,6 +135,6 @@ class ShowMetadata():
         # with open(script_filename, 'w') as f:
         #     f.write(script)
 
-        cmd = f'module load ccp4/7.0.067 && coot --pdb {self.input_model} --map {event_map} --script {str(script_filename)}'
+        cmd = f'module load ccp4/7.0.067 && coot --pdb {self.input_model} --map {event_map}'
         subprocess.Popen(cmd, shell=True)
 
