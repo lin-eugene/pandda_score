@@ -12,10 +12,10 @@ from torch.utils.data import DataLoader
 import pandas as pd
 
 #Custom packages
-from learning.torch_data_setup import *
-from learning.models import SqueezeNet
-from learning.train_engine import train
-from learning.utils import *
+from training.torch_data_setup import *
+from training.models import SqueezeNet
+from training.train_engine import train
+from training.utils import *
 
 
 ####################
@@ -122,8 +122,8 @@ if __name__ == "__main__":
     translation_radius = args.translation_radius
 
     # Define data paths
-    training_csv_path = pathlib.Path.cwd() / "training" / "training_set.csv"
-    test_csv_path = pathlib.Path.cwd() / "training" / "test_set.csv"
+    training_csv_path = pathlib.Path.cwd() / "training_data_paths" / "training_set.csv"
+    test_csv_path = pathlib.Path.cwd() / "training_data_paths" / "test_set.csv"
 
     # Create an instance of SqueezeNet
     model = SqueezeNet(

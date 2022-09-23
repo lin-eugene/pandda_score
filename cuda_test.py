@@ -5,17 +5,17 @@ from torch.utils.data import DataLoader
 from torch import nn as nn
 import pathlib
 import pandas as pd
-from learning.torch_data_setup import *
+from training.torch_data_setup import *
 import os
-from learning.models import SqueezeNet
-from learning.train_engine import train_step, test_step
+from training.models import SqueezeNet
+from training.train_engine import train_step, test_step
 
 logging.basicConfig(level=logging.DEBUG)
 
 device = "cuda" if torch.cuda.is_available() else "cpu"
 
-training_csv = pathlib.Path.cwd() / "training" / "training_set.csv"
-test_csv = pathlib.Path.cwd() / "training" / "test_set.csv"
+training_csv = pathlib.Path.cwd() / 'training_data_paths' / "training_set.csv"
+test_csv = pathlib.Path.cwd() / 'training_data_paths' / "test_set.csv"
 training_dframe = pd.read_csv(training_csv)
 test_dframe = pd.read_csv(test_csv)
 

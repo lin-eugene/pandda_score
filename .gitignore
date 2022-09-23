@@ -2,7 +2,7 @@
 data/
 BAZ2BA-x481/
 *.ccp4
-training/
+training_data_paths/
 coot-backup/
 panddascore.egg-info/
 training_results/
@@ -10,3 +10,5 @@ training_results/
 *.ipynb_checkpoints
 *.pkl
 *.pbs.*
+*coot-history*
+__pycache__/

@@ -5,7 +5,7 @@ from os import access, R_OK
 import pickle
 import gemmi
 
-from lib import rmsdcalc
+from gemmi_lib import rmsdcalc
 import sys
 import numpy as np
 
@@ -131,7 +131,7 @@ def directory_check_from_csv(path_csv: pathlib.PosixPath):
     
     pd_dircheck = pd.DataFrame.from_dict(directories)
     python_path = pathlib.Path(__file__).resolve(strict=True).parent #fetch path of python script
-    outfname = python_path / 'training' / 'manual' / 'dircheck.csv'
+    outfname = python_path / 'training_data_paths' / 'manual' / 'dircheck.csv'
     outfname.parent.mkdir(parents=True, exist_ok=True)
     pd_dircheck.to_csv(outfname)
 
@@ -239,7 +239,7 @@ def directory_check(path_year: pathlib.PosixPath):
     
     pd_dircheck = pd.DataFrame.from_dict(directories)
     python_path = pathlib.Path(__file__).resolve(strict=True).parent #fetch path of python script
-    outfname = python_path / 'training' / path_year.name / 'dircheck.csv'
+    outfname = python_path / 'training_data_paths' / path_year.name / 'dircheck.csv'
     outfname.parent.mkdir(parents=True, exist_ok=True)
     pd_dircheck.to_csv(outfname)
 
@@ -268,7 +268,7 @@ def log_built_ligands(path_system: pathlib.PosixPath):
 
     #saving pandas dataframe into csv
     python_path = pathlib.Path(__file__).resolve(strict=True).parent #fetch path of python script
-    outfile = python_path / 'training' / f'{path_system.parent.name}' / f'{path_system.name}'/ 'pandda_builtligands.csv'
+    outfile = python_path / 'training_data_paths' / f'{path_system.parent.name}' / f'{path_system.name}'/ 'pandda_builtligands.csv'
     outfile.parent.mkdir(parents=True, exist_ok=True)
     ligand_built.to_csv(outfile)
 
@@ -278,7 +278,7 @@ def log_training_data_paths2(path_system: pathlib.PosixPath, path_panddas: pathl
     path_proc_datasets = path_panddas / 'processed_datasets'
     python_path = pathlib.Path(__file__).resolve(strict=True).parent #fetch path of python script
 
-    path_ligand_csv = python_path / 'training' / f'{path_system.parent.name}'
+    path_ligand_csv = python_path / 'training_data_paths' / f'{path_system.parent.name}'
 
     if path_ligand_csv.is_file():
         ligand_csv = pd.read_csv(path_ligand_csv)
@@ -334,7 +334,7 @@ def log_training_data_paths2(path_system: pathlib.PosixPath, path_panddas: pathl
 
     pd_datapaths = pd.DataFrame.from_dict(data_paths)
     python_path = pathlib.Path(__file__).resolve(strict=True).parent #fetch path of python script
-    outfname = python_path / 'training' / f'{path_system.parent.name}' / f'{path_system.name}'/ 'training_data_paths.csv'
+    outfname = python_path / 'training_data_paths' / f'{path_system.parent.name}' / f'{path_system.name}'/ 'training_data_paths.csv'
     outfname.parent.mkdir(parents=True, exist_ok=True)
     pd_datapaths.to_csv(outfname)
 
@@ -352,7 +352,7 @@ def log_training_data_paths(path_system: pathlib.PosixPath):
     path_initial_model = path_panddas.parent / 'initial_model'
 
     python_path = pathlib.Path(__file__).resolve(strict=True).parent #fetch path of python script
-    path_ligand_csv = python_path / 'training' / f'{path_system.parent.name}' / f'{path_system.name}' / 'pandda_builtligands.csv'
+    path_ligand_csv = python_path / 'training_data_paths' / f'{path_system.parent.name}' / f'{path_system.name}' / 'pandda_builtligands.csv'
     
 
     if path_initial_model.is_dir():
@@ -418,7 +418,7 @@ def log_training_data_paths(path_system: pathlib.PosixPath):
 
     pd_datapaths = pd.DataFrame.from_dict(data_paths)
     python_path = pathlib.Path(__file__).resolve(strict=True).parent #fetch path of python script
-    outfname = python_path / 'training' / f'{path_system.parent.name}' / f'{path_system.name}'/ 'training_data_paths.csv'
+    outfname = python_path / 'training_data_paths' / f'{path_system.parent.name}' / f'{path_system.name}'/ 'training_data_paths.csv'
     outfname.parent.mkdir(parents=True, exist_ok=True)
     pd_datapaths.to_csv(outfname)
 
@@ -429,7 +429,7 @@ def gen_rmsds(path_system: pathlib.PosixPath):
     calculates rmsds between input and output models
     """
     python_path = pathlib.Path(__file__).resolve(strict=True).parent #fetch path of python script
-    path_dataset_csv = python_path / 'training' / f'{path_system.parent.name}' / f'{path_system.name}' / 'training_data_paths.csv'
+    path_dataset_csv = python_path / 'training_data_paths' / f'{path_system.parent.name}' / f'{path_system.name}' / 'training_data_paths.csv'
 
 
     if path_dataset_csv.is_file():
@@ -476,7 +476,7 @@ def gen_rmsds(path_system: pathlib.PosixPath):
         dataset.insert(loc=8, column='remodelled_res', value=residues)
         dataset.insert(loc=9, column='chain_mapping', value=chain_mapping)
         
-        outfname = python_path / 'training' / f'{path_system.parent.name}' / f'{path_system.name}' / 'rmsd.csv'
+        outfname = python_path / 'training_data_paths' / f'{path_system.parent.name}' / f'{path_system.name}' / 'rmsd.csv'
         outfname.parent.mkdir(parents=True, exist_ok=True)
         dataset.to_csv(outfname)
 
@@ -502,7 +502,7 @@ def make_training_files():
     """
     print('running make training csvs')
     python_path = pathlib.Path(__file__).resolve(strict=True).parent #fetch path of python script
-    path_training = python_path / 'training'
+    path_training = python_path / 'training_data_paths'
     paths = [x for x in path_training.iterdir() if x.is_dir()]
     print(paths)
     
@@ -531,7 +531,7 @@ def make_training_files():
             gen_rmsds(path_system)
     
     for p in paths:
-        csv_path = python_path / 'training'
+        csv_path = python_path / 'training_data_paths'
 
         if csv_path.is_file():
             df =  pd.read_csv(csv_path)

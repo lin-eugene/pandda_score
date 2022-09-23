@@ -9,7 +9,7 @@ from os import access, R_OK
 import gemmi
 import numpy as np
 
-from lib import rmsdcalc, contact_search
+from gemmi_lib import rmsdcalc, contact_search
 
 
 def list_systems(path_year: pathlib.Path):
@@ -284,7 +284,7 @@ def filter_non_existent_paths(df_pandda_inspect, fname='model_paths.csv'):
             drop.append(i)
 
     df_pandda_inspect_new = df_pandda_inspect.drop(df_pandda_inspect.index[drop])
-    outfname = pathlib.Path.cwd() / 'training' / fname
+    outfname = pathlib.Path.cwd() / 'training_data_paths' / fname
     df_pandda_inspect_new.reset_index(drop=True)
     df_pandda_inspect_new.to_csv(outfname, index=False)
 
@@ -395,7 +395,7 @@ def find_remodelled_residues(df_residues, threshold=0.8, fname='all_residues.csv
     df_residues['remodelled'] = df_residues['rmsd'] > threshold
     df_residues = df_residues.drop_duplicates(keep='first')
     # print(df_residues)
-    outfname = pathlib.Path.cwd() / 'training' / fname
+    outfname = pathlib.Path.cwd() / 'training_data_paths' / fname
     df_residues.to_csv(outfname, index=False)
 
     return df_residues
@@ -404,7 +404,7 @@ def filter_remodelled_residues(df_residues, fname='remodelled.csv'):
     df_remodelled = df_residues[df_residues['remodelled']==True]
     df_remodelled = df_remodelled.reset_index(drop=True)
     print(df_remodelled)
-    outfname = pathlib.Path.cwd() / 'training' / fname
+    outfname = pathlib.Path.cwd() / 'training_data_paths' / fname
     df_remodelled.to_csv(outfname, index=False)
     return df_remodelled
 
@@ -439,7 +439,7 @@ def find_contacts(df_residues, fname='neg_data.csv'):
     df_negative_data = df_negative_data.drop_duplicates()
     df_negative_data = df_negative_data.reset_index(drop=True)
     print(df_negative_data)
-    outfname = pathlib.Path.cwd() / 'training' / fname
+    outfname = pathlib.Path.cwd() / 'training_data_paths' / fname
     df_negative_data.to_csv(outfname, index=False)
     
     return df_negative_data
@@ -448,7 +448,7 @@ def gen_training_data_csv(df_remodelled, df_negative_data, fname='training_data.
     df_training = pd.concat([df_remodelled, df_negative_data])
     df_training = df_training.sort_values(by=['dtag'])
     df_training = df_training.reset_index(drop=True)
-    outfname = pathlib.Path.cwd() / 'training' / fname
+    outfname = pathlib.Path.cwd() / 'training_data_paths' / fname
     df_training.to_csv(outfname, index=False)
 
     return df_training
@@ -456,7 +456,7 @@ def gen_training_data_csv(df_remodelled, df_negative_data, fname='training_data.
 ######
 
 def look_for_training_data_to_csv(path_to_labxchem_data_dir: str, path_to_csv_with_dataset_paths: Optional[str], force=False):
-        training_data_csv = pathlib.Path.cwd() / 'training' / 'training_data.csv'
+        training_data_csv = pathlib.Path.cwd() / 'training_data_paths' / 'training_data.csv'
         
         if training_data_csv.is_file() and force is not True:
             return None

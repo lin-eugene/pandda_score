@@ -1,5 +1,4 @@
 import argparse
-from ctypes import Union
 from typing import Any, Dict, List
 import matplotlib.pyplot as plt
 import torch
@@ -21,6 +20,7 @@ def plot_loss_curves(results: Dict[str, List[float]]):
              "train_acc": [...],
              "test_loss": [...],
              "test_acc": [...]}
+    
     """
     
     # Get the loss values of the results dictionary (training and test)
