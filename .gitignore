@@ -11,4 +11,5 @@ training_results/
 *.pkl
 *.pbs.*
 *coot-history*
+score_examples/
 __pycache__/
