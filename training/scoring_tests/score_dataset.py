@@ -111,7 +111,7 @@ class SamplingRandomRotations(object):
         
         # normalising array values
         # event_map_array_norm = (event_map_array - np.mean(event_map_array)) / np.std(event_map_array)
-        # input_residue_array_norm = (input_residue_array - 0.5) #normalise to -0.5 to 0.5
+        input_residue_array = (input_residue_array - 0.5) #normalise to -0.5 to 0.5
         
         return {
             'event_map_name': sample['event_map_name'],

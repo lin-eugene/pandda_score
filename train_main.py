@@ -187,6 +187,6 @@ if __name__ == "__main__":
                             translation_radius=translation_radius)
     
     ### run analysis 
-    from analysis import model_analysis
+    from training.analysis import model_analysis
     model_path = target_dir / f'{model_name}_saved.pth'
     model_analysis.main(model_path, training_csv_path)
