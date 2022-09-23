@@ -44,10 +44,10 @@ def record_per_residue_data(event_map_path, structure_path, chain_idx, residue_i
 def structure_to_dataframe(event_map_path: str, 
                             structure_path: str):
 
-    event_map_path = pathlib.Path(event_map_path).resolve()
-    structure_path = pathlib.Path(structure_path).resolve()
+    event_map_path = str(pathlib.Path(event_map_path).resolve())
+    structure_path = str(pathlib.Path(structure_path).resolve())
 
-    structure = gemmi.read_structure(str(structure_path))[0]
+    structure = gemmi.read_structure(structure_path)[0]
 
     lists = list_residues_in_structure(structure)
     record = record_per_residue_data(itertools.repeat(event_map_path, len(lists[0])), 
