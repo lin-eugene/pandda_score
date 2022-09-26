@@ -8,5 +8,5 @@
 np=$(cat ${PBS_NODEFILE} | wc -l);
 
 conda activate pandda_env
-cd /dls/labxchem/data/2018/lb18145-80/processing/analysis/eugene/panddaproject
-python analysis/model_analysis.py -m training_results/2022_09_15-07_05_30_PM/model_2022_09_15-07_05_30_PM}_saved.pth -d training/training_set.csv
+cd /dls/labxchem/data/2018/lb18145-80/processing/analysis/eugene/pandda_score
+python training/analysis/model_analysis.py -m training_results/2022_09_15-07_05_30_PM/model_2022_09_15-07_05_30_PM}_saved.pth -d training/training_set.csv
