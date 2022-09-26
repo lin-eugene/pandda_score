@@ -1,4 +1,5 @@
 import logging
+from re import S
 from typing import Dict, Union, List
 import numpy as np
 import torch
@@ -44,6 +45,7 @@ class ResidueDataset(Dataset):
         system = self.residues_dframe.iloc[idx]['system']
         dtag = self.residues_dframe.iloc[idx]['dtag']
         event_map_name = self.residues_dframe.iloc[idx]['event_map']
+        mtz = self.residues_dframe.iloc[idx]['mtz']
         input_structure_name = self.residues_dframe.iloc[idx]['input_model']
         output_structure_name = self.residues_dframe.iloc[idx]['output_model']
         input_chain_idx = self.residues_dframe.iloc[idx]['input_chain_idx']
@@ -63,6 +65,7 @@ class ResidueDataset(Dataset):
             'dtag': dtag,
             'input_model': input_structure_name,
             'output_model': output_structure_name,
+            'mtz': mtz,
             'event_map_name': event_map_name,
             'input_chain_idx': input_chain_idx,
             'input_residue_idx': input_residue_idx,
@@ -134,6 +137,7 @@ class SamplingRandomRotations(object):
             'dtag': sample['dtag'],
             'input_model': sample['input_model'],
             'output_model': sample['output_model'],
+            'mtz': sample['mtz'],
             'event_map_name': sample['event_map_name'],
             'input_chain_idx': sample['input_chain_idx'],
             'input_residue_idx': sample['input_residue_idx'],
@@ -162,6 +166,7 @@ class ConcatEventResidueToTwoChannels(object):
             'dtag': sample['dtag'],
             'input_model': sample['input_model'],
             'output_model': sample['output_model'],
+            'mtz': sample['mtz'],
             'event_map_name': sample['event_map_name'],
             'input_chain_idx': sample['input_chain_idx'],
             'input_residue_idx': sample['input_residue_idx'],
@@ -188,6 +193,7 @@ class ToTensor(object):
             'dtag': sample['dtag'],
             'input_model': sample['input_model'],
             'output_model': sample['output_model'],
+            'mtz': sample['mtz'],
             'event_map_name': sample['event_map_name'],
             'input_chain_idx': sample['input_chain_idx'],
             'input_residue_idx': sample['input_residue_idx'],
@@ -214,6 +220,7 @@ class AddGaussianNoise(object):
             'dtag': sample['dtag'],
             'input_model': sample['input_model'],
             'output_model': sample['output_model'],
+            'mtz': sample['mtz'],
             'event_map_name': sample['event_map_name'],
             'input_chain_idx': sample['input_chain_idx'],
             'input_residue_idx': sample['input_residue_idx'],
@@ -262,6 +269,7 @@ class DebugResidueDataset(Dataset):
         row_idx = self.residues_dframe.iloc[idx]['row_idx']
         system = self.residues_dframe.iloc[idx]['system']
         dtag = self.residues_dframe.iloc[idx]['dtag']
+        mtz = self.residues_dframe.iloc[idx]['mtz']
         event_map_name = self.residues_dframe.iloc[idx]['event_map_name']
         input_structure_name = self.residues_dframe.iloc[idx]['input_model']
         output_structure_name = self.residues_dframe.iloc[idx]['output_model']
@@ -282,6 +290,7 @@ class DebugResidueDataset(Dataset):
             'dtag': dtag,
             'input_model': input_structure_name,
             'output_model': output_structure_name,
+            'mtz': mtz,
             'event_map_name': event_map_name,
             'input_chain_idx': input_chain_idx,
             'input_residue_idx': input_residue_idx,
