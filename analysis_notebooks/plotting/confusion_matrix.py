@@ -10,13 +10,13 @@ def compute_true_false_positives_and_negatives(results_frame: pd.DataFrame,
     results_frame['pred_labels_from_threshold'] = (results_frame['pred_probabilities'] > threshold).astype(int)
 
     true_pos = results_frame.loc[(results_frame['pred_labels_from_threshold'] == 1) & \
-                                    (results_frame['pred_labels'] == 1)]
+                                    (results_frame['labels_remodelled_yes_no'] == 1)]
     true_neg = results_frame.loc[(results_frame['pred_labels_from_threshold'] == 0) & \
-                                    (results_frame['pred_labels'] == 0)]
+                                    (results_frame['labels_remodelled_yes_no'] == 0)]
     false_pos = results_frame.loc[(results_frame['pred_labels_from_threshold'] == 0) & \
-                                    (results_frame['pred_labels'] == 1)]
+                                    (results_frame['labels_remodelled_yes_no'] == 1)]
     false_neg = results_frame.loc[(results_frame['pred_labels_from_threshold'] == 1) & \
-                                    (results_frame['pred_labels'] == 0)]
+                                    (results_frame['labels_remodelled_yes_no'] == 0)]
     
     return true_pos, true_neg, false_pos, false_neg, results_frame
 
