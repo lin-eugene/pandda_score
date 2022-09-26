@@ -14,3 +14,4 @@ def save_output(output_labels: List[Dict],
     df.to_csv(output_file, index=False)
     
     return None
+
