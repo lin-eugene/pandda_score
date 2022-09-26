@@ -81,8 +81,8 @@ def get_training_results_per_residue(row_idx,
         'input_residue_name': input_residue_name,
         'rmsd': rmsd,
         'labels_remodelled_yes_no': labels_remodelled_yes_no,
-        'pred_labels': test_pred_label
-
+        'pred_labels': test_pred_label,
+        'pred_probabilities': pred_probability
     }
 
 
