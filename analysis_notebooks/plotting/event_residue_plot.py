@@ -96,7 +96,7 @@ class ShowMetadata():
         self.system = self.sample['system'][0]
         self.dtag = self.sample['dtag'][0]
         self.input_model = self.sample['input_model'][0]
-        self.output_model = self.sample['output_model'][0]
+        
 
         self.input_chain_idx = self.sample['input_chain_idx']
         self.input_residue_idx = self.sample['input_residue_idx']
@@ -121,9 +121,15 @@ class ShowMetadata():
         print(f'{self.pred_label=}')
         print(f'{self.res_type=}')
 
-    def open_coot(self, show_output_model=False):
+    def open_coot(self, show_output_model=False, show_mtz=False):
         "opens coot on Diamond Remote Desktop"
         event_map = self.sample['event_map_name'][0]
+        if show_mtz:
+            mtz = self.sample['mtz'][0]
+        
+        if show_output_model:
+            output_model = self.sample['output_model'][0]
+
         # coordinates
         x = self.chain[self.input_residue_idx][0].pos.x
         print(x)
@@ -136,10 +142,11 @@ class ShowMetadata():
         with open(script_filename, 'w') as f:
             f.write(script)
         
-        if show_output_model:
-            cmd = f'module load ccp4/7.0.067 && coot --pdb {self.input_model} --pdb {self.output_model} --map {event_map} --script {str(script_filename)}'
-        else:
-            cmd = f'module load ccp4/7.0.067 && coot --pdb {self.input_model} --map {event_map} --script {str(script_filename)}'
+        # if show_output_model:
+        cmd = f'module load ccp4/7.0.067 && coot --pdb {self.input_model} --pdb {output_model} --map {event_map} --data {mtz} --script {str(script_filename)}'
+        # else:
+        #     cmd = f'module load ccp4/7.0.067 && coot --pdb {self.input_model} --map {event_map} --script {str(script_filename)}'
 
+        
         subprocess.Popen(cmd, shell=True)
 
