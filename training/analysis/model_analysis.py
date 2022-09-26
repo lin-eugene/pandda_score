@@ -156,6 +156,7 @@ def debug_loop(model: torch.nn.Module,
             # Calculate and accumulate accuracy
             # print(f'test_pred_logits: {test_pred_logits}')
             if debug_pred_logits.size(dim=1) > 1:
+                debug_pred_probability = torch.softmax(debug_pred_logits, dim=1)
                 debug_pred_labels = torch.argmax(torch.softmax(debug_pred_logits, dim=1), dim=1) #for multiclass classification
 
             else:
