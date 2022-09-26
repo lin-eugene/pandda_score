@@ -1,6 +1,8 @@
-# panddaproject
+# pandda_score
 
-# dependencies for diamond clusters
+CNN(SqueezeNet)-based classifier to identify residues requiring remodelling on PanDDA event maps
+
+# Dependencies
 ```shell
 conda create -n pandda_env python=3.9.13 biopython=1.78 pandas=1.4.3 tqdm=4.64.0 matplotlib=2.2.3 numpy=1.23.1 seaborn=0.11.2
 conda activate pandda_env
