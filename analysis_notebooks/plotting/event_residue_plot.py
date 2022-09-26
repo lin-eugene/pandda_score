@@ -126,9 +126,13 @@ class ShowMetadata():
         event_map = self.sample['event_map_name'][0]
         if show_mtz:
             mtz = self.sample['mtz'][0]
+        else:
+            mtz = None
         
         if show_output_model:
             output_model = self.sample['output_model'][0]
+        else:
+            output_model = None
 
         # coordinates
         x = self.chain[self.input_residue_idx][0].pos.x
