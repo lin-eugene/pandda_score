@@ -11,7 +11,6 @@ conda install -c conda-forge -y gemmi=0.4.5 torchinfo=1.7.0 plotly=5.10.0 fire=0
 python -m pip install notebook
 python -m pip install -e .
 ```
-
 # splitting dataset into training and test sets
 ```shell
 python learning/pull_data/split_dataset.py training/training_data.csv --test HERC2A,INPP5DA,NSP14,IMPA1A -s
