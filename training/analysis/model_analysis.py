@@ -8,8 +8,7 @@ import pathlib
 from torch.utils.data import DataLoader
 import os
 import logging
-
-from training.models import SqueezeNet
+from training.utils import load_model
 
 def plot_loss_curves(results: Dict[str, List[float]]):
     """Plots training curves of a results dictionary.
@@ -67,7 +66,8 @@ def get_training_results_per_residue(row_idx,
                                     input_residue_name,
                                     rmsd,
                                     labels_remodelled_yes_no,
-                                    test_pred_label):
+                                    test_pred_label,
+                                    pred_probability):
 
     return {
         'row_idx': row_idx,
@@ -87,7 +87,8 @@ def get_training_results_per_residue(row_idx,
 
 
 def log_training_results_per_batch(batch: Dict[str, Any],
-                                    test_pred_labels: torch.Tensor,):
+                                    test_pred_labels: torch.Tensor,
+                                    pred_probabilities: torch.Tensor,):
     
     row_idx = batch['row_idx'].tolist()
     system = batch['system']
@@ -101,6 +102,7 @@ def log_training_results_per_batch(batch: Dict[str, Any],
     rmsd = batch['rmsd'].tolist()
     labels_remodelled_yes_no = batch['labels_remodelled_yes_no'].tolist()
     pred_labels = test_pred_labels.tolist()
+    pred_probabilities = pred_probabilities.tolist()
 
     return list(map(get_training_results_per_residue, 
                     row_idx,
@@ -114,7 +116,8 @@ def log_training_results_per_batch(batch: Dict[str, Any],
                     input_residue_name,
                     rmsd,
                     labels_remodelled_yes_no,
-                    pred_labels))
+                    pred_labels,
+                    pred_probabilities))
                     
 
 def debug_loop(model: torch.nn.Module,
@@ -156,11 +159,14 @@ def debug_loop(model: torch.nn.Module,
                 debug_pred_labels = torch.argmax(torch.softmax(debug_pred_logits, dim=1), dim=1) #for multiclass classification
 
             else:
+                debug_pred_probability = torch.sigmoid(debug_pred_logits)[:,1]
                 debug_pred_labels = torch.round(torch.sigmoid(debug_pred_logits)) #for binary classification
 
             logging.debug(sample)
             debug_acc += (debug_pred_labels == labels_batch).sum().item()/len(debug_pred_logits)
-            output_labels += log_training_results_per_batch(sample, debug_pred_labels)
+            output_labels += log_training_results_per_batch(sample, 
+                                                            debug_pred_labels,
+                                                            pred_probabilities=debug_pred_probability)
 
             
     # Adjust metrics to get average loss and accuracy per batch 
@@ -185,16 +191,6 @@ def save_output_labels(output_labels, model_path):
     return None
 
 ####
-
-def load_model(model_path: str, 
-            device) -> torch.nn.Module:
-    model_path = pathlib.Path(model_path).resolve()
-    model = SqueezeNet()
-    model.load_state_dict(torch.load(model_path))
-    model.eval()
-    model.to(device)
-    
-    return model
 
 def load_data(data_path: str) -> torch.utils.data.DataLoader:
     data_path = pathlib.Path(data_path).resolve()
