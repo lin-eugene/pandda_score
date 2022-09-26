@@ -7,7 +7,7 @@ from typing import Optional
 
 def compute_true_false_positives_and_negatives(results_frame: pd.DataFrame, 
                                         threshold=0.5):
-    results_frame['pred_labels_from_threshold'] = results_frame['pred_probabilities'] > threshold
+    results_frame['pred_labels_from_threshold'] = (results_frame['pred_probabilities'] > threshold).astype(int)
 
     true_pos = results_frame.loc[(results_frame['pred_labels_from_threshold'] == 1) & \
                                     (results_frame['pred_labels'] == 1)]
@@ -18,7 +18,7 @@ def compute_true_false_positives_and_negatives(results_frame: pd.DataFrame,
     false_neg = results_frame.loc[(results_frame['pred_labels_from_threshold'] == 1) & \
                                     (results_frame['pred_labels'] == 0)]
     
-    return true_pos, true_neg, false_pos, false_neg
+    return true_pos, true_neg, false_pos, false_neg, results_frame
 
 def compute_confusion_matrix(true_pos,
                                 true_neg,
@@ -37,10 +37,13 @@ def compute_confusion_matrix(true_pos,
     return true_pos_count, true_neg_count, false_pos_count, false_neg_count
 
 def compute_and_plot_confusion_matrix(results_frame: pd.DataFrame,
+                                    thres: float = 0.5,
                                     title: Optional[str]=None):
     # TODO — https://medium.com/@dtuk81/confusion-matrix-visualization-fc31e3f30fea
     
-    cm = confusion_matrix(y_true=results_frame['labels_remodelled_yes_no'].tolist(),
+    _,_,_,_, results_frame = compute_true_false_positives_and_negatives(results_frame, thres)
+    
+    cm = confusion_matrix(y_true=results_frame['pred_labels_from_threshold'].tolist(),
                           y_pred=results_frame['pred_labels'].tolist())
 
     group_names = ['True Neg','False Pos','False Neg','True Pos']
