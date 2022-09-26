@@ -43,8 +43,8 @@ def compute_and_plot_confusion_matrix(results_frame: pd.DataFrame,
     
     _,_,_,_, results_frame = compute_true_false_positives_and_negatives(results_frame, thres)
     
-    cm = confusion_matrix(y_true=results_frame['pred_labels_from_threshold'].tolist(),
-                          y_pred=results_frame['pred_labels'].tolist())
+    cm = confusion_matrix(y_true=results_frame['labels_remodelled_yes_no'].tolist(),
+                          y_pred=results_frame['pred_labels_from_threshold'].tolist())
 
     group_names = ['True Neg','False Pos','False Neg','True Pos']
     group_counts = ["{0:0.0f}".format(value) for value in
