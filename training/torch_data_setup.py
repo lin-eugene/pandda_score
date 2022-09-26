@@ -1,5 +1,4 @@
 import logging
-from re import S
 from typing import Dict, Union, List
 import numpy as np
 import torch
@@ -86,9 +85,10 @@ class SamplingRandomRotations(object):
     """
     Data Augmentation — sampling random rotations and translations
     """
-    def __init__(self, translation_radius=0, random_rotation=True):
+    def __init__(self, translation_radius=0, random_rotation=True, use_mtz=False):
         self.translation_radius = translation_radius
         self.random_rotation = random_rotation
+        self.use_mtz = use_mtz
 
     def __call__(self, sample) -> Dict[str, np.ndarray]:
         event_map_grid = sample['event_map']
@@ -127,10 +127,36 @@ class SamplingRandomRotations(object):
                                                                                     rot_mat, 
                                                                                     vec_rand)
         
-        # normalising array values
-        # event_map_array_norm = (event_map_array - np.mean(event_map_array)) / np.std(event_map_array)
         input_residue_array = (input_residue_array - 0.5) #normalise to -0.5 to 0.5
         
+        
+        if self.use_mtz == True:
+            mtz = sample['mtz']
+            two_fo_fc_grid = extract_box.gen_two_fo_fc_from_mtz(str(mtz))
+            normalized_two_fo_fc_grid = extract_box.copy_normalized_gemmi_float_grid(two_fo_fc_grid)
+            two_fo_fc_array = extract_box.create_numpy_array_with_gemmi_interpolate(input_residue,
+                                                                                    normalized_two_fo_fc_grid,
+                                                                                    rot_mat,
+                                                                                    vec_rand)
+            return {
+                'row_idx': sample['row_idx'],
+                'system': sample['system'],
+                'dtag': sample['dtag'],
+                'input_model': sample['input_model'],
+                'output_model': sample['output_model'],
+                'mtz': sample['mtz'],
+                'event_map_name': sample['event_map_name'],
+                'input_chain_idx': sample['input_chain_idx'],
+                'input_residue_idx': sample['input_residue_idx'],
+                'input_residue_name': input_residue_name,
+                'rmsd': sample['rmsd'],
+                'event_map': event_map_array,
+                'two_fo_fc_array': two_fo_fc_array,
+                'input_residue': input_residue_array,
+                'labels_remodelled_yes_no': labels_remodelled_yes_no
+                }
+
+
         return {
             'row_idx': sample['row_idx'],
             'system': sample['system'],
@@ -158,7 +184,11 @@ class ConcatEventResidueToTwoChannels(object):
         input_residue_array = sample['input_residue']
         labels_remodelled_yes_no = sample['labels_remodelled_yes_no']
 
-        event_residue_array = np.stack((event_map_array, input_residue_array), axis=0) #order of channels along axis 0 = event map, input residue
+        if 'two_fo_fc_array' in sample:
+            two_fo_fc_array = sample['two_fo_fc_array']
+            event_residue_array = np.stack((event_map_array, two_fo_fc_array, input_residue_array), axis=0)
+        else:
+            event_residue_array = np.stack((event_map_array, input_residue_array), axis=0) #order of channels along axis 0 = event map, input residue
         
         return {
             'row_idx': sample['row_idx'],
@@ -204,9 +234,9 @@ class ToTensor(object):
         }
 
 class AddGaussianNoise(object):
+    ##### NOT USED #####
     def __init__(self, mean=0., std=1.):
-
-        ##### NOT USED #####
+       
         self.std = std
         self.mean = mean
     

@@ -26,7 +26,8 @@ def train_main(training_csv_path: str,
                optimiser: torch.optim.Optimizer,
                BATCH_SIZE: int,
                NUM_EPOCHS: int,
-               translation_radius: float,):
+               translation_radius: float,
+               use_mtz=False):
     
     training_csv_path = pathlib.Path(training_csv_path).resolve()
     test_csv_path = pathlib.Path(test_csv_path).resolve()
@@ -35,13 +36,15 @@ def train_main(training_csv_path: str,
 
     #Create dataset
     training_tsfm = transforms.Compose([
-                        SamplingRandomRotations(translation_radius=translation_radius),
+                        SamplingRandomRotations(translation_radius=translation_radius,
+                                                use_mtz=use_mtz),
                         ConcatEventResidueToTwoChannels(),
                         ToTensor(),
                     ])
     test_tsfm = transforms.Compose([
                         SamplingRandomRotations(translation_radius=0, 
-                                                random_rotation=False),
+                                                random_rotation=False,
+                                                use_mtz=use_mtz),
                         ConcatEventResidueToTwoChannels(),
                         ToTensor()
                     ])
@@ -79,7 +82,8 @@ def print_hyperparams(model: torch.nn.Module,
                       LEARNING_RATE: float,
                       OUTPUT_LOGITS: int,
                       LOSS_FN_WEIGHTS: torch.tensor,
-                      translation_radius: float):
+                      translation_radius: float,
+                      use_mtz):
 
     print(f"{model=}")
     print(f"{loss_fn=}")
@@ -90,6 +94,7 @@ def print_hyperparams(model: torch.nn.Module,
     print(f"{OUTPUT_LOGITS=}")
     print(f"{LOSS_FN_WEIGHTS=}")
     print(f"{translation_radius=}")
+    print(f"{use_mtz=}")
 
 #####
 
@@ -106,7 +111,9 @@ if __name__ == "__main__":
     parser.add_argument('-lr', '--learning_rate', type=float, default=0.0001)
     parser.add_argument('-o', '--output_logits', type=int, default=2)
     parser.add_argument('-r', '--translation_radius', type=float, default=1)
+    parser.add_argument('-mtz', '--use_mtz', action='store_true', default=False)
     parser.add_argument('-nl', '--nolog', action='store_true')
+
 
     args = parser.parse_args()
 
@@ -120,6 +127,7 @@ if __name__ == "__main__":
     OUTPUT_LOGITS = args.output_logits
     LOSS_FN_WEIGHTS = torch.tensor([1, 2.158])
     translation_radius = args.translation_radius
+    use_mtz = args.use_mtz
 
     # Define data paths
     training_csv_path = pathlib.Path.cwd() / "training_data_paths" / "training_set.csv"
@@ -145,7 +153,8 @@ if __name__ == "__main__":
                       LEARNING_RATE=LEARNING_RATE,
                       OUTPUT_LOGITS=OUTPUT_LOGITS,
                       LOSS_FN_WEIGHTS=LOSS_FN_WEIGHTS,
-                      translation_radius=translation_radius)
+                      translation_radius=translation_radius,
+                      use_mtz=use_mtz)
 
     start_time = timer()
 
@@ -156,7 +165,8 @@ if __name__ == "__main__":
                                       optimiser=optimiser,
                                       BATCH_SIZE=BATCH_SIZE,
                                       NUM_EPOCHS=NUM_EPOCHS,
-                                      translation_radius=translation_radius)
+                                      translation_radius=translation_radius,
+                                      use_mtz=use_mtz)
     
     end_time = timer()
     print(f"Total training time: {end_time-start_time:.3f} seconds")
@@ -184,7 +194,8 @@ if __name__ == "__main__":
                             LEARNING_RATE=LEARNING_RATE,
                             OUTPUT_LOGITS=OUTPUT_LOGITS,
                             LOSS_FN_WEIGHTS=LOSS_FN_WEIGHTS,
-                            translation_radius=translation_radius)
+                            translation_radius=translation_radius,
+                            use_mtz=use_mtz)
     
     ### run analysis 
     from training.analysis import model_analysis
