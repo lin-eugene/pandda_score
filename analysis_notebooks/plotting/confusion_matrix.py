@@ -8,6 +8,7 @@ from typing import Optional
 def compute_true_false_positives_and_negatives(results_frame: pd.DataFrame, 
                                         threshold=0.5):
     results_frame['pred_labels_from_threshold'] = (results_frame['pred_probabilities'] > threshold).astype(int)
+    results_frame['pred_labels'] = (results_frame['pred_probabilities'] > threshold).astype(int)
 
     true_pos = results_frame.loc[(results_frame['labels_remodelled_yes_no'] == 1) & \
                                     (results_frame['pred_labels_from_threshold'] == 1)]
