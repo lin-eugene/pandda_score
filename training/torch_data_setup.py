@@ -316,6 +316,8 @@ class DebugResidueDataset(Dataset):
         dtag = self.residues_dframe.iloc[idx]['dtag']
         mtz = self.residues_dframe.iloc[idx]['mtz']
         event_map_name = self.residues_dframe.iloc[idx]['event_map_name']
+        high_resolution = self.residues_dframe.iloc[idx]['high_resolution']
+        one_minus_BDC = self.residues_dframe.iloc[idx]['1-BDC']
         input_structure_name = self.residues_dframe.iloc[idx]['input_model']
         output_structure_name = self.residues_dframe.iloc[idx]['output_model']
         input_chain_idx = self.residues_dframe.iloc[idx]['input_chain_idx']
@@ -336,6 +338,9 @@ class DebugResidueDataset(Dataset):
             'input_model': input_structure_name,
             'output_model': output_structure_name,
             'mtz': mtz,
+            'event_map_name': event_map_name,
+            '1-BDC': one_minus_BDC,
+            'high_resolution': high_resolution,
             'event_map_name': event_map_name,
             'input_chain_idx': input_chain_idx,
             'input_residue_idx': input_residue_idx,
