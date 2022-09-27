@@ -95,7 +95,7 @@ class SamplingRandomRotations(object):
         self.use_mtz = use_mtz
 
     def __call__(self, sample) -> Dict[str, np.ndarray]:
-        print(sample)
+        # print(sample)
         event_map_grid = sample['event_map']
         input_residue = sample['input_residue']
         input_residue_name = str(input_residue)
