@@ -99,7 +99,7 @@ class SamplingRandomRotations(object):
         input_residue = sample['input_residue']
         input_residue_name = str(input_residue)
         labels_remodelled_yes_no = np.array(sample['labels_remodelled_yes_no']).astype(np.float32) #needs remodelling = 1, doesn't need remodelling = 0
-        
+
         # logging.debug(type(input_residue))
         # logging.debug(f'event_map_grid = {event_map_grid}')
         # logging.debug(f'axis_order = {event_map_grid.axis_order}')
