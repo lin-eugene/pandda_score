@@ -9,6 +9,12 @@ def gen_two_fo_fc_from_mtz(mtz_path: str) -> type[gemmi.FloatGrid]:
     
     return two_fofc_grid
 
+def gen_fo_fc_from_mtz(mtz_path: str) -> type[gemmi.FloatGrid]:
+    mtz = gemmi.read_mtz_file(mtz_path)
+    fofc_grid = mtz.transform_f_phi_to_map('DELFWT', 'PHDELWT')
+    
+    return fofc_grid
+
 def fetch_grid_from_pandda_map(map: type[gemmi.Ccp4Map]) -> type[gemmi.FloatGrid]:
     """
     reads in map

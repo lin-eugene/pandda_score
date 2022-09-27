@@ -132,11 +132,13 @@ if __name__ == "__main__":
     # Define data paths
     training_csv_path = pathlib.Path.cwd() / "training_data_paths" / "training_set.csv"
     test_csv_path = pathlib.Path.cwd() / "training_data_paths" / "test_set.csv"
+    
+    # Create an instance of SqueezeNet
     if use_mtz:
         input_channels = 3
     else:
         input_channels = 2
-    # Create an instance of SqueezeNet
+        
     model = SqueezeNet(
                 input_channels=input_channels,
                 kernel_size=3,
