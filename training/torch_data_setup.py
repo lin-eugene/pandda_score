@@ -44,6 +44,8 @@ class ResidueDataset(Dataset):
         system = self.residues_dframe.iloc[idx]['system']
         dtag = self.residues_dframe.iloc[idx]['dtag']
         event_map_name = self.residues_dframe.iloc[idx]['event_map']
+        one_minus_BDC = self.residues_dframe.iloc[idx]['1-BDC']
+        high_resolution = self.residues_dframe.iloc[idx]['high_resolution']
         mtz = self.residues_dframe.iloc[idx]['mtz']
         input_structure_name = self.residues_dframe.iloc[idx]['input_model']
         output_structure_name = self.residues_dframe.iloc[idx]['output_model']
@@ -66,6 +68,8 @@ class ResidueDataset(Dataset):
             'output_model': output_structure_name,
             'mtz': mtz,
             'event_map_name': event_map_name,
+            '1-BDC': one_minus_BDC,
+            'high_resolution': high_resolution,
             'input_chain_idx': input_chain_idx,
             'input_residue_idx': input_residue_idx,
             'event_map': event_map_grid,
@@ -146,6 +150,8 @@ class SamplingRandomRotations(object):
                 'output_model': sample['output_model'],
                 'mtz': sample['mtz'],
                 'event_map_name': sample['event_map_name'],
+                '1-BDC': sample['1-BDC'],
+                'high_resolution': sample['high_resolution'],
                 'input_chain_idx': sample['input_chain_idx'],
                 'input_residue_idx': sample['input_residue_idx'],
                 'input_residue_name': input_residue_name,
@@ -165,6 +171,8 @@ class SamplingRandomRotations(object):
             'output_model': sample['output_model'],
             'mtz': sample['mtz'],
             'event_map_name': sample['event_map_name'],
+            '1-BDC': sample['1-BDC'],
+            'high_resolution': sample['high_resolution'],
             'input_chain_idx': sample['input_chain_idx'],
             'input_residue_idx': sample['input_residue_idx'],
             'input_residue_name': input_residue_name,
@@ -198,6 +206,8 @@ class ConcatEventResidueToTwoChannels(object):
             'output_model': sample['output_model'],
             'mtz': sample['mtz'],
             'event_map_name': sample['event_map_name'],
+            '1-BDC': sample['1-BDC'],
+            'high_resolution': sample['high_resolution'],
             'input_chain_idx': sample['input_chain_idx'],
             'input_residue_idx': sample['input_residue_idx'],
             'input_residue_name': sample['input_residue_name'],
@@ -225,6 +235,8 @@ class ToTensor(object):
             'output_model': sample['output_model'],
             'mtz': sample['mtz'],
             'event_map_name': sample['event_map_name'],
+            '1-BDC': sample['1-BDC'],
+            'high_resolution': sample['high_resolution'],
             'input_chain_idx': sample['input_chain_idx'],
             'input_residue_idx': sample['input_residue_idx'],
             'input_residue_name': sample['input_residue_name'],
@@ -252,6 +264,8 @@ class AddGaussianNoise(object):
             'output_model': sample['output_model'],
             'mtz': sample['mtz'],
             'event_map_name': sample['event_map_name'],
+            '1-BDC': sample['1-BDC'],
+            'high_resolution': sample['high_resolution'],
             'input_chain_idx': sample['input_chain_idx'],
             'input_residue_idx': sample['input_residue_idx'],
             'input_residue_name': sample['input_residue_name'],

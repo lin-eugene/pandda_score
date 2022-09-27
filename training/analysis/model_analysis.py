@@ -103,8 +103,8 @@ def log_training_results_per_batch(batch: Dict[str, Any],
     output_model = batch['output_model']
     mtz = batch['mtz']
     event_map_name = batch['event_map_name']
-    one_minus_BDC = batch['1-BDC']
-    high_resolution = batch['high_resolution']
+    one_minus_BDC = batch['1-BDC'].tolist()
+    high_resolution = batch['high_resolution'].tolist()
     input_chain_idx = batch['input_chain_idx'].tolist()
     input_residue_idx = batch['input_residue_idx'].tolist()
     input_residue_name = batch['input_residue_name']
