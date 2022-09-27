@@ -29,10 +29,11 @@ def list_residues_in_structure(structure):
     
     return chain_idx, residues_idx, residue_name
 
-def record_per_residue_data(event_map_path, structure_path, chain_idx, residue_idx, residue_name):
+def record_per_residue_data(event_map_path, mtz_path, structure_path, chain_idx, residue_idx, residue_name):
    
     return {
         'event_map': event_map_path,
+        'mtz': mtz_path,
         'input_model': structure_path,
         'input_chain_idx': chain_idx,
         'input_residue_idx': residue_idx,
@@ -41,16 +42,20 @@ def record_per_residue_data(event_map_path, structure_path, chain_idx, residue_i
 
 ######
 
-def structure_to_dataframe(event_map_path: str, 
+def structure_to_dataframe(event_map_path: str,
+                            mtz_path: str,
                             structure_path: str):
 
     event_map_path = str(pathlib.Path(event_map_path).resolve())
+    mtz_path = str(pathlib.Path(mtz_path).resolve())
     structure_path = str(pathlib.Path(structure_path).resolve())
+
 
     structure = gemmi.read_structure(structure_path)[0]
 
     lists = list_residues_in_structure(structure)
     record = record_per_residue_data(itertools.repeat(event_map_path, len(lists[0])), 
+                                    itertools.repeat(mtz_path, len(lists[0])),
                                     itertools.repeat(structure_path, len(lists[0])), 
                                     *lists)
 
@@ -66,6 +71,7 @@ if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='Convert structure to dataframe')
     parser.add_argument('-e', '--event_map_path', type=str, required=True)
     parser.add_argument('-s', '--structure_path', type=str, required=True)
+    parser.add_argument('-mtz', '--mtz_path', type=str, required=True)
     # parser.add_argument('--output_path', type=str, required=True)
 
     args = parser.parse_args()
