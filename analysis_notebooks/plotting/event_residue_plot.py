@@ -23,19 +23,19 @@ def plot(sample):
                 y=y.flatten(),
                 z=z.flatten(),
                 value = event_map_values,
-                isomin=0.05,
+                isomin=0.15,
                 isomax=5,
                 opacity=0.6,
-                surface_count=2),
+                surface_count=3),
             go.Isosurface(
                 x=x.flatten(),
                 y=y.flatten(),
                 z=z.flatten(),
                 value = input_residue_values,
-                isomin=0.05,
+                isomin=0.0,
                 isomax=5,
                 opacity=0.4,
-                surface_count=1,
+                surface_count=3,
                 colorscale='viridis')
         ]
     )
@@ -47,10 +47,10 @@ def plot(sample):
             y=y.flatten(),
             z=z.flatten(),
             value = event_map_values,
-            isomin=0.1,
-            isomax=1,
+            isomin=0.15,
+            isomax=5,
             opacity=0.6,
-            surface_count=2)
+            surface_count=3)
     )
 
     fig_residue_only = go.Figure(
@@ -59,7 +59,7 @@ def plot(sample):
             y=y.flatten(),
             z=z.flatten(),
             value = input_residue_values,
-            isomin=0.5,
+            isomin=0,
             isomax=1,
             opacity=1,
             surface_count=3)
