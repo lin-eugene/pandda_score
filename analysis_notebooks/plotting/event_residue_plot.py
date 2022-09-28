@@ -26,7 +26,7 @@ def plot(sample):
                 isomin=0.05,
                 isomax=5,
                 opacity=0.6,
-                surface_count=3),
+                surface_count=1),
             go.Isosurface(
                 x=x.flatten(),
                 y=y.flatten(),
@@ -35,7 +35,7 @@ def plot(sample):
                 isomin=0.05,
                 isomax=5,
                 opacity=0.4,
-                surface_count=3,
+                surface_count=1,
                 colorscale='viridis')
         ]
     )
@@ -50,7 +50,7 @@ def plot(sample):
             isomin=0.05,
             isomax=0.5,
             opacity=0.6,
-            surface_count=3)
+            surface_count=1)
     )
 
     fig_residue_only = go.Figure(
@@ -62,7 +62,7 @@ def plot(sample):
             isomin=0.05,
             isomax=1,
             opacity=0.6,
-            surface_count=3)
+            surface_count=1)
     )
 
     fig3 = go.Figure(
@@ -75,7 +75,7 @@ def plot(sample):
                 isomin=0.05,
                 isomax=5,
                 opacity=0.6,
-                surface_count=3),
+                surface_count=1),
             go.Isosurface(
                 x=x.flatten(),
                 y=y.flatten(),
@@ -84,7 +84,7 @@ def plot(sample):
                 isomin=0.05,
                 isomax=5,
                 opacity=0.4,
-                surface_count=3,
+                surface_count=1,
                 colorscale='viridis')
         ]
     )
