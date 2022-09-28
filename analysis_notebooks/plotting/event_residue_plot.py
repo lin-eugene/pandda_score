@@ -120,10 +120,10 @@ class ShowMetadata():
         self.chain_name = self.chain.name
 
         row = self.dataframe.loc[self.dataframe['row_idx'] == self.row_idx]
-        self.gt_label = row['labels_remodelled_yes_no'].values()
-        self.pred_label = row['pred_labels'].values()
-        self.res_type = read_residue_name(self.input_residue_name).values()
-        self.pred_probability = row['pred_probabilities'].values()
+        self.gt_label = row['labels_remodelled_yes_no'].tolist()
+        self.pred_label = row['pred_labels'].tolist()
+        self.res_type = read_residue_name(self.input_residue_name).tolist()
+        self.pred_probability = row['pred_probabilities'].tolist()
 
     def show_metadata(self):
         print(f'{self.row_idx=}')
