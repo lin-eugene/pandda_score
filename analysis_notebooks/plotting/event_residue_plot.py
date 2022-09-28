@@ -59,7 +59,7 @@ def plot(sample):
             y=y.flatten(),
             z=z.flatten(),
             value = input_residue_values,
-            isomin=0,
+            isomin=0.15,
             isomax=1,
             opacity=1,
             surface_count=3)
