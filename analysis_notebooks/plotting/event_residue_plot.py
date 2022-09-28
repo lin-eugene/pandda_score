@@ -122,7 +122,7 @@ class ShowMetadata():
         row = self.dataframe.loc[self.dataframe['row_idx'] == self.row_idx]
         self.gt_label = row['labels_remodelled_yes_no'].tolist()
         self.pred_label = row['pred_labels'].tolist()
-        self.res_type = read_residue_name(self.input_residue_name).tolist()
+        self.res_type = read_residue_name(self.input_residue_name)
         self.pred_probability = row['pred_probabilities'].tolist()
 
     def show_metadata(self):
