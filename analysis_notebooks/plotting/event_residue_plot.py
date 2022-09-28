@@ -26,7 +26,7 @@ def plot(sample):
                 isomin=0.05,
                 isomax=5,
                 opacity=0.6,
-                surface_count=1),
+                surface_count=2),
             go.Isosurface(
                 x=x.flatten(),
                 y=y.flatten(),
@@ -47,10 +47,10 @@ def plot(sample):
             y=y.flatten(),
             z=z.flatten(),
             value = event_map_values,
-            isomin=0.05,
-            isomax=0.5,
+            isomin=0.1,
+            isomax=1,
             opacity=0.6,
-            surface_count=1)
+            surface_count=2)
     )
 
     fig_residue_only = go.Figure(
@@ -59,10 +59,10 @@ def plot(sample):
             y=y.flatten(),
             z=z.flatten(),
             value = input_residue_values,
-            isomin=0.05,
+            isomin=0.5,
             isomax=1,
-            opacity=0.6,
-            surface_count=1)
+            opacity=1,
+            surface_count=3)
     )
 
     fig3 = go.Figure(
