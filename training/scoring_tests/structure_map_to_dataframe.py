@@ -76,7 +76,7 @@ if __name__ == '__main__':
 
     args = parser.parse_args()
 
-    df = structure_to_dataframe(args.event_map_path, args.structure_path)
+    df = structure_to_dataframe(args.event_map_path, args.mtz_path, args.structure_path)
     print(df)
 
     print('Done')

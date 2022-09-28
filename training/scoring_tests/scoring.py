@@ -8,11 +8,13 @@ import os
 
 def main(pandda_input_model_path: str,
         pandda_event_map_path: str,
+        mtz_path: str,
         nn_input_model_path: str):
 
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
-    structure_map_frame = structure_to_dataframe(pandda_event_map_path, 
+    structure_map_frame = structure_to_dataframe(pandda_event_map_path,
+                                                mtz_path,
                                                 pandda_input_model_path)
 
     # data setup
@@ -54,9 +56,11 @@ if __name__ == '__main__':
     parser = argparse.ArgumentParser()
     parser.add_argument('-s', '--structure_path', type=str)
     parser.add_argument('-e','--event_map_path', type=str)
+    parser.add_argument('-mtz', '--mtz_path', type=str)
     parser.add_argument('-m', '--nn_model_path', type=str)
     args = parser.parse_args()
 
     main(args.structure_path,
         args.event_map_path,
+        
         args.nn_model_path)
