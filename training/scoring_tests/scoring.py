@@ -62,5 +62,5 @@ if __name__ == '__main__':
 
     main(args.structure_path,
         args.event_map_path,
-        
+        args.mtz_path,
         args.nn_model_path)
