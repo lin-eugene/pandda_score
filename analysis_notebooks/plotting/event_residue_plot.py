@@ -123,6 +123,7 @@ class ShowMetadata():
         self.gt_label = row['labels_remodelled_yes_no']
         self.pred_label = row['pred_labels']
         self.res_type = read_residue_name(self.input_residue_name)
+        self.pred_probability = row['pred_probabilities']
 
     def show_metadata(self):
         print(f'{self.row_idx=}')
@@ -131,6 +132,7 @@ class ShowMetadata():
         print(f'{self.chain_name=}')
         print(f'{self.input_residue_name=}')
         print(f'{self.gt_label=}')
+        print(f'{self.pred_probability=}')
         print(f'{self.pred_label=}')
         print(f'{self.res_type=}')
 
