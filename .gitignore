@@ -10,6 +10,6 @@ training_results/
 .ipynb_checkpoints
 *.pkl
 *.pbs.*
-*coot-history*
+0-coot-history*
 score_examples/
 __pycache__/
