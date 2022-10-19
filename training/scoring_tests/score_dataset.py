@@ -12,6 +12,7 @@ __all__ = ['ResidueDataset',
            'SamplingRandomRotations',
             'ConcatEventResidueToTwoChannels',
             'ToTensor']
+
 class ResidueDataset(Dataset):
     def __init__(self, 
                 residues_dframe: type[pd.DataFrame], 
@@ -63,7 +64,6 @@ class ResidueDataset(Dataset):
         return sample
 
 
-
 class SamplingRandomRotations(object):
     
     """
@@ -110,7 +110,8 @@ class SamplingRandomRotations(object):
                                                                                     vec_rand)
         
         # normalising array values
-        # event_map_array_norm = (event_map_array - np.mean(event_map_array)) / np.std(event_map_array)
+        # Training seems to be unstable at values when values are 0/1
+        # TODO — look into representing atoms as Gaussian spheres?
         input_residue_array = (input_residue_array - 0.5) #normalise to -0.5 to 0.5
         
         return {
@@ -125,9 +126,11 @@ class SamplingRandomRotations(object):
 
 
 class ConcatEventResidueToTwoChannels(object):
+
     """
     Combine event map and input residue into two channels
     """
+
     def __call__(self, sample) -> Dict[str, Union[np.ndarray, List]]:
         event_map_array = sample['event_map']
         input_residue_array = sample['input_residue']

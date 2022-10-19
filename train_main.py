@@ -8,7 +8,8 @@ import argparse
 #PyTorch and Data
 import torch
 import torch.nn as nn
-from torch.utils.data import DataLoader
+from torch.utils.data import DataLoader, TensorDataset,random_split,SubsetRandomSampler, ConcatDataset
+import sklearn.model_selection.Kfold as KFold
 import pandas as pd
 
 #Custom packages
@@ -62,6 +63,86 @@ def train_main(training_csv_path: str,
                                 batch_size=BATCH_SIZE, 
                                 shuffle=True,
                                 num_workers=os.cpu_count())
+
+    # Train model
+    model_results = train(model=model,
+                        train_dataloader=training_dataloader,
+                        test_dataloader=test_dataloader,
+                        optimiser=optimiser,
+                        loss_fn=loss_fn,
+                        epochs=NUM_EPOCHS, 
+                        device=device)
+        
+    return model_results, model
+
+def train_kfold(training_csv_path: str,
+                test_csv_path: str,
+                model: torch.nn.Module,
+                loss_fn: torch.nn.Module,
+                optimiser: torch.optim.Optimizer,
+                BATCH_SIZE: int,
+                NUM_EPOCHS: int,
+                k_folds: int,
+                translation_radius: float,
+                use_mtz=False):
+    
+    training_csv_path = pathlib.Path(training_csv_path).resolve()
+    test_csv_path = pathlib.Path(test_csv_path).resolve()
+    training_dframe = pd.read_csv(training_csv_path)
+    test_dframe = pd.read_csv(test_csv_path)
+
+    #Create dataset
+    training_tsfm = transforms.Compose([
+                        SamplingRandomRotations(translation_radius=translation_radius,
+                                                use_mtz=use_mtz),
+                        ConcatEventResidueToTwoChannels(),
+                        ToTensor(),
+                    ])
+    test_tsfm = transforms.Compose([
+                        SamplingRandomRotations(translation_radius=0, 
+                                                random_rotation=False,
+                                                use_mtz=use_mtz),
+                        ConcatEventResidueToTwoChannels(),
+                        ToTensor()
+                    ])
+
+    training_dataset = ResidueDataset(training_dframe,
+                                    training_tsfm)
+    test_dataset = ResidueDataset(test_dframe, 
+                                test_tsfm)
+
+    dataset = ConcatDataset([training_dataset, test_dataset])
+
+    splits = KFold(nsplits=k_folds, shuffle=True, random_state=42)
+    fold_performance = {}
+
+    for fold, (train_ids, test_ids) in enumerate(splits.split(dataset)):
+        print(f"Fold {fold}")
+        train_subsampler = SubsetRandomSampler(train_ids)
+        test_subsampler = SubsetRandomSampler(test_ids)
+
+        train_loader = DataLoader(dataset, batch_size=BATCH_SIZE, sampler=train_subsampler)
+        test_loader = DataLoader(dataset, batch_size=BATCH_SIZE, sampler=test_subsampler)
+
+        model_results = train(model=model,
+                            train_dataloader=train_loader,
+                            test_dataloader=test_loader,
+                            optimiser=optimiser,
+                            loss_fn=loss_fn,
+                            epochs=NUM_EPOCHS, 
+                            device=device)
+
+        fold_performance[fold] = model_results
+
+    training_dataloader = DataLoader(dataset=training_dataset, 
+                                batch_size=BATCH_SIZE, 
+                                shuffle=True, 
+                                num_workers=os.cpu_count())
+    test_dataloader = DataLoader(dataset=test_dataset, 
+                                batch_size=BATCH_SIZE, 
+                                shuffle=True,
+                                num_workers=os.cpu_count())
+
 
     # Train model
     model_results = train(model=model,

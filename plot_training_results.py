@@ -1,6 +1,6 @@
 import pathlib
 import pickle
-from analysis.model_analysis import plot_loss_curves
+from training.analysis.model_analysis import plot_loss_curves
 import argparse
 
 

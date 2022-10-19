@@ -6,8 +6,8 @@ training_data_paths/
 coot-backup/
 panddascore.egg-info/
 training_results/
-*.idea
-*.ipynb_checkpoints
+.idea
+.ipynb_checkpoints
 *.pkl
 *.pbs.*
 *coot-history*
